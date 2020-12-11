@@ -1,0 +1,23 @@
+{
+  "name": "jukebox",
+  "version": "1.0.0",
+  "description": "Programa JukeBox",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon --inspect ./index.js"
+  },
+  "keywords": [
+    "JukeBox",
+    "Musicas",
+    "Diversão",
+    "Festas"
+  ],
+  "author": "Raphael Mesquita",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "music-metadata": "^7.5.1",
+    "web-audio-player": "^1.3.3"
+  }
+}

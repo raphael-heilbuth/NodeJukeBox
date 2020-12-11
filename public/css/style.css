@@ -1,0 +1,24 @@
+.tooltip-letra {
+    min-width: 150px;
+    margin-bottom: 12px;
+}
+
+.tooltip-inner-letra {
+    font-size: 80px;
+    background-color: #00000070;
+}
+
+.img-capa {
+    width: 500px;
+    height: 500px;
+    border: 1px solid rgba(0,0,0,.1);
+    border-radius: 3px;
+}
+
+.list-album {
+    width: 500px;
+    height: 500px;
+    max-height: 500px;
+    max-width: 500px;
+    display: none;    
+}

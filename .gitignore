@@ -1,3 +1,9 @@
+# Capas
+public/image/capas/*.jpg
+
+# Config
+config.json
+
 # Logs
 logs
 *.log
