@@ -16,6 +16,9 @@ $.get( "/getList", function(data) {
     buttons: true,
     loop: true,
     fadeIn: 0,
+    start: 0,
+    buttonPrev: 'Anterior',
+    buttonNext: 'Próxima',
     onItemSwitch: function(currentItem, previousItem) {
         let letra = removerAcentos($(currentItem).attr('data-flip-title').substr(0, 1));
         if (letraAnt !== letra) {
@@ -40,7 +43,24 @@ $(document).on('click', '.flipster__item--current', function() {
     listaMusicaArtista.empty();
 
     $.each(listaMusicas[artista], function(index){
-        listaMusicaArtista.append('<li class="list-group-item item-musica" data-artista="'+artista+'" data-musica="'+index+'">'+index+'</li>');
+        let item = '<li class="list-group-item item-musica" data-artista="'+artista+'" data-musica="'+index+'">' +
+                   '   <div class="form-row">' +
+                   '        <div class="col">' +
+                   '            '+index+
+                   '        </div>' +
+                   '        <div class="col-auto">' +
+                   '            04:32' +
+                   '        </div>' +
+                   '        <div class="col-1">' +
+                   '            <div class="progress" style="height: 5px;margin-top: 10px;">' +
+                   '                <div class="progress-bar" role="progressbar" style="width: 15%" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100"></div>' +
+                   '                <div class="progress-bar bg-success" role="progressbar" style="width: 30%" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"></div>' +                   
+                   '            </div>' +
+                   '        </div>' +
+                   '   <div>' +
+                   '</li>';
+
+        listaMusicaArtista.append(item);
     });    
 });
 
@@ -79,6 +99,7 @@ function removerAcentos(newStringComAcento) {
 $(document).on('click', '.item-musica', function () {
     let artista = $(this).attr('data-artista'),
         musica = $(this).attr('data-musica');
+
     $.get('/playMusic?artista='+artista+'&musica='+musica, function(response){
         var audioSrc = 'data:audio/mp3;base64,' + response.fileContent;
 
