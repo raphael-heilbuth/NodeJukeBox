@@ -23,9 +23,7 @@ app.get("/getList", function(req, res){
 app.get("/playMusic", function(req, res){
     var fs = require('fs');
     var returnData = {};
-
-    console.log(req.query.musica);
-
+    
     fs.readFile(musicFolder+'/'+req.query.artista+'/'+req.query.musica, function(err, file){
         var base64File = new  Buffer.from(file, 'binary').toString('base64');
 

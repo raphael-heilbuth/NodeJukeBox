@@ -1,37 +1,47 @@
 let audio = new Audio();
-$.get( "/getList", function( data ) {
-  loadFile();
-  let list = $('.flip-items');
+let listaMusicas;
+$.get( "/getList", function(data) {
+    listaMusicas = data;
 
-  $.each(data,function(index, value){
-    list.append('<li data-flip-title="' + index + '"><img src="../public/image/capas/'+index+'.jpg" class="img-capa"></li>');
-  });
+    let list = $('.flip-items');
 
-let letraAnt = '';
-let coverflow = $("#coverflow").flipster({
-  style: 'carousel',    
-  spacing: -0.15,
-  buttons: true,
-  loop: true,
-  fadeIn: 0,
-  onItemSwitch: function(currentItem, previousItem) {
-    let letra = removerAcentos($(currentItem).attr('data-flip-title').substr(0, 1));
-    if (letraAnt !== letra) {
-      letraAnt = letra;
-      let tooltips = $('.line-cover-flow').tooltip({
-        title: letraAnt,
-        template: '<div class="tooltip tooltip-letra" role="tooltip"><div class="tooltip-inner tooltip-inner-letra"></div></div>'
-      }).tooltip('show');
+    $.each(data,function(index){
+        list.append('<li data-flip-title="' + index + '"><img src="../public/image/capas/'+index+'.jpg" class="img-capa"></li>');
+    });
 
-      setTimeout(function() {
-        tooltips.tooltip('dispose');
-      }, 1000);
-    }          
-  }
-});        
-});      
+    let letraAnt = '';
+    let coverflow = $("#coverflow").flipster({
+    style: 'carousel',    
+    spacing: -0.15,
+    buttons: true,
+    loop: true,
+    fadeIn: 0,
+    onItemSwitch: function(currentItem, previousItem) {
+        let letra = removerAcentos($(currentItem).attr('data-flip-title').substr(0, 1));
+        if (letraAnt !== letra) {
+        letraAnt = letra;
+        let tooltips = $('.line-cover-flow').tooltip({
+            title: letraAnt,
+            template: '<div class="tooltip tooltip-letra" role="tooltip"><div class="tooltip-inner tooltip-inner-letra"></div></div>'
+        }).tooltip('show');
+
+        setTimeout(function() {
+            tooltips.tooltip('dispose');
+        }, 1000);
+        }          
+    }
+    });        
+});  
+
 $(document).on('click', '.flipster__item--current', function() {
-  alert($(this).attr('data-flip-title'));
+    let listaMusicaArtista = $('#list'),
+        artista = $(this).attr('data-flip-title');
+
+    listaMusicaArtista.empty();
+
+    $.each(listaMusicas[artista], function(index){
+        listaMusicaArtista.append('<li class="list-group-item item-musica" data-artista="'+artista+'" data-musica="'+index+'">'+index+'</li>');
+    });    
 });
 
 /**
@@ -39,7 +49,7 @@ $(document).on('click', '.flipster__item--current', function() {
  * @param  {String} stringComAcento [string que contem os acentos]
  * @return {String}                 [string sem acentos]
  */
-function removerAcentos( newStringComAcento ) {
+function removerAcentos(newStringComAcento) {
   var string = newStringComAcento;
   var mapaAcentosHex 	= {
     a : /[\xE0-\xE6]/g,
@@ -66,13 +76,16 @@ function removerAcentos( newStringComAcento ) {
   return string;
 }
 
-function loadFile(){
-  $.get('/playMusic?artista=Adele&musica=13. Adele - Chasing Pavements.mp3', function(response){
+$(document).on('click', '.item-musica', function () {
+    let artista = $(this).attr('data-artista'),
+        musica = $(this).attr('data-musica');
+    $.get('/playMusic?artista='+artista+'&musica='+musica, function(response){
         var audioSrc = 'data:audio/mp3;base64,' + response.fileContent;
+
+        audio.volume = 0.1
 
         audio.src = audioSrc;
         audio.load();
         audio.play();
     });
-
-}
+});
