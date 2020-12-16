@@ -1,3 +1,4 @@
+const { json } = require('express');
 var express = require('express')
 var app = express()
 const mm = require('music-metadata');
@@ -17,7 +18,11 @@ app.listen(8000, function () {
 })
 
 app.get("/getList", function(req, res){
-    res.json(RetornaMusicas());
+    let json = RetornaMusicas();
+    json["Youtube"] = {"Pesquisar" : ""};
+    json["TOP"] = {"Top 10" : "", "Top 20" : "", "Top 30" : "", "Top 40" : "", "Top 50" : "", "Top 100" : ""};
+    json["Random"] = {"Random 1" : "", "Random 3" : "", "Random 5" : "", "Random 10" : ""};
+    res.json(json);
 });
 
 app.get("/playMusic", function(req, res){

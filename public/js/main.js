@@ -6,7 +6,16 @@ $.get( "/getList", function(data) {
     let list = $('.flip-items');
 
     $.each(data,function(index){
-        list.append('<li data-flip-title="' + index + '"><img src="../public/image/capas/'+index+'.jpg" class="img-capa"></li>');
+        switch (index) {
+            case 'Youtube':
+            case 'TOP':
+            case 'Random':
+                list.append('<li data-flip-title="' + index + '"><img src="../public/image/default/'+index+'.jpg" class="img-capa"></li>');
+                break;
+            default:
+                list.append('<li data-flip-title="' + index + '"><img src="../public/image/capas/'+index+'.jpg" class="img-capa"></li>');
+                break;
+        }        
     });
 
     let letraAnt = '';
