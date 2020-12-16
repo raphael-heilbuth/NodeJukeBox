@@ -116,14 +116,17 @@ $(document).on('click', '.item-musica', function () {
 
     $.get('/playMusic?artista='+artista+'&musica='+musica, function(response){
         carregando.addClass('d-none');
-        info.removeClass('d-none');
-        var audioSrc = 'data:audio/mp3;base64,' + response.fileContent;
 
-        audio.volume = 0.1
+        if (response.success) {
+            info.removeClass('d-none');
+            var audioSrc = 'data:audio/mp3;base64,' + response.fileContent;
 
-        audio.src = audioSrc;
-        audio.load();
-        audio.play();
+            audio.volume = 0.1
+
+            audio.src = audioSrc;
+            audio.load();
+            audio.play();
+        }
     });
 });
 

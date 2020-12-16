@@ -30,10 +30,14 @@ app.get("/playMusic", function(req, res){
     var returnData = {};
     
     fs.readFile(musicFolder+'/'+req.query.artista+'/'+req.query.musica, function(err, file){
-        var base64File = new  Buffer.from(file, 'binary').toString('base64');
+        if (err) {
+            returnData.success = false;
+        } else {
+            var base64File = new  Buffer.from(file, 'binary').toString('base64');
 
-        returnData.fileContent = base64File;
-
+            returnData.success = true;
+            returnData.fileContent = base64File;
+        }
         res.json(returnData);
     });
 });
