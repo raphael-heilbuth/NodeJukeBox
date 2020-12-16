@@ -22,3 +22,11 @@
     max-width: 500px;
     display: none;    
 }
+
+#music-time {
+    margin-top: 6px;
+}
+
+.music-progress-bar {
+    height: 11px;
+}
