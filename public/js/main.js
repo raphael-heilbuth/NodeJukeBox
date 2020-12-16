@@ -98,9 +98,16 @@ function removerAcentos(newStringComAcento) {
 
 $(document).on('click', '.item-musica', function () {
     let artista = $(this).attr('data-artista'),
-        musica = $(this).attr('data-musica');
+        musica = $(this).attr('data-musica'),
+        carregando = $('#music-carregando'),
+        info = $('#music-info');
+
+        carregando.removeClass('d-none');
+        info.addClass('d-none');
 
     $.get('/playMusic?artista='+artista+'&musica='+musica, function(response){
+        carregando.addClass('d-none');
+        info.removeClass('d-none');
         var audioSrc = 'data:audio/mp3;base64,' + response.fileContent;
 
         audio.volume = 0.1
@@ -110,3 +117,20 @@ $(document).on('click', '.item-musica', function () {
         audio.play();
     });
 });
+
+audio.addEventListener('timeupdate', () => {
+    $('#music-bar').width(((audio.currentTime * 100) / audio.duration) + '%');
+    $('#music-time').html(display(audio.currentTime) + '/' + display(audio.duration));
+});
+
+audio.addEventListener('ended', () => {
+    $('#music-info').addClass('d-none');
+});
+
+function display (seconds) {
+    const format = val => `0${Math.floor(val)}`.slice(-2)
+    const hours = seconds / 3600
+    const minutes = (seconds % 3600) / 60
+  
+    return ( Math.trunc(hours) > 0 ? [hours, minutes, seconds % 60] : [minutes, seconds % 60]).map(format).join(':')
+  }

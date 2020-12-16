@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
     <link href="../public/css/lib/jquery.flipster/jquery.flipster.min.css" rel='stylesheet'>
     <link href="../public/css/style.css" rel='stylesheet'>
 
@@ -20,6 +20,12 @@
             <ul class="flip-items">
                 <li data-flip-title="Youtube">
                   <img src="../public/image/default/youtube.jpg" class="img-capa">
+                </li>
+                <li data-flip-title="TOP">
+                  <img src="../public/image/default/top.jpg" class="img-capa">
+                </li>
+                <li data-flip-title="Rando">
+                  <img src="../public/image/default/random.png" class="img-capa">
                 </li>                
             </ul>
           </div>
@@ -30,8 +36,10 @@
         <div class="col-3">
           <div class="card">
             <div class="card-header">
-              Anteriores
+              Musicas
             </div>
+            <ul id="list" class="list-group list-group-flush">
+            </ul>
           </div>
         </div>
         <div class="col">
@@ -39,8 +47,17 @@
             <div class="card-header">
               Atual
             </div>
-            <ul id="list" class="list-group list-group-flush">
-            </ul>
+            <div class="card-body">
+              <div id="music-carregando" class="text-center d-none">
+                <div class="spinner-border" role="status">
+                  <span class="sr-only">Loading...</span>
+                </div>
+              </div>
+              <div id="music-info" class="progress position-relative d-none">                
+                <div id="music-bar" class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                <small id="music-time" class="justify-content-center d-flex position-absolute w-100"></small>            
+              </div>
+            </div>
           </div>          
         </div>
         <div class="col-3">
@@ -55,8 +72,8 @@
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="../public/js/jquery.min.js"></script>    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" integrity="sha384-w1Q4orYjBQndcko6MimVbzY0tgp4pWB4lZ7lr30WKz0vr/aWKhXdBNmNb5D92v7s" crossorigin="anonymous"></script>
     <script src="../public/js/lib/jquery.flipster/jquery.flipster.min.js"></script>
     <script src="../public/js/main.js"></script>
   </body>
