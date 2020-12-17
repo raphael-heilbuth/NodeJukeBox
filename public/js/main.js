@@ -45,6 +45,29 @@ $.get( "/getList", function(data) {
     });
 });
 
+function RetornaMusica(artista, index, duracao= null, idMusica = null, capa= null, excluir = false) {
+    let item = '<li class="list-group-item item-musica ' + (excluir ? 'item-exclude' : '') + '" data-artista="' + artista + '" data-musica="' + index + '" data-id-musica="' + idMusica + '" data-capa="' + capa + '">' +
+        '   <div class="form-row">' +
+        '        <div class="col">' +
+        '            ' + index +
+        '        </div>' +
+        '        <div class="col-auto">' +
+        '            ' + duracao +
+        '        </div>';
+        if (!excluir) {
+            item += '        <div class="col-1">' +
+            '            <div class="progress" style="height: 5px;margin-top: 10px;">' +
+            '                <div class="progress-bar" role="progressbar" style="width: 15%" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100"></div>' +
+            '                <div class="progress-bar bg-success" role="progressbar" style="width: 30%" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"></div>' +
+            '            </div>' +
+            '        </div>';
+        }
+        item += '   <div>' +
+        '</li>';
+
+        return item;
+}
+
 $(document).on('click', '.flipster__item--current', function() {
     let listaMusicaArtista = $('#list'),
         artista = $(this).attr('data-flip-title');
@@ -52,22 +75,7 @@ $(document).on('click', '.flipster__item--current', function() {
     listaMusicaArtista.empty();
 
     $.each(listaMusicas[artista], function(index){
-        let item = '<li class="list-group-item item-musica" data-artista="'+artista+'" data-musica="'+index+'">' +
-            '   <div class="form-row">' +
-            '        <div class="col">' +
-            '            '+index+
-            '        </div>' +
-            '        <div class="col-auto">' +
-            '            04:32' +
-            '        </div>' +
-            '        <div class="col-1">' +
-            '            <div class="progress" style="height: 5px;margin-top: 10px;">' +
-            '                <div class="progress-bar" role="progressbar" style="width: 15%" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100"></div>' +
-            '                <div class="progress-bar bg-success" role="progressbar" style="width: 30%" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"></div>' +
-            '            </div>' +
-            '        </div>' +
-            '   <div>' +
-            '</li>';
+        let item = RetornaMusica(artista, index);
 
         listaMusicaArtista.append(item);
     });
@@ -105,32 +113,76 @@ function removerAcentos(newStringComAcento) {
     return string;
 }
 
+$(document).on('keydown', '#pesquisa-youtube', function() {
+    let query = $(this).val();
+
+    $('.item-exclude').remove();
+
+    $.get("/buscaYoutube?busca=" + encodeURI(query),function (retornoLista){
+        $.each(retornoLista, function(index, value) {
+            $('#list').append(RetornaMusica('Youtube', value["Titulo"], value["Duracao"], value["IdMusica"], value["Capa"], true));
+        })
+    });
+});
+
 $(document).on('click', '.item-musica', function () {
     let artista = $(this).attr('data-artista'),
         musica = $(this).attr('data-musica'),
+        idMusica = $(this).attr('data-id-musica'),
+        imageCapa = $(this).attr('data-capa'),
         carregando = $('#music-carregando'),
         info = $('#music-info');
 
-    carregando.removeClass('d-none');
     info.addClass('d-none');
 
-    $.get('/playMusic?artista='+artista+'&musica='+musica, function(response){
-        carregando.addClass('d-none');
+    switch(artista) {
+        case 'Youtube':
+            switch (musica) {
+                case 'Pesquisar':
+                    if ($('#pesquisa-youtube').length === 0) {
+                        $(this).append('<input class="form-control col-auto" id="pesquisa-youtube">');
+                    }
+                    break;
+                default:
+                    carregando.removeClass('d-none');
+                    info.removeClass('d-none');
+                    $('.background-image').css('background-image', 'url(' + imageCapa + ')');
 
-        if (response.success) {
-            let imageUrl = '../public/image/capas/' + encodeURIComponent(artista) + '.jpg',
-                audioSrc = 'data:audio/mp3;base64,' + response.fileContent;
+                    fetch("/tocaYoutube?IdMusica=" + encodeURI(idMusica))
+                        .then(res => {return res.blob()})
+                        .then(blob => {
+                            carregando.addClass('d-none');
+                            info.removeClass('d-none');
 
-            info.removeClass('d-none');
-            $('.background-image').css('background-image', 'url(' + imageUrl + ')');
+                            audio.src = URL.createObjectURL(blob);
+                            audio.volume = 0.1
 
-            audio.volume = 0.1
+                            audio.load();
+                            audio.play();
+                        })
+                    break;
+            }
+            break;
+        default:
+            $.get('/playMusic?artista='+artista+'&musica='+musica, function(response){
+                carregando.addClass('d-none');
 
-            audio.src = audioSrc;
-            audio.load();
-            audio.play();
-        }
-    });
+                if (response.success) {
+                    let imageUrl = '../public/image/capas/' + encodeURIComponent(artista) + '.jpg',
+                        audioSrc = 'data:audio/mp3;base64,' + response.fileContent;
+
+                    info.removeClass('d-none');
+                    $('.background-image').css('background-image', 'url(' + imageUrl + ')');
+
+                    audio.volume = 0.1
+
+                    audio.src = audioSrc;
+                    audio.load();
+                    audio.play();
+                }
+            });
+            break;
+    }
 });
 
 audio.addEventListener('timeupdate', () => {
@@ -153,26 +205,6 @@ function display (seconds) {
 
     return ( Math.trunc(hours) > 0 ? [hours, minutes, seconds % 60] : [minutes, seconds % 60]).map(format).join(':')
   }
-
-  //APENAS PRA EXEMPLIFICAR COMO VAI CHAMAR A MÚSICA QUE VAI TOCAR
-  $(document).on('click','#youtube-playSelecionada',function (){
-      //pode se passar duas informações pra tocar, o ID da musica ou a URL da musica, qualquer uma doas duas a função reproduz
-      fetch("/tocaYoutube?IdMusica=" + encodeURI(this.val()))
-          .then(res => {return res.blob()})
-          .then(blob => {
-              audio.src = URL.createObjectURL(blob);
-              // audio.play();
-          })
-  });
-
-//APENAS PARA EXEMPLIFICAR COMO CHAMAR A BUSCA DE MÚSICAS
-$(document).on('click',"#youtube-buscaMusica",function (){
-
-    $.get("/buscaYoutube?busca=" + encodeURI(this.val()),function (retornoLista){
-        //JSON COM LISTA DAS 5 MÚSICAS BUSCADAS
-        console.log(retornoLista);
-    });
-})
 
 
         var context = new AudioContext();
@@ -207,7 +239,7 @@ $(document).on('click',"#youtube-buscaMusica",function (){
             x = 0;
 
             analyser.getByteFrequencyData(dataArray);
-            ctx.fillStyle = "rgba(255,255,255,0.5)";
+            ctx.fillStyle = "rgb(255,255,255)";
 
             ctx.fillRect(0, 0, WIDTH, HEIGHT);
 
