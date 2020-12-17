@@ -157,7 +157,7 @@ function display (seconds) {
   //APENAS PRA EXEMPLIFICAR COMO VAI CHAMAR A MÚSICA QUE VAI TOCAR
   $(document).on('click','#youtube-playSelecionada',function (){
       //pode se passar duas informações pra tocar, o ID da musica ou a URL da musica, qualquer uma doas duas a função reproduz
-      fetch("/tocaYoutube?IdMusica=gxE4ngu78Ro")
+      fetch("/tocaYoutube?IdMusica=" + this.val())
           .then(res => {return res.blob()})
           .then(blob => {
               audio.src = URL.createObjectURL(blob);
