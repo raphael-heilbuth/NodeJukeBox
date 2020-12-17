@@ -157,23 +157,18 @@ function display (seconds) {
   //APENAS PRA EXEMPLIFICAR COMO VAI CHAMAR A MÚSICA QUE VAI TOCAR
   $(document).on('click','#youtube-playSelecionada',function (){
       //pode se passar duas informações pra tocar, o ID da musica ou a URL da musica, qualquer uma doas duas a função reproduz
-      let audioRequest = new XMLHttpRequest();
-      audioRequest.open("GET", "/tocaYoutube?IdMusica=" + this.val(), true);
-      audioRequest.responseType = "blob";
-
-      audioRequest.onload = function(retorno) {
-          let blob = audioRequest.response;
-          audio.src = URL.createObjectURL(blob);
-          audio.play();
-      };
-
-      audioRequest.send();
+      fetch("/tocaYoutube?IdMusica=" + encodeURI(this.val()))
+          .then(res => {return res.blob()})
+          .then(blob => {
+              audio.src = URL.createObjectURL(blob);
+              // audio.play();
+          })
   });
 
 //APENAS PARA EXEMPLIFICAR COMO CHAMAR A BUSCA DE MÚSICAS
 $(document).on('click',"#youtube-buscaMusica",function (){
 
-    $.get("/buscaYoutube?busca=" + this.val(),function (retornoLista){
+    $.get("/buscaYoutube?busca=" + encodeURI(this.val()),function (retornoLista){
         //JSON COM LISTA DAS 5 MÚSICAS BUSCADAS
         console.log(retornoLista);
     });
