@@ -13,20 +13,12 @@
     <title>NodeJukeBox!</title>
   </head>
   <body>
+    <div class="background-image"></div>
     <div class="container-fluid">
       <div class="form-row mt-5">
         <div class="col">
           <div id="coverflow">
-            <ul class="flip-items">
-                <li data-flip-title="Youtube">
-                  <img src="../public/image/default/youtube.jpg" class="img-capa">
-                </li>
-                <li data-flip-title="TOP">
-                  <img src="../public/image/default/top.jpg" class="img-capa">
-                </li>
-                <li data-flip-title="Rando">
-                  <img src="../public/image/default/random.png" class="img-capa">
-                </li>                
+            <ul class="flip-items">             
             </ul>
           </div>
         </div>
@@ -53,8 +45,8 @@
                   <span class="sr-only">Loading...</span>
                 </div>
               </div>
-              <div id="music-info" class="progress position-relative d-none">                
-                <div id="music-bar" class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+              <div id="music-info" class="progress position-relative music-progress-bar d-none">                
+                <div id="music-bar" class="progress-bar" role="progressbar" style="width: 0" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
                 <small id="music-time" class="justify-content-center d-flex position-absolute w-100"></small>            
               </div>
             </div>

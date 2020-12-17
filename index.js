@@ -1,3 +1,4 @@
+const { json } = require('express');
 var express = require('express')
 var app = express()
 const mm = require('music-metadata');
@@ -23,7 +24,11 @@ app.listen(8000, function () {
 })
 
 app.get("/getList", function(req, res){
-    res.json(RetornaMusicas());
+    let json = RetornaMusicas();
+    json["Youtube"] = {"Pesquisar" : ""};
+    json["TOP"] = {"Top 10" : "", "Top 20" : "", "Top 30" : "", "Top 40" : "", "Top 50" : "", "Top 100" : ""};
+    json["Random"] = {"Random 1" : "", "Random 3" : "", "Random 5" : "", "Random 10" : ""};
+    res.json(json);
 });
 
 app.get("/playMusic", function(req, res){
@@ -31,10 +36,14 @@ app.get("/playMusic", function(req, res){
     var returnData = {};
     
     fs.readFile(musicFolder+'/'+req.query.artista+'/'+req.query.musica, function(err, file){
-        var base64File = new  Buffer.from(file, 'binary').toString('base64');
+        if (err) {
+            returnData.success = false;
+        } else {
+            var base64File = new  Buffer.from(file, 'binary').toString('base64');
 
-        returnData.fileContent = base64File;
-
+            returnData.success = true;
+            returnData.fileContent = base64File;
+        }
         res.json(returnData);
     });
 });
