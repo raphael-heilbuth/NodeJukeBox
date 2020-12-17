@@ -52,6 +52,13 @@ app.get("/tocaYoutube",function (req,res){
     ytdl(req.query.IdMusica, {filter: 'audioonly', highWaterMark: 1 << 25}).pipe(res);
 });
 
+app.get("/buscaYoutube",function (req,res){
+    retornaMusicaYoutube(req.query.busca)
+        .then(listaYoutube =>{
+            res.json(listaYoutube);
+        })
+});
+
 function RetornaMusicas() {        
     const fs = require('fs');
     const path = require('path');

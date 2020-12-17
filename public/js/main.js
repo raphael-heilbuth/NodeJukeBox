@@ -169,3 +169,12 @@ function display (seconds) {
 
       audioRequest.send();
   });
+
+//APENAS PARA EXEMPLIFICAR COMO CHAMAR A BUSCA DE MÚSICAS
+$(document).on('click',"#youtube-buscaMusica",function (){
+
+    $.get("/buscaYoutube?busca=" + this.val(),function (retornoLista){
+        //JSON COM LISTA DAS 5 MÚSICAS BUSCADAS
+        console.log(retornoLista);
+    });
+})
