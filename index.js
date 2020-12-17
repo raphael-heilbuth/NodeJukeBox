@@ -4,9 +4,15 @@ const mm = require('music-metadata');
 const util = require('util');
 const configuracao = require("./config.json");
 const musicFolder = configuracao.FolderMusic;
+const ytdl = require('ytdl-core');
+const youtubeSearch = require('youtube-sr');
+const bodyParser = require("body-parser");
 
 app.use(express.static(__dirname + '/views'));
 app.use(express.static(__dirname + '/'));
+
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 app.get('/', function (req, res) {
     res.render('index');
@@ -31,6 +37,10 @@ app.get("/playMusic", function(req, res){
 
         res.json(returnData);
     });
+});
+
+app.get("/tocaYoutube",function (req,res){
+    ytdl(req.query.IdMusica, {filter: 'audioonly', highWaterMark: 1 << 25}).pipe(res);
 });
 
 function RetornaMusicas() {        
@@ -76,3 +86,22 @@ function RetornaMetaData(file) {
         reject(console.error(err.message));
     });
 }
+
+const retornaMusicaYoutube = (busca) => new Promise((success,reject) => {
+    youtubeSearch.search(busca, {limit: 5})
+        .then(x => {
+
+            let listaBuscas = x.map(json => {
+              return {
+                  'IdMusica' : json["id"],
+                  'Url' : json["url"],
+                  'Titulo' : json["title"],
+                  'Duracao' : json["durationFormatted"],
+                  'Capa' : json["thumbnail"]["url"]
+                }
+            });
+
+            success(listaBuscas);
+        })
+        .catch(err => reject(err));
+});

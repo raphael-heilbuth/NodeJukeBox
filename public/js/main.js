@@ -134,3 +134,19 @@ function display (seconds) {
   
     return ( Math.trunc(hours) > 0 ? [hours, minutes, seconds % 60] : [minutes, seconds % 60]).map(format).join(':')
   }
+
+  //APENAS PRA EXEMPLIFICAR COMO VAI CHAMAR A MÚSICA QUE VAI TOCAR
+  $(document).on('click','#youtube-playSelecionada',function (){
+      //pode se passar duas informações pra tocar, o ID da musica ou a URL da musica, qualquer uma doas duas a função reproduz
+      let audioRequest = new XMLHttpRequest();
+      audioRequest.open("GET", "/tocaYoutube?IdMusica=" + this.val(), true);
+      audioRequest.responseType = "blob";
+
+      audioRequest.onload = function(retorno) {
+          let blob = audioRequest.response;
+          audio.src = URL.createObjectURL(blob);
+          audio.play();
+      };
+
+      audioRequest.send();
+  });
