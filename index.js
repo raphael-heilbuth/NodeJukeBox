@@ -1,6 +1,6 @@
 const { json } = require('express');
-var express = require('express')
-var app = express()
+const express = require('express');
+const app = express();
 const mm = require('music-metadata');
 const util = require('util');
 const configuracao = require("./config.json");
