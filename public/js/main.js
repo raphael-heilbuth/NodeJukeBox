@@ -130,9 +130,24 @@ function removerAcentos(newStringComAcento) {
 function RetornaMusica(artista, index, duracao = null, idMusica = null, capa = null, excluir = false) {
     let item = '<li class="list-group-item item-musica ' + (excluir ? 'item-exclude' : '') + '" data-artista="' + artista + '" data-musica="' + index + '" data-id-musica="' + idMusica + '" data-capa="' + capa + '" data-duracao="'+duracao+'">' +
         '   <div class="form-row">' +
-        '        <div class="col">' +
-        '            ' + index +
-        '        </div>' +
+        '        <div class="col">';
+
+    switch (artista) {
+        case "Youtube":
+            item += '            <i class="fab fa-youtube"></i>&nbsp;' + index;
+            break;
+        case "Random":
+            item += '            <i class="fas fa-random"></i>&nbsp;' + index;
+            break;
+        case "TOP":
+            item += '            <i class="fas fa-chevron-circle-up"></i>&nbsp;' + index;
+            break;
+        default:
+            item += '            <i class="fas fa-compact-disc"></i>&nbsp;' + index;
+            break;
+    }
+
+    item += '        </div>' +
         '        <div class="col-auto">' +
         '            ' + duracao +
         '        </div>';
@@ -233,6 +248,9 @@ function executaMusica(elemento, artista, musica, duracao, imageCapa, idMusica) 
 
                         info.removeClass('d-none');
                         $('.background-image').css('background-image', 'url(' + imageUrl + ')');
+                        $('.capa-atual').attr("src", imageUrl);
+                        $('#title-musica').html('<i class="fas fa-compact-disc"></i>&nbsp;' + musica);
+                        $('#artista-musica').html(artista);
 
                         audio.volume = 0.1
 
