@@ -10,6 +10,7 @@ const youtubeSearch = require('youtube-sr');
 const bodyParser = require("body-parser");
 const fs = require('fs');
 const path = require('path');
+const abrirnavegador = require('open')
 
 app.use(express.static(__dirname + '/views'));
 app.use(express.static(__dirname + '/'));
@@ -22,7 +23,7 @@ app.get('/', function (req, res) {
 })
 
 app.listen(8000, function () {
-  console.log('Example app listening on port 8000!')
+  console.log('Rodando na porta 8000')
 })
 
 app.get("/getList", function(req, res){
@@ -119,3 +120,5 @@ const retornaMusicaYoutube = (busca) => new Promise((success,reject) => {
         })
         .catch(err => reject(err));
 });
+
+abrirnavegador('http://localhost:8000');
