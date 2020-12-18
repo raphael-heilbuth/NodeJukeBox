@@ -8,6 +8,8 @@ const musicFolder = configuracao.FolderMusic;
 const ytdl = require('ytdl-core');
 const youtubeSearch = require('youtube-sr');
 const bodyParser = require("body-parser");
+const fs = require('fs');
+const path = require('path');
 
 app.use(express.static(__dirname + '/views'));
 app.use(express.static(__dirname + '/'));
@@ -32,14 +34,13 @@ app.get("/getList", function(req, res){
 });
 
 app.get("/playMusic", function(req, res){
-    var fs = require('fs');
-    var returnData = {};
+    let returnData = {};
     
     fs.readFile(musicFolder+'/'+req.query.artista+'/'+req.query.musica, function(err, file){
         if (err) {
             returnData.success = false;
         } else {
-            var base64File = new  Buffer.from(file, 'binary').toString('base64');
+            let base64File = new  Buffer.from(file, 'binary').toString('base64');
 
             returnData.success = true;
             returnData.fileContent = base64File;
@@ -59,10 +60,7 @@ app.get("/buscaYoutube",function (req,res){
         })
 });
 
-function RetornaMusicas() {        
-    const fs = require('fs');
-    const path = require('path');
-
+function RetornaMusicas() {
     function readDir(dir){
         let struct = {}
 
