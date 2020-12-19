@@ -103,6 +103,14 @@ jQuery(function () {
         audio.volume = $(this).val();
     });
 
+    $('.musica-pause').on('click', function() {
+        audio.paused ? audio.play() : audio.pause();
+    });
+
+    $('.musica-proxima').on('click', function() {
+        audio.currentTime = audio.duration;
+    });
+
     audio.addEventListener('volumechange', () => {
         $('#ranger-volume').val(audio.volume);
         if (audio.volume === 0) {
@@ -220,7 +228,7 @@ function ItemProximaMusica(artista, musica, duracao, idMusica, imageCapa) {
     };
 }
 
-function    executaMusica(elemento, artista, musica, duracao, imageCapa, idMusica) {
+function executaMusica(elemento, artista, musica, duracao, imageCapa, idMusica) {
     let carregando = $('#music-carregando'),
         info = $('#music-info');
 
