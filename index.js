@@ -64,7 +64,7 @@ app.get("/buscaYoutube",function (req,res){
 app.get("/randomMusica", function (req, res) {
     let random = [];
 
-    for (let i = 0; i < parseInt(req.query.Quantida.replace("Random", "")); i++) {
+    for (let i = 0; i < parseInt(req.query.Quantidade.replace("Random", "")); i++) {
         let artista = Object.keys(listaMusicas)[getRandomInteger(Object.keys(listaMusicas).length)],
             musica = Object.keys(listaMusicas[artista])[getRandomInteger(Object.keys(listaMusicas[artista]).length)],
             item = {

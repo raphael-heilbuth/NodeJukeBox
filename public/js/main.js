@@ -4,6 +4,9 @@ let audio = new Audio(),
 
 jQuery(function () {
     "use strict";
+    audio.volume = 0.1;
+    $('#ranger-volume').val(audio.volume);
+
     $.get("/getList", function (data) {
         listaMusicas = data;
 
@@ -96,9 +99,30 @@ jQuery(function () {
         ExecutaProxima();
     });
 
-    audio.addEventListener('volumechange', () => {
-        alert(audio.volume);
+    $("#ranger-volume").on('change', function(){
+        audio.volume = $(this).val();
     });
+
+    audio.addEventListener('volumechange', () => {
+        $('#ranger-volume').val(audio.volume);
+        if (audio.volume === 0) {
+            $('.icon-volume').removeClass('fa-volume-down').removeClass('fa-volume-up').addClass('fa-volume-off');
+        } else if (audio.volume >= 0.5) {
+            $('.icon-volume').removeClass('fa-volume-off').removeClass('fa-volume-down').addClass('fa-volume-up');
+        } else {
+            $('.icon-volume').removeClass('fa-volume-off').removeClass('fa-volume-up').addClass('fa-volume-down');
+        }
+    });
+
+    setInterval(() => {
+        if (audio.paused) {
+            $.get("/randomMusica?Quantidade=1", function (response) {
+                $.each(response, function(index, value) {
+                    executaMusica(null, value["Artista"], value["Musica"], null, null, null, null);
+                });
+            });
+        }        
+    }, 240000);
 });
 
 function removerAcentos(newStringComAcento) {
@@ -196,13 +220,13 @@ function ItemProximaMusica(artista, musica, duracao, idMusica, imageCapa) {
     };
 }
 
-function executaMusica(elemento, artista, musica, duracao, imageCapa, idMusica) {
+function    executaMusica(elemento, artista, musica, duracao, imageCapa, idMusica) {
     let carregando = $('#music-carregando'),
         info = $('#music-info');
 
     switch (artista) {
         case 'Random': {
-            $.get("/randomMusica?Quantida=" + musica, function (response) {
+            $.get("/randomMusica?Quantidade=" + musica, function (response) {
                 $.each(response, function(index, value) {
                     executaMusica(null, value["Artista"], value["Musica"], null, null, null, null);
                 });
@@ -234,7 +258,6 @@ function executaMusica(elemento, artista, musica, duracao, imageCapa, idMusica) 
                                 $('#artista-musica').html(artista);
 
                                 audio.src = URL.createObjectURL(blob);
-                                audio.volume = 0.1
 
                                 audio.load();
                                 audio.play();
@@ -263,8 +286,6 @@ function executaMusica(elemento, artista, musica, duracao, imageCapa, idMusica) 
                         $('.capa-atual').attr("src", imageUrl);
                         $('#title-musica').html('<i class="fas fa-compact-disc"></i>&nbsp;' + musica);
                         $('#artista-musica').html(artista);
-
-                        audio.volume = 0.1
 
                         audio.src = audioSrc;
                         audio.load();
