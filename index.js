@@ -1,6 +1,6 @@
 const { json } = require('express');
-var express = require('express')
-var app = express()
+let express = require('express')
+let app = express()
 const mm = require('music-metadata');
 const util = require('util');
 const configuracao = require("./config.json");
@@ -10,6 +10,7 @@ const youtubeSearch = require('youtube-sr');
 const bodyParser = require("body-parser");
 const fs = require('fs');
 const path = require('path');
+const listaMusicas = RetornaMusicas();
 
 app.use(express.static(__dirname + '/views'));
 app.use(express.static(__dirname + '/'));
@@ -25,12 +26,11 @@ app.listen(8000, function () {
   console.log('Example app listening on port 8000!')
 })
 
-app.get("/getList", function(req, res){
-    let json = RetornaMusicas();
-    json["Youtube"] = {"Pesquisar" : ""};
-    json["TOP"] = {"Top 10" : "", "Top 20" : "", "Top 30" : "", "Top 40" : "", "Top 50" : "", "Top 100" : ""};
-    json["Random"] = {"Random 1" : "", "Random 3" : "", "Random 5" : "", "Random 10" : ""};
-    res.json(json);
+app.get("/getList", function(req, res){    
+    listaMusicas["Youtube"] = {"Pesquisar" : ""};
+    listaMusicas["TOP"] = {"Top 10" : "", "Top 20" : "", "Top 30" : "", "Top 40" : "", "Top 50" : "", "Top 100" : ""};
+    listaMusicas["Random"] = {"Random 1" : "", "Random 3" : "", "Random 5" : "", "Random 10" : ""};
+    res.json(listaMusicas);
 });
 
 app.get("/playMusic", function(req, res){
@@ -58,6 +58,23 @@ app.get("/buscaYoutube",function (req,res){
         .then(listaYoutube =>{
             res.json(listaYoutube);
         })
+});
+
+app.get("/randomMusica", function (req, res) {
+    let random = [];
+
+    for (let i = 0; i < parseInt(req.query.Quantida.replace("Random", "")); i++) {
+        let artista = Object.keys(listaMusicas)[getRandomInteger(Object.keys(listaMusicas).length)],
+            musica = Object.keys(listaMusicas[artista])[getRandomInteger(Object.keys(listaMusicas[artista]).length)],
+            item = {
+                'Artista': artista,
+                'Musica': musica
+            }
+
+            random.push(item);
+    }
+
+    res.json(random);
 });
 
 function RetornaMusicas() {
@@ -119,3 +136,7 @@ const retornaMusicaYoutube = (busca) => new Promise((success,reject) => {
         })
         .catch(err => reject(err));
 });
+
+const getRandomInteger = (max) => {
+    return Math.floor(Math.random() * max);
+}

@@ -91,6 +91,7 @@ jQuery(function () {
 
     audio.addEventListener('ended', () => {
         $('#music-info').addClass('d-none');
+        $('.background-image').css('background-image', 'none');
 
         ExecutaProxima();
     });
@@ -200,6 +201,14 @@ function executaMusica(elemento, artista, musica, duracao, imageCapa, idMusica) 
         info = $('#music-info');
 
     switch (artista) {
+        case 'Random': {
+            $.get("/randomMusica?Quantida=" + musica, function (response) {
+                $.each(response, function(index, value) {
+                    executaMusica(null, value["Artista"], value["Musica"], null, null, null, null);
+                });
+            });
+        }
+        break;
         case 'Youtube':
             switch (musica) {
                 case 'Pesquisar':
@@ -220,6 +229,9 @@ function executaMusica(elemento, artista, musica, duracao, imageCapa, idMusica) 
                             .then(blob => {
                                 carregando.addClass('d-none');
                                 info.removeClass('d-none');
+                                $('.capa-atual').attr("src", imageCapa);
+                                $('#title-musica').html('<i class="fab fa-youtube"></i>&nbsp;' + musica);
+                                $('#artista-musica').html(artista);
 
                                 audio.src = URL.createObjectURL(blob);
                                 audio.volume = 0.1
