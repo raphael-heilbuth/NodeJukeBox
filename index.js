@@ -11,6 +11,7 @@ const bodyParser = require("body-parser");
 const fs = require('fs');
 const path = require('path');
 const listaMusicas = RetornaMusicas();
+const abrirnavegador = require('open')
 
 app.use(express.static(__dirname + '/views'));
 app.use(express.static(__dirname + '/'));
@@ -23,10 +24,10 @@ app.get('/', function (req, res) {
 })
 
 app.listen(8000, function () {
-  console.log('Example app listening on port 8000!')
+  console.log('Rodando na porta 8000')
 })
 
-app.get("/getList", function(req, res){    
+app.get("/getList", function(req, res){
     listaMusicas["Youtube"] = {"Pesquisar" : ""};
     listaMusicas["TOP"] = {"Top 10" : "", "Top 20" : "", "Top 30" : "", "Top 40" : "", "Top 50" : "", "Top 100" : ""};
     listaMusicas["Random"] = {"Random 1" : "", "Random 3" : "", "Random 5" : "", "Random 10" : ""};
@@ -140,3 +141,5 @@ const retornaMusicaYoutube = (busca) => new Promise((success,reject) => {
 const getRandomInteger = (max) => {
     return Math.floor(Math.random() * max);
 }
+
+abrirnavegador('http://localhost:8000');
