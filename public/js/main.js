@@ -103,14 +103,6 @@ jQuery(function () {
         audio.volume = $(this).val();
     });
 
-    $('.musica-pause').on('click', function() {
-        audio.paused ? audio.play() : audio.pause();
-    });
-
-    $('.musica-proxima').on('click', function() {
-        audio.currentTime = audio.duration;
-    });
-
     audio.addEventListener('volumechange', () => {
         $('#ranger-volume').val(audio.volume);
         if (audio.volume === 0) {
@@ -131,6 +123,13 @@ jQuery(function () {
             });
         }        
     }, 240000);
+
+    document.addEventListener("keydown", (event) => {
+        if (event.altKey == true && event.key == "p") Pause();
+        if (event.altKey == true && event.key == "n") Next();
+        if (event.altKey == true && event.key == ".") MenosVolume();
+        if (event.altKey == true && event.key == ",") MaisVolume();
+      });
 });
 
 function removerAcentos(newStringComAcento) {
@@ -159,6 +158,22 @@ function removerAcentos(newStringComAcento) {
 
     return string;
 }
+
+function Pause() {
+    audio.paused ? audio.play() : audio.pause();
+};
+
+function Next() {
+    audio.currentTime = audio.duration;
+};
+
+function MenosVolume() {
+    audio.volume += 0.1;
+};
+
+function MaisVolume() {
+    audio.volume -= 0.1;
+};
 
 function RetornaMusica(artista, index, duracao = null, idMusica = null, capa = null, excluir = false) {
     let item = '<li class="list-group-item item-musica ' + (excluir ? 'item-exclude' : '') + '" data-artista="' + artista + '" data-musica="' + index + '" data-id-musica="' + idMusica + '" data-capa="' + capa + '" data-duracao="'+duracao+'">' +
@@ -256,7 +271,7 @@ function executaMusica(elemento, artista, musica, duracao, imageCapa, idMusica) 
 
                         fetch("/tocaYoutube?IdMusica=" + encodeURI(idMusica))
                             .then(res => {
-                                return res.blob()
+                                return res.blob();
                             })
                             .then(blob => {
                                 carregando.addClass('d-none');
