@@ -9,8 +9,8 @@
 }
 
 .img-capa {
-    width: 500px;
-    height: 500px;
+    width: 400px;
+    height: 400px;
     border: 1px solid rgba(0,0,0,.1);
     border-radius: 3px;
 }
@@ -59,7 +59,7 @@
 #canvas {
     position: fixed;
     left: 0;
-    bottom: calc(100vh - 564px);
+    bottom: calc(100vh - 464px);    
     width: 100%;
     height: 100%;
     z-index: -500;
@@ -78,4 +78,17 @@
     max-height: calc(100vh - 650px);
     overflow-y: auto;
     min-height: calc(100vh - 650px);
+}
+
+
+@media (min-height: 769px)
+{
+    .img-capa {
+        width: 500px;
+        height: 500px;
+    }
+
+    #canvas {
+        bottom: calc(100vh - 564px);
+    }
 }
