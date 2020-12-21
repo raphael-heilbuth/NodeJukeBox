@@ -1,6 +1,9 @@
+const alfabeto = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 let audio = new Audio(),
     listaMusicas,
-    listaProximasMusicas = [];
+    listaProximasMusicas = [],
+    coverflowlet, 
+    letraAnt = '';
 
 jQuery(function () {
     "use strict";
@@ -17,16 +20,15 @@ jQuery(function () {
                 case 'Youtube':
                 case 'TOP':
                 case 'Random':
-                    list.append('<li data-flip-title="' + index + '"><img src="../public/image/default/' + index + '.jpg" class="img-capa" alt="capa"></li>');
+                    list.append('<li data-flip-title="' + index + '" data-letra="' + removerAcentos(index.substr(0, 1)) + '"><img src="../public/image/default/' + index + '.jpg" class="img-capa" alt="capa"></li>');
                     break;
                 default:
-                    list.append('<li data-flip-title="' + index + '"><img src="../public/image/capas/' + index + '.jpg" class="img-capa" alt="capa"></li>');
+                    list.append('<li data-flip-title="' + index + '" data-letra="' + removerAcentos(index.substr(0, 1)) + '"><img src="../public/image/capas/' + index + '.jpg" class="img-capa" alt="capa"></li>');
                     break;
             }
         });
-
-        let letraAnt = '';
-        let coverflow = $("#coverflow").flipster({
+        
+        coverflow = $("#coverflow").flipster({
             style: 'carousel',
             spacing: -0.15,
             buttons: true,
@@ -94,7 +96,8 @@ jQuery(function () {
 
     audio.addEventListener('ended', () => {
         $('#music-info').addClass('d-none');
-        $('.background-image').css('background-image', 'none');
+        let imageCapa = '../public/image/default/NodeJukebox.png';
+        $('.background-image').css('background-image', 'url(' + imageCapa + ')');
 
         ExecutaProxima();
     });
@@ -127,9 +130,10 @@ jQuery(function () {
     document.addEventListener("keydown", (event) => {
         if (event.altKey == true && event.key == "p") Pause();
         if (event.altKey == true && event.key == "n") Next();
-        if (event.altKey == true && event.key == ".") MaisVolume();
-        MaisVolume
+        if (event.altKey == true && event.key == ".") MaisVolume();        
         if (event.altKey == true && event.key == ",") MenosVolume();
+        if (event.altKey == true && event.key == 'ArrowUp') ProximaLetra(letraAnt);
+        if (event.altKey == true && event.key == 'ArrowDown') LetraAnterior(letraAnt);
     });
 });
 
@@ -169,7 +173,7 @@ function Next() {
 };
 
 function MenosVolume() {
-    if (audio.volume > 0.1) {
+    if (audio.volume >= 0.1) {
         audio.volume -= 0.1;
     }
 
@@ -340,4 +344,12 @@ function ExecutaProxima() {
 
         listaProximas();
     }
+}
+
+function ProximaLetra(letra) {
+    coverflow.flipster('jump', $('.' + $($('.flip-items').find('[data-letra="'+alfabeto[alfabeto.indexOf(letra) + 1]+'"]')[0]).attr('class').split(' ')[3]));
+}
+
+function LetraAnterior(letra) {
+    coverflow.flipster('jump', $('.' + $($('.flip-items').find('[data-letra="'+alfabeto[alfabeto.indexOf(letra) - 1]+'"]')[0]).attr('class').split(' ')[3]));    
 }
