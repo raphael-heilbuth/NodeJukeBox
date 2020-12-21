@@ -31,7 +31,15 @@ app.get("/getList", function(req, res){
     listaMusicas["Youtube"] = {"Pesquisar" : ""};
     listaMusicas["TOP"] = {"Top 10" : "", "Top 20" : "", "Top 30" : "", "Top 40" : "", "Top 50" : "", "Top 100" : ""};
     listaMusicas["Random"] = {"Random 1" : "", "Random 3" : "", "Random 5" : "", "Random 10" : ""};
-    res.json(listaMusicas);
+
+    let orderedListaMusicas = {};
+
+
+    const ordered = Object.keys(listaMusicas).sort().forEach(function(v, i) {
+        orderedListaMusicas[v] = listaMusicas[v];
+     });
+
+    res.json(orderedListaMusicas);
 });
 
 app.get("/playMusic", function(req, res){
@@ -109,7 +117,7 @@ function RetornaMusicas() {
     return readDir(musicFolder);
 }
 
-function RetornaMetaData(file) {
+const  RetornaMetaData = (file) => new Promise((success, reject) => {
     mm.parseFile(dir + "/" + file)
     .then(metadata => {
         success(file = util.inspect(metadata, { showHidden: false, depth: null }));
@@ -117,7 +125,7 @@ function RetornaMetaData(file) {
     .catch(err => {
         reject(console.error(err.message));
     });
-}
+});
 
 const retornaMusicaYoutube = (busca) => new Promise((success,reject) => {
     youtubeSearch.search(busca, {limit: 5})
