@@ -99,7 +99,7 @@ jQuery(function () {
         ExecutaProxima();
     });
 
-    $("#ranger-volume").on('change', function(){
+    $("#ranger-volume").on('change', function () {
         audio.volume = $(this).val();
     });
 
@@ -117,19 +117,20 @@ jQuery(function () {
     setInterval(() => {
         if (audio.paused) {
             $.get("/randomMusica?Quantidade=1", function (response) {
-                $.each(response, function(index, value) {
+                $.each(response, function (index, value) {
                     executaMusica(null, value["Artista"], value["Musica"], null, null, null, null);
                 });
             });
-        }        
+        }
     }, 240000);
 
     document.addEventListener("keydown", (event) => {
         if (event.altKey == true && event.key == "p") Pause();
         if (event.altKey == true && event.key == "n") Next();
-        if (event.altKey == true && event.key == ".") MenosVolume();
-        if (event.altKey == true && event.key == ",") MaisVolume();
-      });
+        if (event.altKey == true && event.key == ".") MaisVolume();
+        MaisVolume
+        if (event.altKey == true && event.key == ",") MenosVolume();
+    });
 });
 
 function removerAcentos(newStringComAcento) {
@@ -168,15 +169,20 @@ function Next() {
 };
 
 function MenosVolume() {
-    audio.volume += 0.1;
+    if (audio.volume > 0.1) {
+        audio.volume -= 0.1;
+    }
+
 };
 
 function MaisVolume() {
-    audio.volume -= 0.1;
+    if (audio.volume < 0.9) {
+        audio.volume += 0.1;
+    }
 };
 
 function RetornaMusica(artista, index, duracao = null, idMusica = null, capa = null, excluir = false) {
-    let item = '<li class="list-group-item item-musica ' + (excluir ? 'item-exclude' : '') + '" data-artista="' + artista + '" data-musica="' + index + '" data-id-musica="' + idMusica + '" data-capa="' + capa + '" data-duracao="'+duracao+'">' +
+    let item = '<li class="list-group-item item-musica ' + (excluir ? 'item-exclude' : '') + '" data-artista="' + artista + '" data-musica="' + index + '" data-id-musica="' + idMusica + '" data-capa="' + capa + '" data-duracao="' + duracao + '">' +
         '   <div class="form-row">' +
         '        <div class="col">';
 
@@ -228,7 +234,7 @@ function listaProximas() {
 
     $('#badge-proximas').html(listaProximasMusicas.length);
 
-    $.each(listaProximasMusicas, function(index, value) {
+    $.each(listaProximasMusicas, function (index, value) {
         lista.append(RetornaMusica(value["Artista"], value["Musica"], value["Duracao"], value["IdMusica"], value["ImagemCapa"], value["IdMusica"] !== null));
     });
 }
@@ -250,12 +256,12 @@ function executaMusica(elemento, artista, musica, duracao, imageCapa, idMusica) 
     switch (artista) {
         case 'Random': {
             $.get("/randomMusica?Quantidade=" + musica, function (response) {
-                $.each(response, function(index, value) {
+                $.each(response, function (index, value) {
                     executaMusica(null, value["Artista"], value["Musica"], null, null, null, null);
                 });
             });
         }
-        break;
+            break;
         case 'Youtube':
             switch (musica) {
                 case 'Pesquisar':
