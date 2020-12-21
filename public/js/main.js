@@ -1,8 +1,8 @@
-const alfabeto = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 let audio = new Audio(),
     listaMusicas,
     listaProximasMusicas = [],
-    coverflowlet, 
+    coverflowlet,
+    alfabeto = [], 
     letraAnt = '';
 
 jQuery(function () {
@@ -14,6 +14,12 @@ jQuery(function () {
         listaMusicas = data;
 
         let list = $('.flip-items');
+
+        alfabeto = Object.keys(data).map(function(artista) {
+            return removerAcentos(artista.substr(0, 1));
+        }).filter(function(itm, i, a) {
+            return i == a.indexOf(itm);
+        });
 
         $.each(data, function (index) {
             switch (index) {
@@ -347,9 +353,11 @@ function ExecutaProxima() {
 }
 
 function ProximaLetra(letra) {
-    coverflow.flipster('jump', $('.' + $($('.flip-items').find('[data-letra="'+alfabeto[alfabeto.indexOf(letra) + 1]+'"]')[0]).attr('class').split(' ')[3]));
+    let proxLetra = letra === "" ? alfabeto[1] : alfabeto[alfabeto.indexOf(letra) + 1 >= alfabeto.length ? 0 : alfabeto.indexOf(letra) + 1];
+    coverflow.flipster('jump', $('.' + $($('.flip-items').find('[data-letra="'+proxLetra+'"]')[0]).attr('class').split(' ')[3]));
 }
 
 function LetraAnterior(letra) {
-    coverflow.flipster('jump', $('.' + $($('.flip-items').find('[data-letra="'+alfabeto[alfabeto.indexOf(letra) - 1]+'"]')[0]).attr('class').split(' ')[3]));    
+    let proxLetra = letra === "" ? alfabeto[alfabeto.length - 1] : alfabeto[alfabeto.indexOf(letra) - 1 === -1 ? alfabeto.length - 1 : alfabeto.indexOf(letra) - 1];
+    coverflow.flipster('jump', $('.' + $($('.flip-items').find('[data-letra="'+proxLetra +'"]')[0]).attr('class').split(' ')[3]));    
 }
