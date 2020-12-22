@@ -31,15 +31,15 @@ app.get("/getList",  async function (req, res) {
 
     let musicasMeta = await RetornaListaMetaData(listaMusicas);
 
-    listaMusicas["Youtube"] = {"Pesquisar": ""};
-    listaMusicas["TOP"] = {"Top 10": "", "Top 20": "", "Top 30": "", "Top 40": "", "Top 50": "", "Top 100": ""};
-    listaMusicas["Random"] = {"Random 1": "", "Random 3": "", "Random 5": "", "Random 10": ""};
+    musicasMeta["Youtube"] = {"Pesquisar": ""};
+    musicasMeta["TOP"] = {"Top 10": "", "Top 20": "", "Top 30": "", "Top 40": "", "Top 50": "", "Top 100": ""};
+    musicasMeta["Random"] = {"Random 1": "", "Random 3": "", "Random 5": "", "Random 10": ""};
 
     let orderedListaMusicas = {};
 
 
-     Object.keys(listaMusicas).sort().forEach(function (v, i) {
-        orderedListaMusicas[v] = listaMusicas[v];
+     Object.keys(musicasMeta).sort().forEach(function (v, i) {
+        orderedListaMusicas[v] = musicasMeta[v];
     });
 
     res.json(orderedListaMusicas);
@@ -97,7 +97,7 @@ function RetornaMusicas() {
             .readdirSync(dir)
             .forEach(file => {
                 if (fs.lstatSync(dir + "/" + file).isFile()) {
-                    if (path.extname(file) === '.jpg') {
+                    if (path.extname(file) === '.jpg' || path.extname(file) === '.JPG') {
                         let diretorios = dir.split('/'),
                             artista = diretorios[diretorios.length - 1];
                         fs.copyFile(dir + "/" + file, 'public/image/capas/' + artista + '.jpg', (err) => {
@@ -124,19 +124,24 @@ const RetornaListaMetaData = (lista) => new Promise(async (success, reject) => {
     for (const pasta of Object.keys(lista)){
         let retornoMusica = []
         for (let musica of Object.entries(lista[pasta])) {
-            await Promise.resolve(RetornaMetaData(configuracao.FolderMusic + "/" + pasta + "/" + musica[0]))
-                .then(meta => {
-                    retornoMusica.push({'Musica' : musica[0],'Meta' : meta})
-                })
+            if(musica[0].includes('.mp3')) {
+                await RetornaMetaData(configuracao.FolderMusic + "/" + pasta + "/" + musica[0])
+                    .then(meta => {
+                        retornoMusica.push({'Musica': musica[0], 'Meta': meta})
+                    })
+                    .catch(err => {
+                        console.log(err)
+                    })
+            }
         }
-        retornoMeta.push({'Artista' : pasta,'Musicas' : retornoMusica})
+        retornoMeta[pasta] = {'Musicas' : retornoMusica}
     }
     success(retornoMeta);
 });
 const RetornaMetaData = (file) => new Promise((success, reject) => {
     mm.parseFile(file)
         .then(metadata => {
-            success(file = util.inspect(metadata, {showHidden: false, depth: null}));
+            success(metadata);
         })
         .catch(err => {
             reject(console.error(err.message));
@@ -152,7 +157,7 @@ const retornaMusicaYoutube = (busca) => new Promise((success, reject) => {
                     'IdMusica': json["id"],
                     'Url': json["url"],
                     'Titulo': json["title"],
-                    'Duracao': json["durationFormatted"],
+                    'Duracao': json["duration"],
                     'Capa': json["thumbnail"]["url"]
                 }
             });

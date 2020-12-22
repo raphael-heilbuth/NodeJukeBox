@@ -83,6 +83,15 @@
     min-height: 448px;
 }
 
+.titulo-musica {
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.row-coverflow {
+    min-height: 548px;
+}
+
 @media (min-height: 769px)
 {
     .img-capa {

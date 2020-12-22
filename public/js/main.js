@@ -17,9 +17,7 @@ jQuery(function () {
         },
         onStop: function(loading) {
             loading.overlay.slideUp(400);
-        },
-        overlay: $("#loading"),
-        theme: 'dark'
+        }
     }, 'start');
 
     $.get("/getList", function (data) {
@@ -86,11 +84,22 @@ jQuery(function () {
 
         listaMusicaArtista.empty();
 
-        $.each(listaMusicas[artista], function (index) {
-            let item = RetornaMusica(artista, index);
+        if(artista === "Youtube" || artista === "TOP" || artista === "Random"){
+            $.each(listaMusicas[artista], function (index) {
 
-            listaMusicaArtista.append(item);
-        });
+                let  item = RetornaMusica(artista,index);
+
+                listaMusicaArtista.append(item);
+            });
+        }else{
+            $.each(listaMusicas[artista]["Musicas"], function (index,value) {
+
+                let meta = value["Meta"],
+                    item = RetornaMusica(artista, value["Musica"],meta["format"]["duration"]);
+
+                listaMusicaArtista.append(item);
+            });
+        }
     });
 
     $(document).on('keydown', '#pesquisa-youtube', function () {
@@ -234,7 +243,7 @@ function MaisVolume() {
 function RetornaMusica(artista, index, duracao = null, idMusica = null, capa = null, excluir = false) {
     let item = '<li class="list-group-item item-musica ' + (excluir ? 'item-exclude' : '') + '" data-artista="' + artista + '" data-musica="' + index + '" data-id-musica="' + idMusica + '" data-capa="' + capa + '" data-duracao="' + duracao + '">' +
         '   <div class="form-row">' +
-        '        <div class="col">';
+        '        <div class="col titulo-musica">';
 
     switch (artista) {
         case "Youtube":
@@ -253,7 +262,7 @@ function RetornaMusica(artista, index, duracao = null, idMusica = null, capa = n
 
     item += '        </div>' +
         '        <div class="col-auto">' +
-        '            ' + duracao +
+        '            ' + display(duracao) +
         '        </div>';
     if (!excluir) {
         item += '        <div class="col-1">' +
@@ -374,7 +383,7 @@ function executaMusica(elemento, artista, musica, duracao, imageCapa, idMusica) 
                     }
                 });
             } else {
-                listaProximasMusicas.push(ItemProximaMusica(artista, musica, null, null, null));
+                listaProximasMusicas.push(ItemProximaMusica(artista, musica, duracao, null, null));
 
                 listaProximas();
             }
