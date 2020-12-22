@@ -10,6 +10,18 @@ jQuery(function () {
     audio.volume = 0.1;
     $('#ranger-volume').val(audio.volume);
 
+    $('body').loading({
+        stoppable: false,
+        onStart: function(loading) {
+            loading.overlay.slideDown(400);
+        },
+        onStop: function(loading) {
+            loading.overlay.slideUp(400);
+        },
+        overlay: $("#loading"),
+        theme: 'dark'
+    }, 'start');
+
     $.get("/getList", function (data) {
         listaMusicas = data;
 
@@ -62,6 +74,8 @@ jQuery(function () {
                 }
             }
         });
+
+        $('body').loading('stop');
     });
 
     $(document).on('click', '.flipster__item--current', function () {
