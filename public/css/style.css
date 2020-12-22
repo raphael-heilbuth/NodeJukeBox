@@ -91,7 +91,11 @@
 }
 
 .row-coverflow {
-    min-height: 548px;
+    min-height: 548px;    
+}
+
+#coverflow {
+    overflow-y: hidden;
 }
 
 .flip-vertical-left {

@@ -199,6 +199,7 @@ function RetornaCapa(index, capa = true) {
     return '<li data-flip-title="' + index + '" data-letra="' + removerAcentos(index.substr(0, 1)) + '">' +
         '     <div class="flip-content">' +
         '        <div class="front">' +
+        '        <h1 class="text-center" style="position: absolute;top: 0px;text-shadow: 2px 0 0 #fff, -2px 0 0 #fff, 0 2px 0 #fff, 0 -2px 0 #fff, 1px 1px #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff;width: 500px;">'+index+'</h1>' +
         '           <img src="' + (capa ? "../public/image/capas/" : "../public/image/default/") + index + '.jpg" class="img-capa" alt="capa">' +
         '        </div>' +
         '        <div class="back img-capa d-none">' +
