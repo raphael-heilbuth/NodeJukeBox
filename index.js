@@ -10,7 +10,8 @@ const youtubeSearch = require('youtube-sr');
 const bodyParser = require("body-parser");
 const fs = require('fs');
 const path = require('path');
-const listaMusicas = RetornaMusicas();
+let musicasMeta = {};
+
 const abrirnavegador = require('open')
 
 app.use(express.static(__dirname + '/views'));
@@ -28,8 +29,9 @@ app.listen(8000, function () {
 })
 
 app.get("/getList",  async function (req, res) {
+    let listaMusicas = RetornaMusicas();
 
-    let musicasMeta = await RetornaListaMetaData(listaMusicas);
+    musicasMeta = await RetornaListaMetaData(listaMusicas);
 
     musicasMeta["Youtube"] = {"Musicas": [
         {"Musica": "Pesquisar", "Meta": null}
@@ -50,7 +52,6 @@ app.get("/getList",  async function (req, res) {
         ]};
 
     let orderedListaMusicas = {};
-
 
      Object.keys(musicasMeta).sort().forEach(function (v, i) {
         orderedListaMusicas[v] = musicasMeta[v];
@@ -90,11 +91,12 @@ app.get("/randomMusica", function (req, res) {
     let random = [];
 
     for (let i = 0; i < parseInt(req.query.Quantidade.replace("Random", "")); i++) {
-        let artista = Object.keys(listaMusicas)[getRandomInteger(Object.keys(listaMusicas).length)],
-            musica = Object.keys(listaMusicas[artista])[getRandomInteger(Object.keys(listaMusicas[artista]).length)],
+        let artista = Object.keys(musicasMeta)[getRandomInteger(Object.keys(musicasMeta).length)],
+            musicas = musicasMeta[artista]["Musicas"][getRandomInteger(musicasMeta[artista]["Musicas"].length)],
             item = {
                 'Artista': artista,
-                'Musica': musica
+                'Musica': musicas["Musica"],
+                'Duracao': musicas["Meta"]["format"]["duration"]
             }
 
         random.push(item);

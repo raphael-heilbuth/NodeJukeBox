@@ -146,7 +146,7 @@ jQuery(function () {
         if (audio.paused) {
             $.get("/randomMusica?Quantidade=1", function (response) {
                 $.each(response, function (index, value) {
-                    executaMusica(null, value["Artista"], value["Musica"], null, null, null, null);
+                    executaMusica(null, value["Artista"], value["Musica"], value["Duracao"], null, null, null);
                 });
             });
         }
@@ -305,7 +305,7 @@ function executaMusica(elemento, artista, musica, duracao, imageCapa, idMusica) 
         case 'Random': {
             $.get("/randomMusica?Quantidade=" + musica, function (response) {
                 $.each(response, function (index, value) {
-                    executaMusica(null, value["Artista"], value["Musica"], null, null, null, null);
+                    executaMusica(null, value["Artista"], value["Musica"], value["Duracao"], null, null, null);
                 });
             });
         }
