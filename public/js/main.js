@@ -1,7 +1,7 @@
 let audio = new Audio(),
     listaMusicas,
     listaProximasMusicas = [],
-    coverflowlet,
+    coverflow,
     alfabeto = [], 
     letraAnt = '';
 
@@ -18,7 +18,7 @@ jQuery(function () {
         alfabeto = Object.keys(data).map(function(artista) {
             return removerAcentos(artista.substr(0, 1));
         }).filter(function(itm, i, a) {
-            return i == a.indexOf(itm);
+            return i === a.indexOf(itm);
         });
 
         $.each(data, function (index) {
@@ -26,14 +26,14 @@ jQuery(function () {
                 case 'Youtube':
                 case 'TOP':
                 case 'Random':
-                    list.append('<li data-flip-title="' + index + '" data-letra="' + removerAcentos(index.substr(0, 1)) + '"><img src="../public/image/default/' + index + '.jpg" class="img-capa" alt="capa"></li>');
+                    list.append(RetornaCapa(index, false));
                     break;
                 default:
-                    list.append('<li data-flip-title="' + index + '" data-letra="' + removerAcentos(index.substr(0, 1)) + '"><img src="../public/image/capas/' + index + '.jpg" class="img-capa" alt="capa"></li>');
+                    list.append(RetornaCapa(index));
                     break;
             }
         });
-        
+
         coverflow = $("#coverflow").flipster({
             style: 'carousel',
             spacing: -0.15,
@@ -41,9 +41,13 @@ jQuery(function () {
             loop: true,
             fadeIn: 0,
             start: 0,
+            keyboard: false,
+            scrollwheel: false,
             buttonPrev: 'Anterior',
             buttonNext: 'Próxima',
             onItemSwitch: function (currentItem, previousItem) {
+                $(previousItem).find('.front').removeClass('d-none').end().find('.back').addClass('d-none');
+
                 let letra = removerAcentos($(currentItem).attr('data-flip-title').substr(0, 1));
                 if (letraAnt !== letra) {
                     letraAnt = letra;
@@ -61,8 +65,10 @@ jQuery(function () {
     });
 
     $(document).on('click', '.flipster__item--current', function () {
-        let listaMusicaArtista = $('#list'),
+        let listaMusicaArtista = $(this).find('.back').find('ul'),
             artista = $(this).attr('data-flip-title');
+
+        $(this).find('.front').addClass('d-none').end().find('.back').removeClass('d-none');
 
         listaMusicaArtista.empty();
 
@@ -136,10 +142,12 @@ jQuery(function () {
     document.addEventListener("keydown", (event) => {
         if (event.altKey == true && event.key == "p") Pause();
         if (event.altKey == true && event.key == "n") Next();
-        if (event.altKey == true && event.key == ".") MaisVolume();        
+        if (event.altKey == true && event.key == ".") MaisVolume();
         if (event.altKey == true && event.key == ",") MenosVolume();
         if (event.altKey == true && event.key == 'ArrowUp') ProximaLetra(letraAnt);
         if (event.altKey == true && event.key == 'ArrowDown') LetraAnterior(letraAnt);
+        if (event.altKey == true && event.key == 'ArrowRight') coverflow.flipster('next');
+        if (event.altKey == true && event.key == 'ArrowLeft') coverflow.flipster('prev');
     });
 });
 
@@ -168,6 +176,24 @@ function removerAcentos(newStringComAcento) {
     }
 
     return string;
+}
+
+function RetornaCapa(index, capa = true) {
+    return '<li data-flip-title="' + index + '" data-letra="' + removerAcentos(index.substr(0, 1)) + '">' +
+        '     <div class="flip-content">' +
+        '        <div class="front">' +
+        '           <img src="' + (capa ? "../public/image/capas/" : "../public/image/default/") + index + '.jpg" class="img-capa" alt="capa">' +
+        '        </div>' +
+        '        <div class="back img-capa d-none">' +
+        '           <div class="card">' +
+        '                <div class="card-header">'+index+'</div>' +
+        '                   <ul class="list-group list-group-flush list-musicas">' +
+        '                   </ul>' +
+        '                </div>' +
+        '           </div>' +
+        '        </div>' +
+        '     </div>' +
+        '</li>';
 }
 
 function Pause() {

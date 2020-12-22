@@ -70,11 +70,18 @@
 }
 
 .card-list {
-    max-height: calc(100vh - 650px);
+    max-height: calc(100vh - 550px);
+    min-height: calc(100vh - 550px);
     overflow-y: auto;
-    min-height: calc(100vh - 650px);
 }
 
+.list-group.list-group-flush.list-musicas {
+    max-height: 448px;
+    overflow-y: auto;
+    transform: none !important;
+    overflow-x: hidden;
+    min-height: 448px;
+}
 
 @media (min-height: 769px)
 {
@@ -88,8 +95,7 @@
     }
 
     .card-list {
-        max-height: calc(100vh - 550px);        
-        min-height: calc(100vh - 550px);
+        max-height: calc(100vh - 650px);
+        min-height: calc(100vh - 650px);
     }
-    
 }
