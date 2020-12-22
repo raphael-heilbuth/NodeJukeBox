@@ -31,9 +31,23 @@ app.get("/getList",  async function (req, res) {
 
     let musicasMeta = await RetornaListaMetaData(listaMusicas);
 
-    musicasMeta["Youtube"] = {"Pesquisar": ""};
-    musicasMeta["TOP"] = {"Top 10": "", "Top 20": "", "Top 30": "", "Top 40": "", "Top 50": "", "Top 100": ""};
-    musicasMeta["Random"] = {"Random 1": "", "Random 3": "", "Random 5": "", "Random 10": ""};
+    musicasMeta["Youtube"] = {"Musicas": [
+        {"Musica": "Pesquisar", "Meta": null}
+        ]};
+    musicasMeta["TOP"] = {"Musicas": [
+            {"Musica": "Top 10", "Meta": null},
+            {"Musica": "Top 20", "Meta": null},
+            {"Musica": "Top 30", "Meta": null},
+            {"Musica": "Top 40", "Meta": null},
+            {"Musica": "Top 50", "Meta": null},
+            {"Musica": "Top 100", "Meta": null}
+            ]};
+    musicasMeta["Random"] = {"Musicas": [
+            {"Musica": "Random 1", "Meta": null},
+            {"Musica": "Random 3", "Meta": null},
+            {"Musica": "Random 5", "Meta": null},
+            {"Musica": "Random 10", "Meta": null}
+        ]};
 
     let orderedListaMusicas = {};
 
