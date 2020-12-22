@@ -76,30 +76,34 @@ jQuery(function () {
     });
 
     $(document).on('click', '.flipster__item--current', function () {
-        let listaMusicaArtista = $(this).find('.back').find('ul'),
-            artista = $(this).attr('data-flip-title');
 
-        $(this).find('.front').addClass('d-none').end().find('.back').removeClass('d-none');
+        if (!$(this).find('.back').is(':visible')) {
+            let listaMusicaArtista = $(this).find('.back').find('ul'),
+                artista = $(this).attr('data-flip-title');
 
-        listaMusicaArtista.empty();
+            $(this).find('.front').addClass('d-none').end().find('.back').removeClass('d-none');
 
-        $.each(listaMusicas[artista]["Musicas"], function (index,value) {
+            listaMusicaArtista.empty();
 
-            let meta = value["Meta"],
-                item = RetornaMusica(artista, value["Musica"], (meta !== null ? meta["format"]["duration"] : meta));
+            $.each(listaMusicas[artista]["Musicas"], function (index,value) {
 
-            listaMusicaArtista.append(item);
-        });
+                let meta = value["Meta"],
+                    item = RetornaMusica(artista, value["Musica"], (meta !== null ? meta["format"]["duration"] : meta));
+
+                listaMusicaArtista.append(item);
+            });
+        }
     });
 
     $(document).on('keydown', '#pesquisa-youtube', function () {
-        let query = $(this).val();
+        let query = $(this).val(),
+            list = $('#pesquisa-youtube').offsetParent();
 
         $('.item-exclude').remove();
 
         $.get("/buscaYoutube?busca=" + encodeURI(query), function (retornoLista) {
             $.each(retornoLista, function (index, value) {
-                $('#list').append(RetornaMusica('Youtube', value["Titulo"], value["Duracao"], value["IdMusica"], value["Capa"], true));
+                list.append(RetornaMusica('Youtube', value["Titulo"], value["Duracao"], value["IdMusica"], value["Capa"], true));
             })
         });
     });
@@ -249,10 +253,12 @@ function RetornaMusica(artista, index, duracao = null, idMusica = null, capa = n
             break;
     }
 
-    item += '        </div>' +
-        '        <div class="col-auto">' +
+    item += '        </div>';
+    if (duracao !== null) {
+    item += '        <div class="col-auto">' +
         '            ' + display(duracao) +
         '        </div>';
+    }
     if (!excluir) {
         item += '        <div class="col-1">' +
             '            <div class="progress" style="height: 5px;margin-top: 10px;">' +

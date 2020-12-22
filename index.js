@@ -173,7 +173,7 @@ const retornaMusicaYoutube = (busca) => new Promise((success, reject) => {
                     'IdMusica': json["id"],
                     'Url': json["url"],
                     'Titulo': json["title"],
-                    'Duracao': json["duration"],
+                    'Duracao': json["duration"] / 1000,
                     'Capa': json["thumbnail"]["url"]
                 }
             });
@@ -187,4 +187,4 @@ const getRandomInteger = (max) => {
     return Math.floor(Math.random() * max);
 }
 
-//abrirnavegador('http://localhost:8000');
+abrirnavegador('http://localhost:8000');
