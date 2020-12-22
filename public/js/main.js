@@ -230,7 +230,6 @@ function MenosVolume() {
     if (audio.volume >= 0.1) {
         audio.volume -= 0.1;
     }
-
 }
 
 function MaisVolume() {
