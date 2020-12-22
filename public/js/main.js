@@ -5,20 +5,19 @@ let audio = new Audio(),
     alfabeto = [], 
     letraAnt = '';
 
+$('body').loading({
+    stoppable: false,
+    onStop: function(loading) {
+        loading.overlay.slideUp(400);
+    },
+    overlay: $(".loading"),
+    start: true
+});
+
 jQuery(function () {
     "use strict";
     audio.volume = 0.1;
     $('#ranger-volume').val(audio.volume);
-
-    $('body').loading({
-        stoppable: false,
-        onStart: function(loading) {
-            loading.overlay.slideDown(400);
-        },
-        onStop: function(loading) {
-            loading.overlay.slideUp(400);
-        }
-    }, 'start');
 
     $.get("/getList", function (data) {
         listaMusicas = data;
@@ -95,7 +94,7 @@ jQuery(function () {
             $.each(listaMusicas[artista]["Musicas"], function (index,value) {
 
                 let meta = value["Meta"],
-                    item = RetornaMusica(artista, value["Musica"],meta["format"]["duration"]);
+                    item = RetornaMusica(artista, value["Musica"], meta["format"]["duration"]);
 
                 listaMusicaArtista.append(item);
             });
@@ -163,14 +162,14 @@ jQuery(function () {
     }, 240000);
 
     document.addEventListener("keydown", (event) => {
-        if (event.altKey == true && event.key == "p") Pause();
-        if (event.altKey == true && event.key == "n") Next();
-        if (event.altKey == true && event.key == ".") MaisVolume();
-        if (event.altKey == true && event.key == ",") MenosVolume();
-        if (event.altKey == true && event.key == 'ArrowUp') ProximaLetra(letraAnt);
-        if (event.altKey == true && event.key == 'ArrowDown') LetraAnterior(letraAnt);
-        if (event.altKey == true && event.key == 'ArrowRight') coverflow.flipster('next');
-        if (event.altKey == true && event.key == 'ArrowLeft') coverflow.flipster('prev');
+        if (event.altKey === true && event.key === "p") Pause();
+        if (event.altKey === true && event.key === "n") Next();
+        if (event.altKey === true && event.key === ".") MaisVolume();
+        if (event.altKey === true && event.key === ",") MenosVolume();
+        if (event.altKey === true && event.key === 'ArrowUp') ProximaLetra(letraAnt);
+        if (event.altKey === true && event.key === 'ArrowDown') LetraAnterior(letraAnt);
+        if (event.altKey === true && event.key === 'ArrowRight') coverflow.flipster('next');
+        if (event.altKey === true && event.key === 'ArrowLeft') coverflow.flipster('prev');
     });
 });
 
@@ -221,24 +220,24 @@ function RetornaCapa(index, capa = true) {
 
 function Pause() {
     audio.paused ? audio.play() : audio.pause();
-};
+}
 
 function Next() {
     audio.currentTime = audio.duration;
-};
+}
 
 function MenosVolume() {
     if (audio.volume >= 0.1) {
         audio.volume -= 0.1;
     }
 
-};
+}
 
 function MaisVolume() {
     if (audio.volume < 0.9) {
         audio.volume += 0.1;
     }
-};
+}
 
 function RetornaMusica(artista, index, duracao = null, idMusica = null, capa = null, excluir = false) {
     let item = '<li class="list-group-item item-musica ' + (excluir ? 'item-exclude' : '') + '" data-artista="' + artista + '" data-musica="' + index + '" data-id-musica="' + idMusica + '" data-capa="' + capa + '" data-duracao="' + duracao + '">' +

@@ -92,6 +92,17 @@
     min-height: 548px;
 }
 
+.flip-vertical-left {
+    -webkit-animation: flip-vertical-left 1.5s cubic-bezier(0.175, 0.885, 0.320, 1.275) infinite both;
+    animation: flip-vertical-left 1.5s cubic-bezier(0.175, 0.885, 0.320, 1.275) infinite both;
+}
+
+.loading{
+    background-color: #ffffff;
+    opacity: 0.7;
+    overflow: hidden;
+}
+
 @media (min-height: 769px)
 {
     .img-capa {
