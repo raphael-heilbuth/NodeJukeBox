@@ -72,13 +72,22 @@ jQuery(function () {
 
         listaMusicaArtista.empty();
 
-        $.each(listaMusicas[artista]["Musicas"], function (index,value) {
+        if(artista === "Youtube" || artista === "TOP" || artista === "Random"){
+            $.each(listaMusicas[artista], function (index) {
 
-            let meta = value["Meta"],
-                item = RetornaMusica(artista, value["Musica"],meta["format"]["duration"]);
+                let  item = RetornaMusica(artista,index);
 
-            listaMusicaArtista.append(item);
-        });
+                listaMusicaArtista.append(item);
+            });
+        }else{
+            $.each(listaMusicas[artista]["Musicas"], function (index,value) {
+
+                let meta = value["Meta"],
+                    item = RetornaMusica(artista, value["Musica"],meta["format"]["duration"]);
+
+                listaMusicaArtista.append(item);
+            });
+        }
     });
 
     $(document).on('keydown', '#pesquisa-youtube', function () {
