@@ -18,7 +18,7 @@
   "dependencies": {
     "body-parser": "^1.19.0",
     "express": "^4.17.1",
-    "music-metadata": "^7.5.1",
+    "music-metadata": "^7.5.2",
     "open": "^7.3.0",
     "web-audio-player": "^1.3.3",
     "youtube-sr": "^2.0.5",

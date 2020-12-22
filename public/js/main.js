@@ -72,8 +72,10 @@ jQuery(function () {
 
         listaMusicaArtista.empty();
 
-        $.each(listaMusicas[artista], function (index) {
-            let item = RetornaMusica(artista, index);
+        $.each(listaMusicas[artista]["Musicas"], function (index,value) {
+
+            let meta = value["Meta"],
+                item = RetornaMusica(artista, value["Musica"],meta["format"]["duration"]);
 
             listaMusicaArtista.append(item);
         });
@@ -239,7 +241,7 @@ function RetornaMusica(artista, index, duracao = null, idMusica = null, capa = n
 
     item += '        </div>' +
         '        <div class="col-auto">' +
-        '            ' + duracao +
+        '            ' + display(duracao) +
         '        </div>';
     if (!excluir) {
         item += '        <div class="col-1">' +
