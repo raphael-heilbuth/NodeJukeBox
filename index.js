@@ -137,21 +137,25 @@ function RetornaMusicas() {
 }
 
 const RetornaListaMetaData = (lista) => new Promise(async (success, reject) => {
-    let retornoMeta = [];
+    let retornoMeta = [],
+        totalTocadas = await global.db.TotalTocadas();
     for (const pasta of Object.keys(lista)){
-        let retornoMusica = []
+        let retornoMusica = [],
+            tocadasArtista = await global.db.PopularidadeArtista(pasta);
         for (let musica of Object.entries(lista[pasta])) {
-            if(musica[0].includes('.mp3')) {
+            if (musica[0].includes('.mp3') || musica[0].includes('.mp4')) {
                 await RetornaMetaData(configuracao.FolderMusic + "/" + pasta + "/" + musica[0])
                     .then(meta => {
-                        retornoMusica.push({'Musica': musica[0], 'Meta': meta})
+                        global.db.PopularidadeMusica(musica[0]).then(tocadasMusica => {
+                            retornoMusica.push({'Musica': musica[0], 'Meta': meta, 'PopularidadeGlobal': (tocadasMusica * 100) / totalTocadas, 'PopularidadeArtista': (tocadasMusica * 100) / tocadasArtista});
+                        })
                     })
                     .catch(err => {
                         console.log(err)
                     })
             }
         }
-        retornoMeta[pasta] = {'Musicas' : retornoMusica}
+        retornoMeta[pasta] = {'Musicas' : retornoMusica, 'Popularidade':  (tocadasArtista * 100) / totalTocadas}
     }
     success(retornoMeta);
 });

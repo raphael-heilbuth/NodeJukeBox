@@ -30,15 +30,15 @@ jQuery(function () {
             return i === a.indexOf(itm);
         });
 
-        $.each(data, function (index) {
+        $.each(data, function (index, value) {
             switch (index) {
                 case 'Youtube':
                 case 'TOP':
                 case 'Random':
-                    list.append(RetornaCapa(index, false));
+                    list.append(RetornaCapa(index, null, null, false));
                     break;
                 default:
-                    list.append(RetornaCapa(index));
+                    list.append(RetornaCapa(index, value["Popularidade"], value["Musicas"].length));
                     break;
             }
         });
@@ -88,7 +88,7 @@ jQuery(function () {
             $.each(listaMusicas[artista]["Musicas"], function (index,value) {
 
                 let meta = value["Meta"],
-                    item = RetornaMusica(artista, value["Musica"], (meta !== null ? meta["format"]["duration"] : meta));
+                    item = RetornaMusica(artista, value["Musica"], (meta !== null ? meta["format"]["duration"] : meta), null, null, null, value["PopularidadeGlobal"], value["PopularidadeArtista"]);
 
                 listaMusicaArtista.append(item);
             });
@@ -195,19 +195,49 @@ function removerAcentos(newStringComAcento) {
     return string;
 }
 
-function RetornaCapa(index, capa = true) {
+function RetornaCapa(index, popularidade = null, qtdMusica = null, capa = true) {
+    let classBar;
+
+    switch (true) {
+        case (popularidade < 25):
+            classBar = 'bg-danger';
+            break;
+        case (popularidade < 50):
+            classBar = 'bg-warning';
+            break;
+        case (popularidade < 75):
+            classBar = 'bg-info';
+            break;
+        default:
+            classBar = 'bg-success';
+            break;
+    }
+
     return '<li data-flip-title="' + index + '" data-letra="' + removerAcentos(index.substr(0, 1)) + '">' +
         '     <div class="flip-content">' +
         '        <div class="front">' +
-        '        <h1 class="text-center" style="position: absolute;top: 0px;text-shadow: 2px 0 0 #fff, -2px 0 0 #fff, 0 2px 0 #fff, 0 -2px 0 #fff, 1px 1px #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff;width: 500px;">'+index+'</h1>' +
+        '           <h1 class="text-center titulo-musica-capa">'+index+' - ' + qtdMusica + '</h1>' +
         '           <img src="' + (capa ? "../public/image/capas/" : "../public/image/default/") + index + '.jpg" class="img-capa" alt="capa">' +
+        '           <div class="progress progress-bar-capa">' +
+        '               <div class="progress-bar '+classBar+'" role="progressbar" aria-valuenow="'+popularidade+'" aria-valuemin="0" aria-valuemax="100" style="width: '+popularidade+'%;"></div>' +
+        '           </div>' +
         '        </div>' +
         '        <div class="back img-capa d-none">' +
         '           <div class="card">' +
-        '                <div class="card-header">'+index+'</div>' +
-        '                   <ul class="list-group list-group-flush list-musicas">' +
-        '                   </ul>' +
+        '                <div class="card-header">'+
+        '                   <div class="form-row">' +
+        '                       <div class="col">' +
+                                    index +
+        '                       </div>' +
+        '                       <div class="col-2 padding-top-list-music">' +
+        '                           <div class="progress progress-list-music">' +
+        '                               <div class="progress-bar '+classBar+'" role="progressbar" aria-valuenow="'+popularidade+'" aria-valuemin="0" aria-valuemax="100" style="width: '+popularidade+'%;"></div>' +
+        '                           </div>' +
+        '                       </div>' +
+        '                   </div>' +
         '                </div>' +
+        '                <ul class="list-group list-group-flush list-musicas">' +
+        '                </ul>' +
         '           </div>' +
         '        </div>' +
         '     </div>' +
@@ -234,7 +264,7 @@ function MaisVolume() {
     }
 }
 
-function RetornaMusica(artista, index, duracao = null, idMusica = null, capa = null, excluir = false) {
+function RetornaMusica(artista, index, duracao = null, idMusica = null, capa = null, excluir = false, popularidadeGloba = null, popularidadeArtista = null) {
     let item = '<li class="list-group-item item-musica ' + (excluir ? 'item-exclude' : '') + '" data-artista="' + artista + '" data-musica="' + index + '" data-id-musica="' + idMusica + '" data-capa="' + capa + '" data-duracao="' + duracao + '">' +
         '   <div class="form-row">' +
         '        <div class="col titulo-musica">';
@@ -255,19 +285,22 @@ function RetornaMusica(artista, index, duracao = null, idMusica = null, capa = n
     }
 
     item += '        </div>';
+
+    if (popularidadeGloba !== null || popularidadeArtista !== null) {
+        item += '        <div class="col-1">' +
+            '            <div class="progress" style="height: 5px;margin-top: 10px;">' +
+            '                <div class="progress-bar" role="progressbar" style="width: '+popularidadeGloba+'%" aria-valuenow="'+popularidadeGloba+'" aria-valuemin="0" aria-valuemax="100"></div>' +
+            '                <div class="progress-bar bg-success" role="progressbar" style="width: '+popularidadeArtista+'%" aria-valuenow="'+popularidadeArtista+'" aria-valuemin="0" aria-valuemax="100"></div>' +
+            '            </div>' +
+            '        </div>';
+    }
+
     if (duracao !== null) {
     item += '        <div class="col-auto">' +
         '            ' + display(duracao) +
         '        </div>';
     }
-    if (!excluir) {
-        item += '        <div class="col-1">' +
-            '            <div class="progress" style="height: 5px;margin-top: 10px;">' +
-            '                <div class="progress-bar" role="progressbar" style="width: 15%" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100"></div>' +
-            '                <div class="progress-bar bg-success" role="progressbar" style="width: 30%" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"></div>' +
-            '            </div>' +
-            '        </div>';
-    }
+
     item += '   <div>' +
         '</li>';
 

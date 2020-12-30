@@ -40,7 +40,7 @@ function CountMusica(artista, musica) {
                 });
             });
         } else {
-            Artista.update({'name': artista}, {$inc: {reproduzida: 1}}).exec().then(r => console.log(r));
+            Artista.updateOne({'name': artista}, {$inc: {reproduzida: 1}}).exec().then(r => console.log(r));
 
             Musica.findOne({'title': musica}, function (err, retornoMusica) {
                 if (err) return console.log(err);
@@ -57,12 +57,29 @@ function CountMusica(artista, musica) {
                         console.log("Musica %s salva", musica);
                     });
                 } else {
-                    Musica.update({'title': musica}, {$inc: {reproduzida: 1}}).exec().then(r => console.log(r));
+                    Musica.updateOne({'title': musica}, {$inc: {reproduzida: 1}}).exec().then(r => console.log(r));
                 }
             });
         }
     });
 }
 
+const TotalTocadas = () => new Promise((success, reject) => {
+   Artista.aggregate([
+       { $group: {
+               _id: null,
+               total: { $sum: "$reproduzida"}
+           }}]).exec().then(r => {
+                success(r !== null ? r["0"].total : 0)
+           });
+});
 
-module.exports = { CountMusica }
+const PopularidadeArtista = (artista) => new Promise((success, reject) => {
+    Artista.findOne({'name': artista}).then(r => success(r !== null ? r.reproduzida : 0));
+});
+
+const PopularidadeMusica = (musica) => new Promise((success, reject) => {
+    Musica.findOne({'title': musica}).then(r => success(r !== null ? r.reproduzida : 0));
+});
+
+module.exports = { TotalTocadas, PopularidadeArtista, PopularidadeMusica, CountMusica }
