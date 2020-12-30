@@ -2,7 +2,6 @@ const {json} = require('express');
 let express = require('express')
 let app = express()
 const mm = require('music-metadata');
-const util = require('util');
 const configuracao = require("./config.json");
 const musicFolder = configuracao.FolderMusic;
 const ytdl = require('ytdl-core');
@@ -11,8 +10,8 @@ const bodyParser = require("body-parser");
 const fs = require('fs');
 const path = require('path');
 let musicasMeta = {};
-
-const abrirnavegador = require('open')
+const abrirnavegador = require('open');
+global.db = require('./db');
 
 app.use(express.static(__dirname + '/views'));
 app.use(express.static(__dirname + '/'));
@@ -67,6 +66,8 @@ app.get("/playMusic", function (req, res) {
         if (err) {
             returnData.success = false;
         } else {
+            //global.db.AtualizaCount();
+            global.db.CountMusica(req.query.artista, req.query.musica);
             let base64File = new Buffer.from(file, 'binary').toString('base64');
 
             returnData.success = true;
