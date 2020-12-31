@@ -82,4 +82,13 @@ const PopularidadeMusica = (musica) => new Promise((success, reject) => {
     Musica.findOne({'title': musica}).then(r => success(r !== null ? r.reproduzida : 0));
 });
 
-module.exports = { TotalTocadas, PopularidadeArtista, PopularidadeMusica, CountMusica }
+const RetornaTopMusicas = (qtd) => new Promise((success) => {
+    Musica.aggregate([{ '$lookup': {
+            'from': 'artistas',
+            'localField': 'artista',
+            'foreignField': '_id',
+            'as': 'Artista'
+        }}]).sort({'reproduzida': -1}).limit(qtd).exec().then(r => success(r));
+})
+
+module.exports = { TotalTocadas, PopularidadeArtista, PopularidadeMusica, CountMusica, RetornaTopMusicas }

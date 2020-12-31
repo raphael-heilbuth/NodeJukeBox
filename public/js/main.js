@@ -35,7 +35,7 @@ jQuery(function () {
                 case 'Youtube':
                 case 'TOP':
                 case 'Random':
-                    list.append(RetornaCapa(index, null, null, false));
+                    list.append(RetornaCapa(index, null, value["Musicas"].length, false));
                     break;
                 default:
                     list.append(RetornaCapa(index, value["Popularidade"], value["Musicas"].length));
@@ -344,6 +344,14 @@ function executaMusica(elemento, artista, musica, duracao, imageCapa, idMusica) 
     switch (artista) {
         case 'Random': {
             $.get("/randomMusica?Quantidade=" + musica, function (response) {
+                $.each(response, function (index, value) {
+                    executaMusica(null, value["Artista"], value["Musica"], value["Duracao"], null, null, null);
+                });
+            });
+        }
+            break;
+        case 'TOP': {
+            $.get("/topMusica?Quantidade=" + musica, function (response) {
                 $.each(response, function (index, value) {
                     executaMusica(null, value["Artista"], value["Musica"], value["Duracao"], null, null, null);
                 });

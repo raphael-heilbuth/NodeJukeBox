@@ -106,6 +106,28 @@ app.get("/randomMusica", function (req, res) {
     res.json(random);
 });
 
+app.get("/topMusica", async function (req, res) {
+    let top = [],
+        arrayTop = await global.db.RetornaTopMusicas(parseInt(req.query.Quantidade.replace("Top", "")));
+
+    Array.from(arrayTop).forEach(el => {
+        console.log(el)
+    });
+
+    Array.from(arrayTop).forEach(el => {
+        let musicas = musicasMeta[el["Artista"]["0"]["name"]]["Musicas"].find(x => x.Musica === el["title"]),
+            item = {
+                'Artista': el["Artista"]["0"]["name"],
+                'Musica': musicas["Musica"],
+                'Duracao': musicas["Meta"]["format"]["duration"]
+            }
+
+        top.push(item);
+    });
+
+    res.json(top);
+});
+
 function RetornaMusicas() {
     function readDir(dir) {
         let struct = {}
