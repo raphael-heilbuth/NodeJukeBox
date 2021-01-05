@@ -72,7 +72,7 @@ const TotalTocadas = () => new Promise((success, reject) => {
            }}]).exec().then(r => {
                 success(r.length > 0 ? r["0"].total : 0)
            })
-       .catch(success(()=> 0));
+       .catch(() => success(0));
 });
 
 const PopularidadeArtista = (artista) => new Promise((success, reject) => {

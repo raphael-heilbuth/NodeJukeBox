@@ -5,7 +5,10 @@ let audio = document.getElementById("myVideo"),
     alfabeto = [], 
     letraAnt = '',
     initial,
-    timePesquisaYoutube;
+    timePesquisaYoutube,
+    firstIndex,
+    lastIndex,
+    currentArtista;
 
 $('body').loading({
     stoppable: false,
@@ -94,6 +97,15 @@ jQuery(function () {
 
                 listaMusicaArtista.append(item);
             });
+
+            listaMusicaArtista.focus();
+
+            firstIndex = listaMusicaArtista.find('.item-musica').first().index();
+            lastIndex = listaMusicaArtista.find('.item-musica').last().index();
+
+            currentArtista = listaMusicaArtista;
+        } else {
+            $(this).find('.back').addClass('d-none').end().find('.front').removeClass('d-none');
         }
     });
 
@@ -104,14 +116,7 @@ jQuery(function () {
     });
 
     $(document).on('click', '.item-musica', function () {
-        let artista = $(this).attr('data-artista'),
-            musica = $(this).attr('data-musica'),
-            duracao = $(this).attr('data-duracao'),
-            idMusica = $(this).attr('data-id-musica'),
-            imageCapa = $(this).attr('data-capa'),
-            tipo = $(this).attr('data-tipo');
-
-        executaMusica($(this), artista, musica, duracao, imageCapa, idMusica, tipo);
+        selecionaMusica($(this));
     });
 
     audio.addEventListener('timeupdate', () => {
@@ -160,7 +165,23 @@ jQuery(function () {
         if (event.altKey === true && event.key === ".") MaisVolume();
         if (event.altKey === true && event.key === ",") MenosVolume();
         if (event.altKey === true && event.key === 'ArrowUp') {
-            ProximaLetra(letraAnt);
+            if ($('.flipster__item--current').find('.front').is(':visible')) {
+                ProximaLetra(letraAnt);
+            } else {
+                let index = currentArtista.find('.active').index();
+
+                index = (index === firstIndex ? lastIndex : index - 1);
+
+                currentArtista[0].scrollIntoView();
+
+                currentArtista.find('.active').removeClass('active');
+                let itemAtual = currentArtista.find('.list-group-item:eq( '+ index +' )').addClass('active');
+                itemAtual.get(0).scrollIntoView({
+                    behavior: "smooth", // or "auto" or "instant"
+                    block: "end" // or "start" or "end"
+                });
+            }
+
             audio.classList.add("Utilizando");
 
             clearTimeout(initial);
@@ -168,7 +189,20 @@ jQuery(function () {
             invocation();
         }
         if (event.altKey === true && event.key === 'ArrowDown') {
-            LetraAnterior(letraAnt);
+            if ($('.flipster__item--current').find('.front').is(':visible')) {
+                LetraAnterior(letraAnt);
+            } else {
+                let index = currentArtista.find('.active').index();
+
+                index = (index === lastIndex ? 0 : index + 1);
+
+                currentArtista.find('.active').removeClass('active');
+                let itemAtual = currentArtista.find('.list-group-item:eq( '+ index +' )').addClass('active');
+                itemAtual.get(0).scrollIntoView({
+                    behavior: "smooth", // or "auto" or "instant"
+                    block: "end" // or "end"
+                });
+            }
             audio.classList.add("Utilizando");
 
             clearTimeout(initial);
@@ -192,7 +226,19 @@ jQuery(function () {
             invocation();
         }
         if (event.altKey === true && event.key === 'Enter') {
-            $('.flipster__item--current').trigger('click');
+            let flipCurrent = $('.flipster__item--current');
+
+            if (flipCurrent.find('.front').is(':visible')) {
+                flipCurrent.trigger('click');
+            } else {
+                if (currentArtista.find('.active').length > 0) {
+                    selecionaMusica(currentArtista.find('.active'));
+                } else {
+                    //TODO: Adicionar informação na tela
+                    console.log("Nenhuma musica selecionada.");
+                }
+            }
+
             audio.classList.add("Utilizando");
 
             clearTimeout(initial);
@@ -201,6 +247,17 @@ jQuery(function () {
         }
     });
 });
+
+function selecionaMusica(elemento) {
+    let artista = elemento.attr('data-artista'),
+        musica = elemento.attr('data-musica'),
+        duracao = elemento.attr('data-duracao'),
+        idMusica = elemento.attr('data-id-musica'),
+        imageCapa = elemento.attr('data-capa'),
+        tipo = elemento.attr('data-tipo');
+
+    executaMusica(elemento, artista, musica, duracao, imageCapa, idMusica, tipo);
+}
 
 function removerAcentos(newStringComAcento) {
     let string = newStringComAcento;
@@ -441,7 +498,7 @@ function executaMusica(elemento, artista, musica, duracao, imageCapa, idMusica, 
 
                     if (response.success) {
                         let imageUrl = '../public/image/capas/' + encodeURIComponent(artista) + '.jpg',
-                            audioSrc = 'data:audio/'+tipo.replace('.','')+';base64,' + response.fileContent;
+                            audioSrc = 'data:audio/'+(tipo === null ? 'mp3' : tipo.replace('.',''))+';base64,' + response.fileContent;
 
                         info.removeClass('d-none');
                         $('.background-image').css('background-image', 'url(' + imageUrl + ')');
