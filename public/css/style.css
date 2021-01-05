@@ -143,6 +143,8 @@
     background: #000000d4;
     z-index: 1000;
     top: 48px;
+    -webkit-animation: scale-up-center 0.4s cubic-bezier(0.390, 0.575, 0.565, 1.000) both;
+    animation: scale-up-center 0.4s cubic-bezier(0.390, 0.575, 0.565, 1.000) both;
 }
 
 #myVideo.Utilizando {
@@ -153,6 +155,13 @@
     min-height: 382px;
     max-height: 382px;
     background: #000;
+    -webkit-animation: slide-tl 0.5s cubic-bezier(0.250, 0.460, 0.450, 0.940) reverse both;
+    animation: slide-tl 0.5s cubic-bezier(0.250, 0.460, 0.450, 0.940) reverse both;
+}
+
+#myVideo.d-none {
+    -webkit-animation: scale-down-center 0.4s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
+    animation: scale-down-center 0.4s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
 }
 
 @media (min-height: 769px)
@@ -171,3 +180,4 @@
         min-height: calc(100vh - 650px);
     }
 }
+

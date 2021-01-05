@@ -3,7 +3,8 @@ let audio = document.getElementById("myVideo"),
     listaProximasMusicas = [],
     coverflow,
     alfabeto = [], 
-    letraAnt = '';
+    letraAnt = '',
+    initial;
 
 $('body').loading({
     stoppable: false,
@@ -167,22 +168,42 @@ jQuery(function () {
         if (event.altKey === true && event.key === 'ArrowUp') {
             ProximaLetra(letraAnt);
             audio.classList.add("Utilizando");
+
+            clearTimeout(initial);
+
+            invocation();
         }
         if (event.altKey === true && event.key === 'ArrowDown') {
             LetraAnterior(letraAnt);
             audio.classList.add("Utilizando");
+
+            clearTimeout(initial);
+
+            invocation();
         }
         if (event.altKey === true && event.key === 'ArrowRight') {
             coverflow.flipster('next');
             audio.classList.add("Utilizando");
+
+            clearTimeout(initial);
+
+            invocation();
         }
         if (event.altKey === true && event.key === 'ArrowLeft') {
             coverflow.flipster('prev');
             audio.classList.add("Utilizando");
+
+            clearTimeout(initial);
+
+            invocation();
         }
         if (event.altKey === true && event.key === 'Enter') {
             $('.flipster__item--current').trigger('click');
             audio.classList.add("Utilizando");
+
+            clearTimeout(initial);
+
+            invocation();
         }
     });
 });
@@ -470,4 +491,11 @@ function ProximaLetra(letra) {
 function LetraAnterior(letra) {
     let proxLetra = letra === "" ? alfabeto[alfabeto.length - 1] : alfabeto[alfabeto.indexOf(letra) - 1 === -1 ? alfabeto.length - 1 : alfabeto.indexOf(letra) - 1];
     coverflow.flipster('jump', $('.' + $($('.flip-items').find('[data-letra="'+proxLetra +'"]')[0]).attr('class').split(' ')[3]));    
+}
+
+function invocation() {
+    initial = window.setTimeout(
+        function() {
+            audio.classList.remove("Utilizando");
+        }, 3000);
 }
