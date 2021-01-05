@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const { Artista, Musica } = require('./models');
 
-mongoose.connect('mongodb://localhost/JukeBox', {useNewUrlParser: true});
+mongoose.connect('mongodb://localhost/JukeBox', {useNewUrlParser: true,useUnifiedTopology: true});
 
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
@@ -70,9 +70,9 @@ const TotalTocadas = () => new Promise((success, reject) => {
                _id: null,
                total: { $sum: "$reproduzida"}
            }}]).exec().then(r => {
-                success(r !== null ? r["0"].total : 0)
+                success(r.length > 0 ? r["0"].total : 0)
            })
-       .catch(success(0));
+       .catch(success(()=> 0));
 });
 
 const PopularidadeArtista = (artista) => new Promise((success, reject) => {
