@@ -4,7 +4,8 @@ let audio = document.getElementById("myVideo"),
     coverflow,
     alfabeto = [], 
     letraAnt = '',
-    initial;
+    initial,
+    timePesquisaYoutube;
 
 $('body').loading({
     stoppable: false,
@@ -97,16 +98,9 @@ jQuery(function () {
     });
 
     $(document).on('keydown', '#pesquisa-youtube', function () {
-        let query = $(this).val(),
-            list = $('#pesquisa-youtube').offsetParent();
+        clearTimeout(timePesquisaYoutube);
 
-        $('.item-exclude').remove();
-
-        $.get("/buscaYoutube?busca=" + encodeURI(query), function (retornoLista) {
-            $.each(retornoLista, function (index, value) {
-                list.append(RetornaMusica('Youtube', value["Titulo"], value["Duracao"], value["IdMusica"], value["Capa"], true));
-            })
-        });
+        timeYoutube($(this).val());
     });
 
     $(document).on('click', '.item-musica', function () {
@@ -500,4 +494,23 @@ function invocation() {
         function() {
             audio.classList.remove("Utilizando");
         }, 3000);
+}
+
+function timeYoutube(query) {
+    timePesquisaYoutube = window.setTimeout(
+        function() {
+            pesquisaYoutube(query)
+        }, 2000);
+}
+
+function pesquisaYoutube(query) {
+    let list = $('#pesquisa-youtube').offsetParent();
+
+    $('.item-exclude').remove();
+
+    $.get("/buscaYoutube?busca=" + encodeURI(query), function (retornoLista) {
+        $.each(retornoLista, function (index, value) {
+            list.append(RetornaMusica('Youtube', value["Titulo"], value["Duracao"], value["IdMusica"], value["Capa"], true));
+        })
+    });
 }

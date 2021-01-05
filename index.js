@@ -111,10 +111,6 @@ app.get("/topMusica", async function (req, res) {
         arrayTop = await global.db.RetornaTopMusicas(parseInt(req.query.Quantidade.replace("Top", "")));
 
     Array.from(arrayTop).forEach(el => {
-        console.log(el)
-    });
-
-    Array.from(arrayTop).forEach(el => {
         let musicas = musicasMeta[el["Artista"]["0"]["name"]]["Musicas"].find(x => x.Musica === el["title"]),
             item = {
                 'Artista': el["Artista"]["0"]["name"],
