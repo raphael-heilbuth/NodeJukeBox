@@ -67,7 +67,7 @@ app.get("/playMusic", function (req, res) {
             returnData.success = false;
         } else {
             //global.db.AtualizaCount();
-            global.db.CountMusica(req.query.artista, req.query.musica);
+            //global.db.CountMusica(req.query.artista, req.query.musica);
             let base64File = new Buffer.from(file, 'binary').toString('base64');
 
             returnData.success = true;
@@ -78,7 +78,7 @@ app.get("/playMusic", function (req, res) {
 });
 
 app.get("/tocaYoutube", function (req, res) {
-    ytdl(req.query.IdMusica, {filter: 'audioonly', highWaterMark: 1 << 25}).pipe(res);
+    ytdl(req.query.IdMusica, {highWaterMark: 1 << 25}).pipe(res);
 });
 
 app.get("/buscaYoutube", function (req, res) {
