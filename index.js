@@ -66,8 +66,7 @@ app.get("/playMusic", function (req, res) {
         if (err) {
             returnData.success = false;
         } else {
-            //global.db.AtualizaCount();
-            //global.db.CountMusica(req.query.artista, req.query.musica);
+            global.db.CountMusica(req.query.artista, req.query.musica);
             let base64File = new Buffer.from(file, 'binary').toString('base64');
 
             returnData.success = true;
