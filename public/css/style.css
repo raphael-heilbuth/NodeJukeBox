@@ -134,6 +134,27 @@
     overflow: hidden;
 }
 
+#myVideo {
+    position: absolute;
+    width: 100%;
+    height: calc((9 / 16) * 100vw);
+    max-height: calc(100vh - 464px);
+    min-height: 480px;
+    background: #000000d4;
+    z-index: 1000;
+    top: 48px;
+}
+
+#myVideo.Utilizando {
+    width: 623px;
+    top: 580px;
+    left: 1282px;
+    height: 382px;
+    min-height: 382px;
+    max-height: 382px;
+    background: #000;
+}
+
 @media (min-height: 769px)
 {
     .img-capa {

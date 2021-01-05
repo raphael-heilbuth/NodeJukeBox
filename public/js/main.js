@@ -1,4 +1,4 @@
-let audio = new Audio(),
+let audio = document.getElementById("myVideo"),
     listaMusicas,
     listaProximasMusicas = [],
     coverflow,
@@ -88,7 +88,7 @@ jQuery(function () {
             $.each(listaMusicas[artista]["Musicas"], function (index,value) {
 
                 let meta = value["Meta"],
-                    item = RetornaMusica(artista, value["Musica"], (meta !== null ? meta["format"]["duration"] : meta), null, null, null, value["PopularidadeGlobal"], value["PopularidadeArtista"]);
+                    item = RetornaMusica(artista, value["Musica"], (meta !== null ? meta["format"]["duration"] : meta), null, null, null, value["PopularidadeGlobal"], value["PopularidadeArtista"], value["Tipo"]);
 
                 listaMusicaArtista.append(item);
             });
@@ -113,9 +113,10 @@ jQuery(function () {
             musica = $(this).attr('data-musica'),
             duracao = $(this).attr('data-duracao'),
             idMusica = $(this).attr('data-id-musica'),
-            imageCapa = $(this).attr('data-capa');
+            imageCapa = $(this).attr('data-capa'),
+            tipo = $(this).attr('data-tipo');
 
-        executaMusica($(this), artista, musica, duracao, imageCapa, idMusica);
+        executaMusica($(this), artista, musica, duracao, imageCapa, idMusica, tipo);
     });
 
     audio.addEventListener('timeupdate', () => {
@@ -127,6 +128,8 @@ jQuery(function () {
         $('#music-info').addClass('d-none');
         let imageCapa = '../public/image/default/NodeJukebox.png';
         $('.background-image').css('background-image', 'url(' + imageCapa + ')');
+
+        audio.classList.add("d-none");
 
         ExecutaProxima();
     });
@@ -161,10 +164,26 @@ jQuery(function () {
         if (event.altKey === true && event.key === "n") Next();
         if (event.altKey === true && event.key === ".") MaisVolume();
         if (event.altKey === true && event.key === ",") MenosVolume();
-        if (event.altKey === true && event.key === 'ArrowUp') ProximaLetra(letraAnt);
-        if (event.altKey === true && event.key === 'ArrowDown') LetraAnterior(letraAnt);
-        if (event.altKey === true && event.key === 'ArrowRight') coverflow.flipster('next');
-        if (event.altKey === true && event.key === 'ArrowLeft') coverflow.flipster('prev');
+        if (event.altKey === true && event.key === 'ArrowUp') {
+            ProximaLetra(letraAnt);
+            audio.classList.add("Utilizando");
+        }
+        if (event.altKey === true && event.key === 'ArrowDown') {
+            LetraAnterior(letraAnt);
+            audio.classList.add("Utilizando");
+        }
+        if (event.altKey === true && event.key === 'ArrowRight') {
+            coverflow.flipster('next');
+            audio.classList.add("Utilizando");
+        }
+        if (event.altKey === true && event.key === 'ArrowLeft') {
+            coverflow.flipster('prev');
+            audio.classList.add("Utilizando");
+        }
+        if (event.altKey === true && event.key === 'Enter') {
+            $('.flipster__item--current').trigger('click');
+            audio.classList.add("Utilizando");
+        }
     });
 });
 
@@ -264,8 +283,8 @@ function MaisVolume() {
     }
 }
 
-function RetornaMusica(artista, index, duracao = null, idMusica = null, capa = null, excluir = false, popularidadeGloba = null, popularidadeArtista = null) {
-    let item = '<li class="list-group-item item-musica ' + (excluir ? 'item-exclude' : '') + '" data-artista="' + artista + '" data-musica="' + index + '" data-id-musica="' + idMusica + '" data-capa="' + capa + '" data-duracao="' + duracao + '">' +
+function RetornaMusica(artista, index, duracao = null, idMusica = null, capa = null, excluir = false, popularidadeGloba = null, popularidadeArtista = null, tipo = null) {
+    let item = '<li class="list-group-item item-musica ' + (excluir ? 'item-exclude' : '') + '" data-artista="' + artista + '" data-musica="' + index + '" data-id-musica="' + idMusica + '" data-capa="' + capa + '" data-duracao="' + duracao + '" data-tipo="' + tipo + '">' +
         '   <div class="form-row">' +
         '        <div class="col titulo-musica">';
 
@@ -280,7 +299,7 @@ function RetornaMusica(artista, index, duracao = null, idMusica = null, capa = n
             item += '            <i class="fas fa-chevron-circle-up"></i>&nbsp;' + index;
             break;
         default:
-            item += '            <i class="fas fa-compact-disc"></i>&nbsp;' + index;
+            item += '            <i class="fas ' + (tipo === '.mp3' ? 'fa-compact-disc' : 'fa-video') + '"></i>&nbsp;' + index;
             break;
     }
 
@@ -323,21 +342,22 @@ function listaProximas() {
     $('#badge-proximas').html(listaProximasMusicas.length);
 
     $.each(listaProximasMusicas, function (index, value) {
-        lista.append(RetornaMusica(value["Artista"], value["Musica"], value["Duracao"], value["IdMusica"], value["ImagemCapa"], value["IdMusica"] !== null));
+        lista.append(RetornaMusica(value["Artista"], value["Musica"], value["Duracao"], value["IdMusica"], value["ImagemCapa"], value["IdMusica"] !== null, null, null, value["Tipo"]));
     });
 }
 
-function ItemProximaMusica(artista, musica, duracao, idMusica, imageCapa) {
+function ItemProximaMusica(artista, musica, duracao, idMusica, imageCapa, tipo) {
     return {
         'Artista': artista,
         'Musica': musica,
         'Duracao': duracao,
         'IdMusica': idMusica,
-        'ImagemCapa': imageCapa
+        'ImagemCapa': imageCapa,
+        'Tipo': tipo
     };
 }
 
-function executaMusica(elemento, artista, musica, duracao, imageCapa, idMusica) {
+function executaMusica(elemento, artista, musica, duracao, imageCapa, idMusica, tipo) {
     let carregando = $('#music-carregando'),
         info = $('#music-info');
 
@@ -404,13 +424,17 @@ function executaMusica(elemento, artista, musica, duracao, imageCapa, idMusica) 
 
                     if (response.success) {
                         let imageUrl = '../public/image/capas/' + encodeURIComponent(artista) + '.jpg',
-                            audioSrc = 'data:audio/mp3;base64,' + response.fileContent;
+                            audioSrc = 'data:audio/'+tipo.replace('.','')+';base64,' + response.fileContent;
 
                         info.removeClass('d-none');
                         $('.background-image').css('background-image', 'url(' + imageUrl + ')');
                         $('.capa-atual').attr("src", imageUrl);
                         $('#title-musica').html('<i class="fas fa-compact-disc"></i>&nbsp;' + musica);
                         $('#artista-musica').html(artista);
+
+                        if (tipo === ".mp4") {
+                            audio.classList.remove("d-none");
+                        }
 
                         audio.src = audioSrc;
                         audio.load();
@@ -420,7 +444,7 @@ function executaMusica(elemento, artista, musica, duracao, imageCapa, idMusica) 
                     }
                 });
             } else {
-                listaProximasMusicas.push(ItemProximaMusica(artista, musica, duracao, null, null));
+                listaProximasMusicas.push(ItemProximaMusica(artista, musica, duracao, null, null, tipo));
 
                 listaProximas();
             }
@@ -432,7 +456,7 @@ function ExecutaProxima() {
     if (listaProximasMusicas.length > 0) {
         let proxima = listaProximasMusicas.shift();
 
-        executaMusica(null, proxima["Artista"], proxima["Musica"], proxima["Duracao"], proxima["ImagemCapa"], proxima["IdMusica"]);
+        executaMusica(null, proxima["Artista"], proxima["Musica"], proxima["Duracao"], proxima["ImagemCapa"], proxima["IdMusica"], proxima["Tipo"]);
 
         listaProximas();
     }

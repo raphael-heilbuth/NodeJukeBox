@@ -169,7 +169,7 @@ const RetornaListaMetaData = (lista) => new Promise(async (success, reject) => {
                 await RetornaMetaData(configuracao.FolderMusic + "/" + pasta + "/" + musica[0])
                     .then(meta => {
                         global.db.PopularidadeMusica(musica[0]).then(tocadasMusica => {
-                            retornoMusica.push({'Musica': musica[0], 'Meta': meta, 'PopularidadeGlobal': (tocadasMusica * 100) / totalTocadas, 'PopularidadeArtista': (tocadasMusica * 100) / tocadasArtista});
+                            retornoMusica.push({'Musica': musica[0], 'Tipo': path.extname(musica[0]), 'Meta': meta, 'PopularidadeGlobal': (tocadasMusica * 100) / totalTocadas, 'PopularidadeArtista': (tocadasMusica * 100) / tocadasArtista});
                         })
                     })
                     .catch(err => {
