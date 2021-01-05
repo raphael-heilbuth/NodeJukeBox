@@ -422,11 +422,13 @@ function executaMusica(elemento, artista, musica, duracao, imageCapa, idMusica, 
                                 $('.capa-atual').attr("src", imageCapa);
                                 $('#title-musica').html('<i class="fab fa-youtube"></i>&nbsp;' + musica);
                                 $('#artista-musica').html(artista);
+                                audio.classList.remove("d-none");
 
                                 audio.src = URL.createObjectURL(blob);
 
                                 audio.load();
                                 audio.play();
+
                             })
                     } else {
                         listaProximasMusicas.push(ItemProximaMusica(artista, musica, duracao, idMusica, imageCapa));
