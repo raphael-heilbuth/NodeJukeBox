@@ -20,23 +20,31 @@ $('body').loading({
     start: true
 });
 
+$.fn.countAnimation = function (valor) {
+    animationCount($(this), valor);
+}
+
 jQuery(function () {
     "use strict";
     audio.volume = 0.1;
     $('#ranger-volume').val(audio.volume);
 
     $.get("/getList", function (data) {
-        listaMusicas = data;
+        listaMusicas = data["ListaMusica"];
+
+        $('#total-musica').html(data["TotalMusicas"]).countAnimation(data["TotalMusicas"]);
+        $('#tocadas').html(data["MusicasTocas"]).countAnimation(data["MusicasTocas"]);
+        $('#total-reproducao').html(data["TotalReproducao"]).countAnimation(data["TotalReproducao"]);
 
         let list = $('.flip-items');
 
-        alfabeto = Object.keys(data).map(function(artista) {
+        alfabeto = Object.keys(listaMusicas).map(function(artista) {
             return removerAcentos(artista.substr(0, 1));
         }).filter(function(itm, i, a) {
             return i === a.indexOf(itm);
         });
 
-        $.each(data, function (index, value) {
+        $.each(listaMusicas, function (index, value) {
             switch (index) {
                 case 'Youtube':
                 case 'TOP':
@@ -570,5 +578,17 @@ function pesquisaYoutube(query) {
         $.each(retornoLista, function (index, value) {
             list.append(RetornaMusica('Youtube', value["Titulo"], value["Duracao"], value["IdMusica"], value["Capa"], true));
         })
+    });
+}
+
+function animationCount(element, valor) {
+    element.prop('Counter', 0).animate({
+        Counter: valor > 0 ? valor : $(this).text()
+    }, {
+        duration: 3000,
+        easing: 'swing',
+        step: function (now) {
+            element.text(Math.ceil(now));
+        }
     });
 }

@@ -193,6 +193,10 @@
     font-weight: bold;
 }
 
+.border-right {
+    border-right: 1px solid rgba(0,0,0,.1);
+}
+
 @media (min-height: 769px)
 {
     .img-capa {

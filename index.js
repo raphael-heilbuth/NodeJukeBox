@@ -1,5 +1,5 @@
-let express = require('express')
-let app = express()
+const express = require('express')
+const app = express()
 const mm = require('music-metadata');
 const configuracao = require("./config.json");
 const musicFolder = configuracao.FolderMusic;
@@ -8,8 +8,11 @@ const youtubeSearch = require('youtube-sr');
 const bodyParser = require("body-parser");
 const fs = require('fs');
 const path = require('path');
+const abrirNavegador = require('open');
+
 let musicasMeta = {};
-const abrirnavegador = require('open');
+let totalMusica = 0;
+
 global.db = require('./db');
 
 app.use(express.static(__dirname + '/views'));
@@ -27,9 +30,11 @@ app.listen(8000, function () {
 })
 
 app.get("/getList",  async function (req, res) {
-    let listaMusicas = RetornaMusicas();
+    let listaMusicas = RetornaMusicas(),
+        musicasTocadas = await global.db.MusicasTocadas(),
+        totalTocadas = await global.db.TotalTocadas();
 
-    musicasMeta = await RetornaListaMetaData(listaMusicas);
+    musicasMeta = await RetornaListaMetaData(listaMusicas, totalTocadas);
 
     musicasMeta["Youtube"] = {"Musicas": [
         {"Musica": "Pesquisar", "Meta": null}
@@ -55,7 +60,14 @@ app.get("/getList",  async function (req, res) {
         orderedListaMusicas[v] = musicasMeta[v];
     });
 
-    res.json(orderedListaMusicas);
+     let lista = {
+         'ListaMusica': orderedListaMusicas,
+         'TotalMusicas': totalMusica,
+         'MusicasTocas': musicasTocadas,
+         'TotalReproducao': totalTocadas
+     }
+
+    res.json(lista);
 });
 
 app.get("/playMusic", function (req, res) {
@@ -154,9 +166,9 @@ function RetornaMusicas() {
     return readDir(musicFolder);
 }
 
-const RetornaListaMetaData = (lista) => new Promise(async (success) => {
-    let retornoMeta = [],
-        totalTocadas = await global.db.TotalTocadas();
+const RetornaListaMetaData = (lista, totalTocadas) => new Promise(async (success) => {
+    let retornoMeta = [];
+
     for (const pasta of Object.keys(lista)){
         let retornoMusica = [],
             tocadasArtista = await global.db.PopularidadeArtista(pasta);
@@ -164,6 +176,7 @@ const RetornaListaMetaData = (lista) => new Promise(async (success) => {
             if (musica[0].includes('.mp3') || musica[0].includes('.mp4')) {
                 await RetornaMetaData(configuracao.FolderMusic + "/" + pasta + "/" + musica[0])
                     .then(meta => {
+                        totalMusica++;
                         global.db.PopularidadeMusica(pasta, musica[0]).then(tocadasMusica => {
                             retornoMusica.push({'Musica': musica[0], 'Tipo': path.extname(musica[0]), 'Meta': meta, 'PopularidadeGlobal': (100 / totalTocadas) * tocadasMusica, 'PopularidadeArtista': (100 / tocadasArtista) * tocadasMusica});
                         })
@@ -210,4 +223,4 @@ const getRandomInteger = (max) => {
     return Math.floor(Math.random() * max);
 }
 
-abrirnavegador('http://localhost:8000');
+abrirNavegador('http://localhost:8000');

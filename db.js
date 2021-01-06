@@ -99,6 +99,12 @@ const RetornaTopMusicas = (qtd) => new Promise((success) => {
             'foreignField': '_id',
             'as': 'Artista'
         }}]).sort({'reproduzida': -1}).limit(qtd).exec().then(r => success(r));
-})
+});
 
-module.exports = { TotalTocadas, PopularidadeArtista, PopularidadeMusica, CountMusica, RetornaTopMusicas }
+const MusicasTocadas = () => new Promise((success) => {
+    Musica.count({}, function( err, count){
+        success(count);
+    });
+});
+
+module.exports = { TotalTocadas, PopularidadeArtista, PopularidadeMusica, CountMusica, RetornaTopMusicas, MusicasTocadas }
