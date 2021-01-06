@@ -242,8 +242,14 @@ jQuery(function () {
                 if (currentArtista.find('.active').length > 0) {
                     selecionaMusica(currentArtista.find('.active'));
                 } else {
-                    //TODO: Adicionar informação na tela
-                    console.log("Nenhuma musica selecionada.");
+                    let tooltips = $('body').tooltip({
+                        title: 'Nenhuma musica selecionada.',
+                        template: '<div class="tooltip tooltip-sem-musica" role="tooltip"><div class="tooltip-inner"></div></div>'
+                    }).tooltip('show');
+
+                    setTimeout(function () {
+                        tooltips.tooltip('dispose');
+                    }, 1000);
                 }
             }
 

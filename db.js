@@ -102,7 +102,7 @@ const RetornaTopMusicas = (qtd) => new Promise((success) => {
 });
 
 const MusicasTocadas = () => new Promise((success) => {
-    Musica.count({}, function( err, count){
+    Musica.countDocuments({}, function( err, count){
         success(count);
     });
 });
