@@ -164,6 +164,35 @@
     animation: scale-down-center 0.4s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
 }
 
+.statusbar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    background-color: #ffffffb3;
+    width: 50vw;
+    border-top-right-radius: 29px;
+    padding-inline-start: 10px;
+}
+
+.list-group-item.item-musica {
+    background-color: transparent;
+}
+
+.list-group-item.item-musica.active {
+    background-color: #007bff96;
+    border-color: #007bffb3;
+}
+.capa-artista-list {
+    position: absolute;
+    width: 500px;
+    height: 500px;
+    opacity: 0.2;
+}
+
+.title-artista{
+    font-weight: bold;
+}
+
 @media (min-height: 769px)
 {
     .img-capa {
@@ -180,4 +209,3 @@
         min-height: calc(100vh - 650px);
     }
 }
-

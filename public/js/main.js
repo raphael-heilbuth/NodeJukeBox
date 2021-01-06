@@ -4,11 +4,12 @@ let audio = document.getElementById("myVideo"),
     coverflow,
     alfabeto = [], 
     letraAnt = '',
-    initial,
+    timeVideo,
     timePesquisaYoutube,
     firstIndex,
     lastIndex,
-    currentArtista;
+    currentArtista,
+    timeRandom;
 
 $('body').loading({
     stoppable: false,
@@ -81,7 +82,6 @@ jQuery(function () {
     });
 
     $(document).on('click', '.flipster__item--current', function () {
-
         if (!$(this).find('.back').is(':visible')) {
             let listaMusicaArtista = $(this).find('.back').find('ul'),
                 artista = $(this).attr('data-flip-title');
@@ -104,8 +104,6 @@ jQuery(function () {
             lastIndex = listaMusicaArtista.find('.item-musica').last().index();
 
             currentArtista = listaMusicaArtista;
-        } else {
-            $(this).find('.back').addClass('d-none').end().find('.front').removeClass('d-none');
         }
     });
 
@@ -132,6 +130,8 @@ jQuery(function () {
         audio.classList.add("d-none");
 
         ExecutaProxima();
+
+        clearInterval(timeRandom);
     });
 
     $("#ranger-volume").on('change', function () {
@@ -149,7 +149,7 @@ jQuery(function () {
         }
     });
 
-    setInterval(() => {
+    timeRandom = setInterval(() => {
         if (audio.paused) {
             $.get("/randomMusica?Quantidade=1", function (response) {
                 $.each(response, function (index, value) {
@@ -184,7 +184,7 @@ jQuery(function () {
 
             audio.classList.add("Utilizando");
 
-            clearTimeout(initial);
+            clearTimeout(timeVideo);
 
             invocation();
         }
@@ -205,7 +205,7 @@ jQuery(function () {
             }
             audio.classList.add("Utilizando");
 
-            clearTimeout(initial);
+            clearTimeout(timeVideo);
 
             invocation();
         }
@@ -213,7 +213,7 @@ jQuery(function () {
             coverflow.flipster('next');
             audio.classList.add("Utilizando");
 
-            clearTimeout(initial);
+            clearTimeout(timeVideo);
 
             invocation();
         }
@@ -221,7 +221,7 @@ jQuery(function () {
             coverflow.flipster('prev');
             audio.classList.add("Utilizando");
 
-            clearTimeout(initial);
+            clearTimeout(timeVideo);
 
             invocation();
         }
@@ -241,7 +241,7 @@ jQuery(function () {
 
             audio.classList.add("Utilizando");
 
-            clearTimeout(initial);
+            clearTimeout(timeVideo);
 
             invocation();
         }
@@ -315,9 +315,10 @@ function RetornaCapa(index, popularidade = null, qtdMusica = null, capa = true) 
         '        </div>' +
         '        <div class="back img-capa d-none">' +
         '           <div class="card">' +
+        '                <img src="' + (capa ? "../public/image/capas/" : "../public/image/default/") + index + '.jpg" class="capa-artista-list" alt="capa">' +
         '                <div class="card-header">'+
         '                   <div class="form-row">' +
-        '                       <div class="col">' +
+        '                       <div class="col title-artista">' +
                                     index +
         '                       </div>' +
         '                       <div class="col-2 padding-top-list-music">' +
@@ -547,7 +548,7 @@ function LetraAnterior(letra) {
 }
 
 function invocation() {
-    initial = window.setTimeout(
+    timeVideo = window.setTimeout(
         function() {
             audio.classList.remove("Utilizando");
         }, 3000);
@@ -557,7 +558,7 @@ function timeYoutube(query) {
     timePesquisaYoutube = window.setTimeout(
         function() {
             pesquisaYoutube(query)
-        }, 2000);
+        }, 1500);
 }
 
 function pesquisaYoutube(query) {

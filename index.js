@@ -1,4 +1,3 @@
-const {json} = require('express');
 let express = require('express')
 let app = express()
 const mm = require('music-metadata');
@@ -52,7 +51,7 @@ app.get("/getList",  async function (req, res) {
 
     let orderedListaMusicas = {};
 
-     Object.keys(musicasMeta).sort().forEach(function (v, i) {
+     Object.keys(musicasMeta).sort().forEach(function (v) {
         orderedListaMusicas[v] = musicasMeta[v];
     });
 
@@ -62,11 +61,11 @@ app.get("/getList",  async function (req, res) {
 app.get("/playMusic", function (req, res) {
     let returnData = {};
 
-    fs.readFile(musicFolder + '/' + req.query.artista + '/' + req.query.musica, function (err, file) {
+    fs.readFile(musicFolder + '/' + req.query["artista"] + '/' + req.query["musica"], function (err, file) {
         if (err) {
             returnData.success = false;
         } else {
-            global.db.CountMusica(req.query.artista, req.query.musica);
+            global.db.CountMusica(req.query["artista"], req.query["musica"]);
             let base64File = new Buffer.from(file, 'binary').toString('base64');
 
             returnData.success = true;
@@ -81,7 +80,7 @@ app.get("/tocaYoutube", function (req, res) {
 });
 
 app.get("/buscaYoutube", function (req, res) {
-    retornaMusicaYoutube(req.query.busca)
+    retornaMusicaYoutube(req.query["busca"])
         .then(listaYoutube => {
             res.json(listaYoutube);
         })
@@ -90,7 +89,7 @@ app.get("/buscaYoutube", function (req, res) {
 app.get("/randomMusica", function (req, res) {
     let random = [];
 
-    for (let i = 0; i < parseInt(req.query.Quantidade.replace("Random", "")); i++) {
+    for (let i = 0; i < parseInt(req.query["Quantidade"].replace("Random", "")); i++) {
         let artista = Object.keys(musicasMeta)[getRandomInteger(Object.keys(musicasMeta).length)],
             musicas = musicasMeta[artista]["Musicas"][getRandomInteger(musicasMeta[artista]["Musicas"].length)],
             item = {
@@ -107,7 +106,7 @@ app.get("/randomMusica", function (req, res) {
 
 app.get("/topMusica", async function (req, res) {
     let top = [],
-        arrayTop = await global.db.RetornaTopMusicas(parseInt(req.query.Quantidade.replace("Top", "")));
+        arrayTop = await global.db.RetornaTopMusicas(parseInt(req.query["Quantidade"].replace("Top", "")));
 
     Array.from(arrayTop).forEach(el => {
         let musicas = musicasMeta[el["Artista"]["0"]["name"]]["Musicas"].find(x => x.Musica === el["title"]),
@@ -153,7 +152,7 @@ function RetornaMusicas() {
     return readDir(musicFolder);
 }
 
-const RetornaListaMetaData = (lista) => new Promise(async (success, reject) => {
+const RetornaListaMetaData = (lista) => new Promise(async (success) => {
     let retornoMeta = [],
         totalTocadas = await global.db.TotalTocadas();
     for (const pasta of Object.keys(lista)){
@@ -163,8 +162,8 @@ const RetornaListaMetaData = (lista) => new Promise(async (success, reject) => {
             if (musica[0].includes('.mp3') || musica[0].includes('.mp4')) {
                 await RetornaMetaData(configuracao.FolderMusic + "/" + pasta + "/" + musica[0])
                     .then(meta => {
-                        global.db.PopularidadeMusica(musica[0]).then(tocadasMusica => {
-                            retornoMusica.push({'Musica': musica[0], 'Tipo': path.extname(musica[0]), 'Meta': meta, 'PopularidadeGlobal': (tocadasMusica * 100) / totalTocadas, 'PopularidadeArtista': (tocadasMusica * 100) / tocadasArtista});
+                        global.db.PopularidadeMusica(pasta, musica[0]).then(tocadasMusica => {
+                            retornoMusica.push({'Musica': musica[0], 'Tipo': path.extname(musica[0]), 'Meta': meta, 'PopularidadeGlobal': (100 / totalTocadas) * tocadasMusica, 'PopularidadeArtista': (100 / tocadasArtista) * tocadasMusica});
                         })
                     })
                     .catch(err => {
@@ -172,7 +171,7 @@ const RetornaListaMetaData = (lista) => new Promise(async (success, reject) => {
                     })
             }
         }
-        retornoMeta[pasta] = {'Musicas' : retornoMusica, 'Popularidade':  (tocadasArtista * 100) / totalTocadas}
+        retornoMeta[pasta] = {'Musicas' : retornoMusica, 'Popularidade':  (100 / totalTocadas) * tocadasArtista }
     }
     success(retornoMeta);
 });
