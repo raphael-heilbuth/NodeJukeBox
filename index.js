@@ -95,7 +95,8 @@ app.get("/randomMusica", function (req, res) {
             item = {
                 'Artista': artista,
                 'Musica': musicas["Musica"],
-                'Duracao': musicas["Meta"]["format"]["duration"]
+                'Duracao': musicas["Meta"]["format"]["duration"],
+                'Tipo': path.extname(musicas["Musica"])
             }
 
         random.push(item);
@@ -113,7 +114,8 @@ app.get("/topMusica", async function (req, res) {
             item = {
                 'Artista': el["Artista"]["0"]["name"],
                 'Musica': musicas["Musica"],
-                'Duracao': musicas["Meta"]["format"]["duration"]
+                'Duracao': musicas["Meta"]["format"]["duration"],
+                'Tipo': path.extname(musicas["Musica"])
             }
 
         top.push(item);
