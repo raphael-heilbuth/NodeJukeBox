@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const { Artista, Musica } = require('./models');
 
-mongoose.connect('mongodb://localhost/JukeBox', {useNewUrlParser: true,useUnifiedTopology: true});
+mongoose.connect('mongodb://localhost/JukeBox', {useNewUrlParser: true,useUnifiedTopology: true}).then(() => {});
 
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
@@ -22,7 +22,7 @@ function CountMusica(artista, musica) {
 
                 console.log('Artista %s salvo', artista);
 
-                Musica.findOne({'title': musica}, function (err, retornoMusica) {
+                Musica.findOne({'title': musica, 'artista': newArtista._id}, function (err, retornoMusica) {
                     if (err) return console.log(err);
 
                     if (retornoMusica === null) {
@@ -40,9 +40,9 @@ function CountMusica(artista, musica) {
                 });
             });
         } else {
-            Artista.updateOne({'name': artista}, {$inc: {reproduzida: 1}}).exec().then(r => console.log(r));
+            Artista.updateOne({'_id': retornoArtista._id}, {$inc: {reproduzida: 1}}).exec().then(r => console.log(r));
 
-            Musica.findOne({'title': musica}, function (err, retornoMusica) {
+            Musica.findOne({'title': musica, 'artista': retornoArtista._id}, function (err, retornoMusica) {
                 if (err) return console.log(err);
 
                 if (retornoMusica === null) {
@@ -57,14 +57,14 @@ function CountMusica(artista, musica) {
                         console.log("Musica %s salva", musica);
                     });
                 } else {
-                    Musica.updateOne({'title': musica}, {$inc: {reproduzida: 1}}).exec().then(r => console.log(r));
+                    Musica.updateOne({'_id': retornoMusica._id}, {$inc: {reproduzida: 1}}).exec().then(r => console.log(r));
                 }
             });
         }
     });
 }
 
-const TotalTocadas = () => new Promise((success, reject) => {
+const TotalTocadas = () => new Promise((success) => {
    Artista.aggregate([
        { $group: {
                _id: null,
@@ -75,12 +75,21 @@ const TotalTocadas = () => new Promise((success, reject) => {
        .catch(() => success(0));
 });
 
-const PopularidadeArtista = (artista) => new Promise((success, reject) => {
+const PopularidadeArtista = (artista) => new Promise((success) => {
     Artista.findOne({'name': artista}).then(r => success(r !== null ? r.reproduzida : 0));
 });
 
-const PopularidadeMusica = (musica) => new Promise((success, reject) => {
-    Musica.findOne({'title': musica}).then(r => success(r !== null ? r.reproduzida : 0));
+const PopularidadeMusica = (artista, musica) => new Promise((success) => {
+    Artista.findOne({'name': artista}).then(artista => {
+        if (artista === null) {
+            success(0);
+        } else {
+            Musica.findOne({
+                'title': musica,
+                'artista': artista._id
+            }).then(r => success(r !== null ? r.reproduzida : 0));
+        }
+    });
 });
 
 const RetornaTopMusicas = (qtd) => new Promise((success) => {
