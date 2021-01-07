@@ -94,10 +94,43 @@
 }
 
 .titulo-musica {
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
     word-spacing: normal;
+    display: inline-block;
+    /* important */
+    white-space: nowrap;
+    overflow: hidden;
+    /* when not hovering show ellipsis */
+    /* animate on either hover or focus */
+    /* define the animation */
+}
+.titulo-musica:not(.active) {
+    text-overflow: ellipsis;
+}
+.titulo-musica.active span {
+    display: inline-block;
+    animation-name: scroll-text;
+    animation-duration: 7s;
+    animation-timing-function: linear;
+    animation-delay: 0s;
+    animation-iteration-count: infinite;
+    animation-direction: normal;
+    /* FYI this would be the shorthand:
+      animation: scroll-text 5s ease 0s 2 normal;
+    */
+}
+@keyframes scroll-text {
+    0% {
+        transform: translateX(0%);
+    }
+    90% {
+        transform: translateX(-100%);
+    }
+    95% {
+        transform: translateX(0%);
+    }
+    100% {
+        transform: translateX(0%);
+    }
 }
 
 .row-coverflow {
@@ -147,12 +180,11 @@
 #myVideo {
     position: absolute;
     width: 100%;
-    height: calc((9 / 16) * 100vw);
-    max-height: calc(100vh - 464px);
-    min-height: 480px;
+    height: 564px;
+    max-height: 564px;
+    min-height: 564px;
     background: #000000d4;
     z-index: 1000;
-    top: 48px;
     -webkit-animation: scale-up-center 0.4s cubic-bezier(0.390, 0.575, 0.565, 1.000) both;
     animation: scale-up-center 0.4s cubic-bezier(0.390, 0.575, 0.565, 1.000) both;
 }
@@ -192,6 +224,7 @@
     background-color: #007bff96;
     border-color: #007bffb3;
 }
+
 .capa-artista-list {
     position: absolute;
     width: 500px;
@@ -205,6 +238,23 @@
 
 .border-right {
     border-right: 1px solid rgba(0,0,0,.1);
+}
+
+.qtd-musica {
+    position: absolute;
+    right: 0;
+    background-color: #00000078;
+    width: 48px;
+    height: 48px;
+    color: white;
+    border-bottom-left-radius: 15px;
+    font-size: 24px;
+    font-weight: bold;
+    padding-top: 5px;
+    margin-top: 1px;
+    margin-right: 1px;
+    border-top-right-radius: 3px;
+    text-align: center;
 }
 
 @media (min-height: 769px)
