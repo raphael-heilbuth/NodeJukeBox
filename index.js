@@ -1,5 +1,7 @@
 const express = require('express')
 const app = express()
+const http = require('http').Server(app);
+const io = require('socket.io')(http);
 const mm = require('music-metadata');
 const configuracao = require("./config.json");
 const musicFolder = configuracao.FolderMusic;
@@ -21,11 +23,15 @@ app.use(express.static(__dirname + '/'));
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
+io.on('connection', (socket) => {
+    console.log('Usuário conectado.');
+});
+
 app.get('/', function (req, res) {
     res.render('index');
 })
 
-app.listen(8000, function () {
+http.listen(8000, function () {
     console.log('Rodando na porta 8000')
 })
 

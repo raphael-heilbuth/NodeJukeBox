@@ -9,7 +9,8 @@ let audio = document.getElementById("myVideo"),
     firstIndex,
     lastIndex,
     currentArtista,
-    timeRandom;
+    timeRandom,
+    socket = io();
 
 $('body').loading({
     stoppable: false,
