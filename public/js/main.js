@@ -87,7 +87,19 @@ jQuery(function () {
         });
 
         $('body').loading('stop');
+
+        timeRandomInit();
     });
+
+    window.setInterval(() => {
+        if (audio.paused) {
+            $.get("/randomMusica?Quantidade=1", function (response) {
+                $.each(response, function (index, value) {
+                    executaMusica(null, value["Artista"], value["Musica"], value["Duracao"], null, null, null);
+                });
+            });
+        }
+    }, 40000);
 
     $(document).on('click', '.flipster__item--current', function () {
         if (!$(this).find('.back').is(':visible')) {
@@ -140,6 +152,7 @@ jQuery(function () {
         ExecutaProxima();
 
         clearInterval(timeRandom);
+        timeRandomInit();
     });
 
     $("#ranger-volume").on('change', function () {
@@ -156,16 +169,6 @@ jQuery(function () {
             $('.icon-volume').removeClass('fa-volume-off').removeClass('fa-volume-up').addClass('fa-volume-down');
         }
     });
-
-    timeRandom = setInterval(() => {
-        if (audio.paused) {
-            $.get("/randomMusica?Quantidade=1", function (response) {
-                $.each(response, function (index, value) {
-                    executaMusica(null, value["Artista"], value["Musica"], value["Duracao"], null, null, null);
-                });
-            });
-        }
-    }, 240000);
 
     document.addEventListener("keydown", (event) => {
         if (event.altKey === true && event.key === "p") Pause();
@@ -184,9 +187,10 @@ jQuery(function () {
 
                 currentArtista.find('.active').removeClass('active');
                 let itemAtual = currentArtista.find('.list-group-item:eq( '+ index +' )').addClass('active');
+                itemAtual.find('.titulo-musica').addClass('active');
                 itemAtual.get(0).scrollIntoView({
                     behavior: "smooth", // or "auto" or "instant"
-                    block: "end" // or "start" or "end"
+                    block: "start" // or "start" or "end"
                 });
             }
 
@@ -194,7 +198,8 @@ jQuery(function () {
 
             clearTimeout(timeVideo);
 
-            invocation();
+
+             invocation();
         }
         if (event.altKey === true && event.key === 'ArrowDown') {
             if ($('.flipster__item--current').find('.front').is(':visible')) {
@@ -206,6 +211,7 @@ jQuery(function () {
 
                 currentArtista.find('.active').removeClass('active');
                 let itemAtual = currentArtista.find('.list-group-item:eq( '+ index +' )').addClass('active');
+                itemAtual.find('.titulo-musica').addClass('active');
                 itemAtual.get(0).scrollIntoView({
                     behavior: "smooth", // or "auto" or "instant"
                     block: "end" // or "end"
@@ -321,7 +327,8 @@ function RetornaCapa(index, popularidade = null, qtdMusica = null, capa = true) 
     return '<li data-flip-title="' + index + '" data-letra="' + removerAcentos(index.substr(0, 1)) + '">' +
         '     <div class="flip-content">' +
         '        <div class="front">' +
-        '           <h1 class="text-center titulo-musica-capa">'+index+' - ' + qtdMusica + '</h1>' +
+        '           <h1 class="text-center titulo-musica-capa">'+index+'</h1>' +
+        '           <div class="qtd-musica">' + qtdMusica + '</div>' +
         '           <img src="' + (capa ? "../public/image/capas/" : "../public/image/default/") + index + '.jpg" class="img-capa" alt="capa">' +
         '           <div class="progress progress-bar-capa">' +
         '               <div class="progress-bar '+classBar+'" role="progressbar" aria-valuenow="'+popularidade+'" aria-valuemin="0" aria-valuemax="100" style="width: '+popularidade+'%;"></div>' +
@@ -373,23 +380,27 @@ function MaisVolume() {
 function RetornaMusica(artista, index, duracao = null, idMusica = null, capa = null, excluir = false, popularidadeGloba = null, popularidadeArtista = null, tipo = null) {
     let item = '<li class="list-group-item item-musica ' + (excluir ? 'item-exclude' : '') + '" data-artista="' + artista + '" data-musica="' + index + '" data-id-musica="' + idMusica + '" data-capa="' + capa + '" data-duracao="' + duracao + '" data-tipo="' + tipo + '">' +
         '   <div class="form-row">' +
-        '        <div class="col titulo-musica">';
+        '        <div class="col-auto">';
 
     switch (artista) {
         case "Youtube":
-            item += '            <i class="fab fa-youtube"></i>&nbsp;' + index;
+            item += '            <i class="fab fa-youtube"></i>';
             break;
         case "Random":
-            item += '            <i class="fas fa-random"></i>&nbsp;' + index;
+            item += '            <i class="fas fa-random"></i>';
             break;
         case "TOP":
-            item += '            <i class="fas fa-chevron-circle-up"></i>&nbsp;' + index;
+            item += '            <i class="fas fa-chevron-circle-up"></i>';
             break;
         default:
-            item += '            <i class="fas ' + (tipo === '.mp3' ? 'fa-compact-disc' : 'fa-video') + '"></i>&nbsp;' + index;
+            item += '            <i class="fas ' + (tipo === '.mp3' ? 'fa-compact-disc' : 'fa-video') + '"></i>';
             break;
     }
 
+    item += '        </div>';
+
+    item += '        <div class="col titulo-musica">';
+    item += '            <span>' + index + '</span>';
     item += '        </div>';
 
     if (popularidadeGloba !== null || popularidadeArtista !== null) {
@@ -566,6 +577,18 @@ function invocation() {
         function() {
             audio.classList.remove("Utilizando");
         }, 3000);
+}
+
+function timeRandomInit() {
+    timeRandom = window.setInterval(() => {
+        if (audio.paused) {
+            $.get("/randomMusica?Quantidade=1", function (response) {
+                $.each(response, function (index, value) {
+                    executaMusica(null, value["Artista"], value["Musica"], value["Duracao"], null, null, null);
+                });
+            });
+        }
+    }, 40000);
 }
 
 function timeYoutube(query) {
