@@ -30,6 +30,14 @@ jQuery(function () {
     audio.volume = 0.1;
     $('#ranger-volume').val(audio.volume);
 
+    socket.on('volume',function (teste){
+        alert(teste);
+    });
+
+    socket.on('credito',function (qtd){
+        alert(qtd);
+    })
+
     $.get("/getList", function (data) {
         listaMusicas = data["ListaMusica"];
 

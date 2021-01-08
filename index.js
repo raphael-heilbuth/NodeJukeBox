@@ -1,5 +1,5 @@
 const express = require('express')
-const app = express()
+const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const mm = require('music-metadata');
@@ -7,10 +7,10 @@ const configuracao = require("./config.json");
 const musicFolder = configuracao.FolderMusic;
 const ytdl = require('ytdl-core');
 const youtubeSearch = require('youtube-sr');
-const bodyParser = require("body-parser");
 const fs = require('fs');
 const path = require('path');
 const abrirNavegador = require('open');
+
 
 let musicasMeta = {};
 let totalMusica = 0;
@@ -20,20 +20,15 @@ global.db = require('./db');
 app.use(express.static(__dirname + '/views'));
 app.use(express.static(__dirname + '/'));
 
-app.use(bodyParser.urlencoded({extended: false}));
-app.use(bodyParser.json());
+app.use(require('./rotas'));
 
 io.on('connection', (socket) => {
     console.log('Usuário conectado.');
 });
 
-app.get('/', function (req, res) {
-    res.render('index');
-})
-
 http.listen(8000, function () {
     console.log('Rodando na porta 8000')
-})
+});
 
 app.get("/getList",  async function (req, res) {
     let listaMusicas = RetornaMusicas(),
@@ -230,3 +225,12 @@ const getRandomInteger = (max) => {
 }
 
 abrirNavegador('http://localhost:8000');
+
+exports.SocketIO = io;
+exports.retornaListaArtista = function retornaListaArtista(){
+    return Object.keys(musicasMeta);
+}
+
+exports.retornaListaMusica = function retornaListaMusica(artista){
+    return Object.values(musicasMeta[artista]);
+}
