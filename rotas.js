@@ -58,7 +58,7 @@ rotas.get("/listaMusica", function (req, res) {
 });
 
 rotas.get("/getParametro",function (req,res){
-    res.json({'Desenv' : configuracao.Desenv});
+    res.json({'Desenv' : configuracao.Desenv !== undefined ? configuracao.Desenv : false});
 })
 
 module.exports = rotas;
