@@ -228,9 +228,17 @@ abrirNavegador('http://localhost:8000');
 
 exports.SocketIO = io;
 exports.retornaListaArtista = function retornaListaArtista(){
-    return Object.keys(musicasMeta);
+    if(musicasMeta.length > 0){
+        return Object.keys(musicasMeta);
+    }else{
+        return {};
+    }
 }
 
 exports.retornaListaMusica = function retornaListaMusica(artista){
-    return Object.values(musicasMeta[artista]);
+    if(musicasMeta.length > 0){
+        return Object.values(musicasMeta[artista]["Musicas"].map(x => x.Musica));
+    }else{
+        return {};
+    }
 }
