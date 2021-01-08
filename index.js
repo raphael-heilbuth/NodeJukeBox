@@ -22,10 +22,6 @@ app.use(express.static(__dirname + '/'));
 
 app.use(require('./rotas'));
 
-io.on('connection', (socket) => {
-    console.log('Usuário conectado.');
-});
-
 http.listen(8000, function () {
     console.log('Rodando na porta 8000')
 });

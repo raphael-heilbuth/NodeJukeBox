@@ -2,7 +2,7 @@ let audio = document.getElementById("myVideo"),
     listaMusicas,
     listaProximasMusicas = [],
     coverflow,
-    alfabeto = [], 
+    alfabeto = [],
     letraAnt = '',
     timeVideo,
     timePesquisaYoutube,
@@ -10,11 +10,12 @@ let audio = document.getElementById("myVideo"),
     lastIndex,
     currentArtista,
     timeRandom,
-    socket = io();
+    socket = io(),
+    desenv = false;
 
 $('body').loading({
     stoppable: false,
-    onStop: function(loading) {
+    onStop: function (loading) {
         loading.overlay.slideUp(400);
     },
     overlay: $(".loading"),
@@ -26,17 +27,22 @@ $.fn.countAnimation = function (valor) {
 }
 
 jQuery(function () {
+    let credito = $('#badge-creditos');
     "use strict";
-    audio.volume = 0.1;
-    $('#ranger-volume').val(audio.volume);
+    audio.volume = 0.1,
+        $('#ranger-volume').val(audio.volume);
 
-    socket.on('volume',function (teste){
-        alert(teste);
+    socket.on('volume', function (teste) {
+        audio.volume = teste;
     });
 
-    socket.on('credito',function (qtd){
-        alert(qtd);
-    })
+    socket.on('mute', function () {
+        audio.volume = 0.0;
+    });
+
+    socket.on('credito', function (qtd) {
+        credito.text(qtd);
+    });
 
     $.get("/getList", function (data) {
         listaMusicas = data["ListaMusica"];
@@ -47,9 +53,9 @@ jQuery(function () {
 
         let list = $('.flip-items');
 
-        alfabeto = Object.keys(listaMusicas).map(function(artista) {
+        alfabeto = Object.keys(listaMusicas).map(function (artista) {
             return removerAcentos(artista.substr(0, 1));
-        }).filter(function(itm, i, a) {
+        }).filter(function (itm, i, a) {
             return i === a.indexOf(itm);
         });
 
@@ -100,6 +106,10 @@ jQuery(function () {
         timeRandomInit();
     });
 
+    $.get("/getParametro",function (parametro){
+        desenv = parametro['Desenv'];
+    })
+
     window.setInterval(() => {
         if (audio.paused) {
             $.get("/randomMusica?Quantidade=1", function (response) {
@@ -119,7 +129,7 @@ jQuery(function () {
 
             listaMusicaArtista.empty();
 
-            $.each(listaMusicas[artista]["Musicas"], function (index,value) {
+            $.each(listaMusicas[artista]["Musicas"], function (index, value) {
 
                 let meta = value["Meta"],
                     item = RetornaMusica(artista, value["Musica"], (meta !== null ? meta["format"]["duration"] : meta), null, null, null, value["PopularidadeGlobal"], value["PopularidadeArtista"], value["Tipo"]);
@@ -143,7 +153,17 @@ jQuery(function () {
     });
 
     $(document).on('click', '.item-musica', function () {
-        selecionaMusica($(this));
+        let qtdCredito = parseInt(credito.text());
+
+        if (qtdCredito > 0) {
+            selecionaMusica($(this));
+            qtdCredito--;
+            credito.text(qtdCredito);
+        } else if (desenv) {
+            selecionaMusica($(this));
+        } else {
+            alert('Favor comprar créditos.')
+        }
     });
 
     audio.addEventListener('timeupdate', () => {
@@ -195,7 +215,7 @@ jQuery(function () {
                 currentArtista[0].scrollIntoView();
 
                 currentArtista.find('.active').removeClass('active');
-                let itemAtual = currentArtista.find('.list-group-item:eq( '+ index +' )').addClass('active');
+                let itemAtual = currentArtista.find('.list-group-item:eq( ' + index + ' )').addClass('active');
                 itemAtual.find('.titulo-musica').addClass('active');
                 itemAtual.get(0).scrollIntoView({
                     behavior: "smooth", // or "auto" or "instant"
@@ -208,7 +228,7 @@ jQuery(function () {
             clearTimeout(timeVideo);
 
 
-             invocation();
+            invocation();
         }
         if (event.altKey === true && event.key === 'ArrowDown') {
             if ($('.flipster__item--current').find('.front').is(':visible')) {
@@ -219,7 +239,7 @@ jQuery(function () {
                 index = (index === lastIndex ? 0 : index + 1);
 
                 currentArtista.find('.active').removeClass('active');
-                let itemAtual = currentArtista.find('.list-group-item:eq( '+ index +' )').addClass('active');
+                let itemAtual = currentArtista.find('.list-group-item:eq( ' + index + ' )').addClass('active');
                 itemAtual.find('.titulo-musica').addClass('active');
                 itemAtual.get(0).scrollIntoView({
                     behavior: "smooth", // or "auto" or "instant"
@@ -336,24 +356,24 @@ function RetornaCapa(index, popularidade = null, qtdMusica = null, capa = true) 
     return '<li data-flip-title="' + index + '" data-letra="' + removerAcentos(index.substr(0, 1)) + '">' +
         '     <div class="flip-content">' +
         '        <div class="front">' +
-        '           <h1 class="text-center titulo-musica-capa">'+index+'</h1>' +
+        '           <h1 class="text-center titulo-musica-capa">' + index + '</h1>' +
         '           <div class="qtd-musica">' + qtdMusica + '</div>' +
         '           <img src="' + (capa ? "../public/image/capas/" : "../public/image/default/") + index + '.jpg" class="img-capa" alt="capa">' +
         '           <div class="progress progress-bar-capa">' +
-        '               <div class="progress-bar '+classBar+'" role="progressbar" aria-valuenow="'+popularidade+'" aria-valuemin="0" aria-valuemax="100" style="width: '+popularidade+'%;"></div>' +
+        '               <div class="progress-bar ' + classBar + '" role="progressbar" aria-valuenow="' + popularidade + '" aria-valuemin="0" aria-valuemax="100" style="width: ' + popularidade + '%;"></div>' +
         '           </div>' +
         '        </div>' +
         '        <div class="back img-capa d-none">' +
         '           <div class="card">' +
         '                <img src="' + (capa ? "../public/image/capas/" : "../public/image/default/") + index + '.jpg" class="capa-artista-list" alt="capa">' +
-        '                <div class="card-header">'+
+        '                <div class="card-header">' +
         '                   <div class="form-row">' +
         '                       <div class="col title-artista">' +
-                                    index +
+        index +
         '                       </div>' +
         '                       <div class="col-2 padding-top-list-music">' +
         '                           <div class="progress progress-list-music">' +
-        '                               <div class="progress-bar '+classBar+'" role="progressbar" aria-valuenow="'+popularidade+'" aria-valuemin="0" aria-valuemax="100" style="width: '+popularidade+'%;"></div>' +
+        '                               <div class="progress-bar ' + classBar + '" role="progressbar" aria-valuenow="' + popularidade + '" aria-valuemin="0" aria-valuemax="100" style="width: ' + popularidade + '%;"></div>' +
         '                           </div>' +
         '                       </div>' +
         '                   </div>' +
@@ -415,16 +435,16 @@ function RetornaMusica(artista, index, duracao = null, idMusica = null, capa = n
     if (popularidadeGloba !== null || popularidadeArtista !== null) {
         item += '        <div class="col-1">' +
             '            <div class="progress" style="height: 5px;margin-top: 10px;">' +
-            '                <div class="progress-bar" role="progressbar" style="width: '+popularidadeGloba+'%" aria-valuenow="'+popularidadeGloba+'" aria-valuemin="0" aria-valuemax="100"></div>' +
-            '                <div class="progress-bar bg-success" role="progressbar" style="width: '+popularidadeArtista+'%" aria-valuenow="'+popularidadeArtista+'" aria-valuemin="0" aria-valuemax="100"></div>' +
+            '                <div class="progress-bar" role="progressbar" style="width: ' + popularidadeGloba + '%" aria-valuenow="' + popularidadeGloba + '" aria-valuemin="0" aria-valuemax="100"></div>' +
+            '                <div class="progress-bar bg-success" role="progressbar" style="width: ' + popularidadeArtista + '%" aria-valuenow="' + popularidadeArtista + '" aria-valuemin="0" aria-valuemax="100"></div>' +
             '            </div>' +
             '        </div>';
     }
 
     if (duracao !== null) {
-    item += '        <div class="col-auto">' +
-        '            ' + display(duracao) +
-        '        </div>';
+        item += '        <div class="col-auto">' +
+            '            ' + display(duracao) +
+            '        </div>';
     }
 
     item += '   <div>' +
@@ -533,7 +553,7 @@ function executaMusica(elemento, artista, musica, duracao, imageCapa, idMusica, 
 
                     if (response.success) {
                         let imageUrl = '../public/image/capas/' + encodeURIComponent(artista) + '.jpg',
-                            audioSrc = 'data:audio/'+(tipo === null ? 'mp3' : tipo.replace('.',''))+';base64,' + response.fileContent;
+                            audioSrc = 'data:audio/' + (tipo === null ? 'mp3' : tipo.replace('.', '')) + ';base64,' + response.fileContent;
 
                         info.removeClass('d-none');
                         $('.background-image').css('background-image', 'url(' + imageUrl + ')');
@@ -573,17 +593,17 @@ function ExecutaProxima() {
 
 function ProximaLetra(letra) {
     let proxLetra = letra === "" ? alfabeto[1] : alfabeto[alfabeto.indexOf(letra) + 1 >= alfabeto.length ? 0 : alfabeto.indexOf(letra) + 1];
-    coverflow.flipster('jump', $('.' + $($('.flip-items').find('[data-letra="'+proxLetra+'"]')[0]).attr('class').split(' ')[3]));
+    coverflow.flipster('jump', $('.' + $($('.flip-items').find('[data-letra="' + proxLetra + '"]')[0]).attr('class').split(' ')[3]));
 }
 
 function LetraAnterior(letra) {
     let proxLetra = letra === "" ? alfabeto[alfabeto.length - 1] : alfabeto[alfabeto.indexOf(letra) - 1 === -1 ? alfabeto.length - 1 : alfabeto.indexOf(letra) - 1];
-    coverflow.flipster('jump', $('.' + $($('.flip-items').find('[data-letra="'+proxLetra +'"]')[0]).attr('class').split(' ')[3]));    
+    coverflow.flipster('jump', $('.' + $($('.flip-items').find('[data-letra="' + proxLetra + '"]')[0]).attr('class').split(' ')[3]));
 }
 
 function invocation() {
     timeVideo = window.setTimeout(
-        function() {
+        function () {
             audio.classList.remove("Utilizando");
         }, 3000);
 }
@@ -602,7 +622,7 @@ function timeRandomInit() {
 
 function timeYoutube(query) {
     timePesquisaYoutube = window.setTimeout(
-        function() {
+        function () {
             pesquisaYoutube(query)
         }, 1500);
 }

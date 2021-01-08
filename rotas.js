@@ -1,6 +1,7 @@
 const rotas = require('express').Router();
 const bodyParser = require("body-parser");
 const funcoes = require('./index.js');
+const configuracao = require("./config.json");
 
 rotas.use(bodyParser.json());
 rotas.use(bodyParser.urlencoded({
@@ -54,8 +55,11 @@ rotas.get("/listaArtista", function (req, res) {
 rotas.get("/listaMusica", function (req, res) {
     let lista = funcoes.retornaListaMusica(req.query.Artista);
     res.json(lista);
-})
+});
 
+rotas.get("/getParametro",function (req,res){
+    res.json({'Desenv' : configuracao.Desenv});
+})
 
 module.exports = rotas;
 
