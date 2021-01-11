@@ -18,6 +18,16 @@ rotas.post("/volume", function (req, res) {
     funcoes.SocketIO.emit('volume', volume);
 });
 
+rotas.post("/volumeMais", function (req, res) {
+    res.json({'Sucesso': true});
+    funcoes.SocketIO.emit('volumeMais');
+});
+
+rotas.post("/volumeMenos", function (req, res) {
+    res.json({'Sucesso': true});
+    funcoes.SocketIO.emit('volumeMenos');
+});
+
 rotas.post("/mute", function (req, res) {
     res.json({'Sucesso': true});
     funcoes.SocketIO.emit('volume', 0.0);

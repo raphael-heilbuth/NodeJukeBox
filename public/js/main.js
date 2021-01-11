@@ -27,13 +27,23 @@ $.fn.countAnimation = function (valor) {
 }
 
 jQuery(function () {
-    let credito = $('#badge-creditos');
     "use strict";
-    audio.volume = 0.1,
-        $('#ranger-volume').val(audio.volume);
+    let credito = $('#badge-creditos');
 
-    socket.on('volume', function (teste) {
-        audio.volume = teste;
+    audio.volume = 0.1;
+
+    $('#ranger-volume').val(audio.volume);
+
+    socket.on('volume', function (volume) {
+        audio.volume = volume;
+    });
+
+    socket.on('volumeMais', function () {
+        MaisVolume();
+    });
+
+    socket.on('volumeMenos', function () {
+        MenosVolume();
     });
 
     socket.on('mute', function () {

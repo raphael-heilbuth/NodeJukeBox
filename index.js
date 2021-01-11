@@ -6,7 +6,7 @@ const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const mm = require('music-metadata');
-const musicFolder = process.env.FOLDER_MUSIC;
+const musicFolder = (process.env.FOLDER_MUSIC || "/home/raphael/Downloads/MUSICAS VS PRODUTOS");
 const ytdl = require('ytdl-core');
 const youtubeSearch = require('youtube-sr');
 const fs = require('fs');
@@ -28,43 +28,49 @@ http.listen(8000, function () {
     console.log('Rodando na porta 8000')
 });
 
-app.get("/getList",  async function (req, res) {
+app.get("/getList", async function (req, res) {
     let listaMusicas = RetornaMusicas(),
         musicasTocadas = await global.db.MusicasTocadas(),
         totalTocadas = await global.db.TotalTocadas();
 
     musicasMeta = await RetornaListaMetaData(listaMusicas, totalTocadas);
 
-    musicasMeta["Youtube"] = {"Musicas": [
-        {"Musica": "Pesquisar", "Meta": null}
-        ]};
-    musicasMeta["TOP"] = {"Musicas": [
+    musicasMeta["Youtube"] = {
+        "Musicas": [
+            {"Musica": "Pesquisar", "Meta": null}
+        ]
+    };
+    musicasMeta["TOP"] = {
+        "Musicas": [
             {"Musica": "Top 10", "Meta": null},
             {"Musica": "Top 20", "Meta": null},
             {"Musica": "Top 30", "Meta": null},
             {"Musica": "Top 40", "Meta": null},
             {"Musica": "Top 50", "Meta": null},
             {"Musica": "Top 100", "Meta": null}
-            ]};
-    musicasMeta["Random"] = {"Musicas": [
+        ]
+    };
+    musicasMeta["Random"] = {
+        "Musicas": [
             {"Musica": "Random 1", "Meta": null},
             {"Musica": "Random 3", "Meta": null},
             {"Musica": "Random 5", "Meta": null},
             {"Musica": "Random 10", "Meta": null}
-        ]};
+        ]
+    };
 
     let orderedListaMusicas = {};
 
-     Object.keys(musicasMeta).sort().forEach(function (v) {
+    Object.keys(musicasMeta).sort().forEach(function (v) {
         orderedListaMusicas[v] = musicasMeta[v];
     });
 
-     let lista = {
-         'ListaMusica': orderedListaMusicas,
-         'TotalMusicas': totalMusica,
-         'MusicasTocas': musicasTocadas,
-         'TotalReproducao': totalTocadas
-     }
+    let lista = {
+        'ListaMusica': orderedListaMusicas,
+        'TotalMusicas': totalMusica,
+        'MusicasTocas': musicasTocadas,
+        'TotalReproducao': totalTocadas
+    }
 
     res.json(lista);
 });
@@ -168,7 +174,7 @@ function RetornaMusicas() {
 const RetornaListaMetaData = (lista, totalTocadas) => new Promise(async (success) => {
     let retornoMeta = [];
 
-    for (const pasta of Object.keys(lista)){
+    for (const pasta of Object.keys(lista)) {
         let retornoMusica = [],
             tocadasArtista = await global.db.PopularidadeArtista(pasta);
         for (let musica of Object.entries(lista[pasta])) {
@@ -177,7 +183,13 @@ const RetornaListaMetaData = (lista, totalTocadas) => new Promise(async (success
                     .then(meta => {
                         totalMusica++;
                         global.db.PopularidadeMusica(pasta, musica[0]).then(tocadasMusica => {
-                            retornoMusica.push({'Musica': musica[0], 'Tipo': path.extname(musica[0]), 'Meta': meta, 'PopularidadeGlobal': (100 / totalTocadas) * tocadasMusica, 'PopularidadeArtista': (100 / tocadasArtista) * tocadasMusica});
+                            retornoMusica.push({
+                                'Musica': musica[0],
+                                'Tipo': path.extname(musica[0]),
+                                'Meta': meta,
+                                'PopularidadeGlobal': (100 / totalTocadas) * tocadasMusica,
+                                'PopularidadeArtista': (100 / tocadasArtista) * tocadasMusica
+                            });
                         })
                     })
                     .catch(err => {
@@ -185,7 +197,7 @@ const RetornaListaMetaData = (lista, totalTocadas) => new Promise(async (success
                     })
             }
         }
-        retornoMeta[pasta] = {'Musicas' : retornoMusica, 'Popularidade':  (100 / totalTocadas) * tocadasArtista }
+        retornoMeta[pasta] = {'Musicas': retornoMusica, 'Popularidade': (100 / totalTocadas) * tocadasArtista}
     }
     success(retornoMeta);
 });
@@ -226,18 +238,25 @@ const getRandomInteger = (max) => {
 
 exports.SocketIO = io;
 
-exports.retornaListaArtista = function retornaListaArtista(){
-    if(musicasMeta.length > 0){
-        return Object.keys(musicasMeta);
-    }else{
+exports.retornaListaArtista = function retornaListaArtista() {
+    if (Object.keys(musicasMeta).length > 0) {
+        return Object.keys(musicasMeta).map(x => {
+            return {'Artista': x, 'Capa': 'public/image/capas/' + x + '.jpg'};
+        });
+    } else {
         return {};
     }
 }
 
-exports.retornaListaMusica = function retornaListaMusica(artista){
-    if(musicasMeta.length > 0){
-        return Object.values(musicasMeta[artista]["Musicas"].map(x => x.Musica));
-    }else{
+exports.retornaListaMusica = function retornaListaMusica(artista) {
+    if (Object.keys(musicasMeta).length > 0) {
+        return Object.values(musicasMeta[artista]["Musicas"].map(x => {
+            return {
+                'NomeMusica': x["Musica"],
+                'Duracao': x["Meta"]["format"]["duration"]
+            }
+        }));
+    } else {
         return {};
     }
 }
