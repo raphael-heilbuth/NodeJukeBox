@@ -3,6 +3,7 @@ public/image/capas/*.jpg
 
 # Config
 config.json
+.env
 
 # Logs
 logs

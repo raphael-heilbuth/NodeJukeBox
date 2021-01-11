@@ -1,10 +1,12 @@
+const dotenv = require('dotenv');
+dotenv.config();
+//
 const express = require('express')
 const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const mm = require('music-metadata');
-const configuracao = require("./config.json");
-const musicFolder = configuracao.FolderMusic;
+const musicFolder = process.env.FOLDER_MUSIC;
 const ytdl = require('ytdl-core');
 const youtubeSearch = require('youtube-sr');
 const fs = require('fs');
@@ -171,7 +173,7 @@ const RetornaListaMetaData = (lista, totalTocadas) => new Promise(async (success
             tocadasArtista = await global.db.PopularidadeArtista(pasta);
         for (let musica of Object.entries(lista[pasta])) {
             if (musica[0].includes('.mp3') || musica[0].includes('.mp4')) {
-                await RetornaMetaData(configuracao.FolderMusic + "/" + pasta + "/" + musica[0])
+                await RetornaMetaData(musicFolder + "/" + pasta + "/" + musica[0])
                     .then(meta => {
                         totalMusica++;
                         global.db.PopularidadeMusica(pasta, musica[0]).then(tocadasMusica => {
@@ -220,9 +222,10 @@ const getRandomInteger = (max) => {
     return Math.floor(Math.random() * max);
 }
 
-abrirNavegador('http://localhost:8000');
+//abrirNavegador('http://localhost:8000');
 
 exports.SocketIO = io;
+
 exports.retornaListaArtista = function retornaListaArtista(){
     if(musicasMeta.length > 0){
         return Object.keys(musicasMeta);
