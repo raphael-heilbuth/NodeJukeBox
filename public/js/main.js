@@ -12,9 +12,9 @@ let audio = document.getElementById("myVideo"),
     currentArtista,
     timeRandom,
     socket = io(),
-    desenv = false,
+    modoLivre = false,
     totalCredito = 0,
-    tempoRandom = 400000;
+    tempoRandom = 240000;
 
 $('body').loading({
     stoppable: false,
@@ -60,6 +60,10 @@ jQuery(function () {
         totalCredito += qtd;
         credito.text(totalCredito);
         AbreToastInfo('Crédito', qtd);
+    });
+
+    socket.on('musica', function (value) {
+        executaMusica(null, value["Artista"], value["Musica"], value["Duracao"], null, null, value["Tipo"]);
     });
 
     $.get("/getList", function (data) {
@@ -125,19 +129,9 @@ jQuery(function () {
     });
 
     $.get("/getParametro",function (parametro){
-        desenv = parametro['Desenv'];
+        modoLivre = parametro['Desenv'];
         tempoRandom =  parametro['TempoRandom'];
     })
-
-    // window.setInterval(() => {
-    //     if (audio.paused) {
-    //         $.get("/randomMusica?Quantidade=1", function (response) {
-    //             $.each(response, function (index, value) {
-    //                 executaMusica(null, value["Artista"], value["Musica"], value["Duracao"], null, null, null);
-    //             });
-    //         });
-    //     }
-    // }, tempoRandom);
 
     $(document).on('click', '.flipster__item--current', function () {
         if (!$(this).find('.back').is(':visible')) {
@@ -331,7 +325,7 @@ function selecionaMusica(elemento) {
         executaMusica(elemento, artista, musica, duracao, imageCapa, idMusica, tipo);
         totalCredito--;
         credito.text(totalCredito);
-    } else if (desenv) {
+    } else if (modoLivre) {
         executaMusica(elemento, artista, musica, duracao, imageCapa, idMusica, tipo);
     } else {
         AbreToastInfo('Favor comprar créditos.')

@@ -45,13 +45,10 @@ rotas.get("/proxima", function (req, res) {
 });
 
 rotas.post("/selecionaMusica", function (req, res) {
-    let data = {
-        'Artista': req.body.Artista,
-        'Musica': req.body.Musica
-    };
+    let musica = funcoes.buscaMusica(req.body.Artista, req.body.Musica);
 
-    res.json({'Sucesso': true});
-    funcoes.SocketIO.emit('musica', data);
+    res.json({'Sucesso': musica !== {}});
+    funcoes.SocketIO.emit('musica', musica);
 })
 
 rotas.get("/listaArtista", function (req, res) {
@@ -65,7 +62,7 @@ rotas.get("/listaMusica", function (req, res) {
 });
 
 rotas.get("/getParametro",function (req,res){
-    res.json({'Desenv' : (process.env.DESENV === "true"), 'TempoRandom' : parseFloat(process.env.TIMERANDOM !== "" ? process.env.TIMERANDOM : 400000)});
+    res.json({'Desenv' : (process.env.DESENV === "true"), 'TempoRandom' : process.env.TIMERANDOM || 240000});
 })
 
 rotas.get("/dashboard", function (req,res){

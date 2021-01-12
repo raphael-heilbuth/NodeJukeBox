@@ -238,7 +238,7 @@ const getRandomInteger = (max) => {
     return Math.floor(Math.random() * max);
 }
 
-//abrirNavegador('http://localhost:8000');
+abrirNavegador('http://localhost:8000');
 
 exports.SocketIO = io;
 
@@ -270,5 +270,24 @@ exports.retornaDadosDashboard = function retornaDadosDashboard() {
         'TotalMusicas': totalMusica,
         'MusicasTocadas': musicasTocadas,
         'TotalTocadas': totalTocadas
+    }
+}
+
+exports.buscaMusica = function buscaMusica(artista, musica) {
+    if (Object.keys(musicasMeta).length > 0) {
+        let musicas = musicasMeta[artista]["Musicas"].find(x => x.Musica === musica);
+
+        if (musica) {
+            return {
+                'Artista': artista,
+                'Musica': musicas["Musica"],
+                'Duracao': musicas["Meta"]["format"]["duration"],
+                'Tipo': path.extname(musicas["Musica"])
+            }
+        } else {
+            return {};
+        }
+    } else {
+        return {};
     }
 }
