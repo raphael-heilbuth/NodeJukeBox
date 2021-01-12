@@ -14,8 +14,10 @@ const path = require('path');
 const abrirNavegador = require('open');
 
 
-let musicasMeta = {};
-let totalMusica = 0;
+let musicasMeta = {},
+    totalMusica = 0,
+    musicasTocadas = 0,
+    totalTocadas = 0;
 
 global.db = require('./db');
 
@@ -29,9 +31,11 @@ http.listen(8000, function () {
 });
 
 app.get("/getList", async function (req, res) {
-    let listaMusicas = RetornaMusicas(),
-        musicasTocadas = await global.db.MusicasTocadas(),
-        totalTocadas = await global.db.TotalTocadas();
+    let listaMusicas = RetornaMusicas();
+
+    musicasTocadas = await global.db.MusicasTocadas();
+    totalTocadas = await global.db.TotalTocadas();
+    totalMusica = 0;
 
     musicasMeta = await RetornaListaMetaData(listaMusicas, totalTocadas);
 
@@ -258,5 +262,13 @@ exports.retornaListaMusica = function retornaListaMusica(artista) {
         }));
     } else {
         return {};
+    }
+}
+
+exports.retornaDadosDashboard = function retornaDadosDashboard() {
+    return {
+        'TotalMusicas': totalMusica,
+        'MusicasTocadas': musicasTocadas,
+        'TotalTocadas': totalTocadas
     }
 }

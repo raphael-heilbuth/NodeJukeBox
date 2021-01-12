@@ -45,7 +45,6 @@ rotas.get("/proxima", function (req, res) {
 });
 
 rotas.post("/selecionaMusica", function (req, res) {
-
     let data = {
         'Artista': req.body.Artista,
         'Musica': req.body.Musica
@@ -53,7 +52,6 @@ rotas.post("/selecionaMusica", function (req, res) {
 
     res.json({'Sucesso': true});
     funcoes.SocketIO.emit('musica', data);
-
 })
 
 rotas.get("/listaArtista", function (req, res) {
@@ -68,6 +66,10 @@ rotas.get("/listaMusica", function (req, res) {
 
 rotas.get("/getParametro",function (req,res){
     res.json({'Desenv' : (process.env.DESENV === "true")});
+})
+
+rotas.get("/dashboard", function (req,res){
+    res.json(funcoes.retornaDadosDashboard());
 })
 
 module.exports = rotas;
