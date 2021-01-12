@@ -15,33 +15,33 @@ rotas.get('/', function (req, res) {
 rotas.post("/volume", function (req, res) {
     let volume = parseFloat(req.body.nivelVolume);
     res.json({'Sucesso': true});
-    funcoes.SocketIO.emit('volume', volume);
+    io.emit('volume', volume);
 });
 
 rotas.post("/volumeMais", function (req, res) {
     res.json({'Sucesso': true});
-    funcoes.SocketIO.emit('volumeMais');
+    io.emit('volumeMais');
 });
 
 rotas.post("/volumeMenos", function (req, res) {
     res.json({'Sucesso': true});
-    funcoes.SocketIO.emit('volumeMenos');
+    io.emit('volumeMenos');
 });
 
 rotas.post("/mute", function (req, res) {
     res.json({'Sucesso': true});
-    funcoes.SocketIO.emit('volume', 0.0);
+    io.emit('volume', 0.0);
 });
 
 rotas.post("/credito", function (req, res) {
     let credito = parseInt(req.body.qtdCredito);
     res.json({'Sucesso': true});
-    funcoes.SocketIO.emit('credito', credito);
+    io.emit('credito', credito);
 });
 
 rotas.get("/proxima", function (req, res) {
     res.json({'Sucesso': true});
-    funcoes.SocketIO.emit('proxima', 1);
+    io.emit('proxima', 1);
 });
 
 rotas.post("/selecionaMusica", function (req, res) {
@@ -51,7 +51,7 @@ rotas.post("/selecionaMusica", function (req, res) {
     };
 
     res.json({'Sucesso': true});
-    funcoes.SocketIO.emit('musica', data);
+    io.emit('musica', data);
 })
 
 rotas.get("/listaArtista", function (req, res) {
@@ -64,11 +64,14 @@ rotas.get("/listaMusica", function (req, res) {
     res.json(lista);
 });
 
-rotas.get("/getParametro",function (req,res){
-    res.json({'Desenv' : (process.env.DESENV === "true"), 'TempoRandom' : parseFloat(process.env.TIMERANDOM !== "" ? process.env.TIMERANDOM : 400000)});
+rotas.get("/getParametro", function (req, res) {
+    res.json({
+        'Desenv': (process.env.DESENV === "true"),
+        'TempoRandom': parseFloat(process.env.TIMERANDOM !== "" ? process.env.TIMERANDOM : 400000)
+    });
 })
 
-rotas.get("/dashboard", function (req,res){
+rotas.get("/dashboard", function (req, res) {
     res.json(funcoes.retornaDadosDashboard());
 })
 
