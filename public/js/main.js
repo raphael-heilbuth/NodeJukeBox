@@ -13,7 +13,8 @@ let audio = document.getElementById("myVideo"),
     timeRandom,
     socket = io(),
     desenv = false,
-    totalCredito = 0;
+    totalCredito = 0,
+    tempoRandom = 400000;
 
 $('body').loading({
     stoppable: false,
@@ -125,17 +126,18 @@ jQuery(function () {
 
     $.get("/getParametro",function (parametro){
         desenv = parametro['Desenv'];
+        tempoRandom =  parametro['TempoRandom'];
     })
 
-    window.setInterval(() => {
-        if (audio.paused) {
-            $.get("/randomMusica?Quantidade=1", function (response) {
-                $.each(response, function (index, value) {
-                    executaMusica(null, value["Artista"], value["Musica"], value["Duracao"], null, null, null);
-                });
-            });
-        }
-    }, 40000);
+    // window.setInterval(() => {
+    //     if (audio.paused) {
+    //         $.get("/randomMusica?Quantidade=1", function (response) {
+    //             $.each(response, function (index, value) {
+    //                 executaMusica(null, value["Artista"], value["Musica"], value["Duracao"], null, null, null);
+    //             });
+    //         });
+    //     }
+    // }, tempoRandom);
 
     $(document).on('click', '.flipster__item--current', function () {
         if (!$(this).find('.back').is(':visible')) {
@@ -645,7 +647,7 @@ function timeRandomInit() {
                 });
             });
         }
-    }, 40000);
+    }, tempoRandom);
 }
 
 function timeYoutube(query) {

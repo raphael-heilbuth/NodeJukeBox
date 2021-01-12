@@ -65,7 +65,7 @@ rotas.get("/listaMusica", function (req, res) {
 });
 
 rotas.get("/getParametro",function (req,res){
-    res.json({'Desenv' : (process.env.DESENV === "true")});
+    res.json({'Desenv' : (process.env.DESENV === "true"), 'TempoRandom' : parseFloat(process.env.TIMERANDOM !== "" ? process.env.TIMERANDOM : 400000)});
 })
 
 rotas.get("/dashboard", function (req,res){
