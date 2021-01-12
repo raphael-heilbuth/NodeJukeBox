@@ -1,4 +1,5 @@
 let audio = document.getElementById("myVideo"),
+    credito = $('#badge-creditos'),
     listaMusicas,
     listaProximasMusicas = [],
     coverflow,
@@ -11,7 +12,8 @@ let audio = document.getElementById("myVideo"),
     currentArtista,
     timeRandom,
     socket = io(),
-    desenv = false;
+    desenv = false,
+    totalCredito = 0;
 
 $('body').loading({
     stoppable: false,
@@ -28,7 +30,6 @@ $.fn.countAnimation = function (valor) {
 
 jQuery(function () {
     "use strict";
-    let credito = $('#badge-creditos');
 
     audio.volume = 0.1;
 
@@ -36,22 +37,28 @@ jQuery(function () {
 
     socket.on('volume', function (volume) {
         audio.volume = volume;
+        AbreToastInfo('Volume', Math.round(audio.volume * 10));
     });
 
     socket.on('volumeMais', function () {
         MaisVolume();
+        AbreToastInfo('Volume', Math.round(audio.volume * 10));
     });
 
     socket.on('volumeMenos', function () {
         MenosVolume();
+        AbreToastInfo('Volume', Math.round(audio.volume * 10));
     });
 
     socket.on('mute', function () {
         audio.volume = 0.0;
+        AbreToastInfo('Volume', 'Mute');
     });
 
     socket.on('credito', function (qtd) {
-        credito.text(qtd);
+        totalCredito += qtd;
+        credito.text(totalCredito);
+        AbreToastInfo('Crédito', qtd);
     });
 
     $.get("/getList", function (data) {
@@ -163,17 +170,7 @@ jQuery(function () {
     });
 
     $(document).on('click', '.item-musica', function () {
-        let qtdCredito = parseInt(credito.text());
-
-        if (qtdCredito > 0) {
-            selecionaMusica($(this));
-            qtdCredito--;
-            credito.text(qtdCredito);
-        } else if (desenv) {
-            selecionaMusica($(this));
-        } else {
-            alert('Favor comprar créditos.')
-        }
+        selecionaMusica($(this));
     });
 
     audio.addEventListener('timeupdate', () => {
@@ -307,6 +304,19 @@ jQuery(function () {
     });
 });
 
+function AbreToastInfo(titulo, valor = '') {
+    let tooltips = $('#info').tooltip({
+        title: titulo + '<div class="msg-info">' + valor + '</div>',
+        container: '#info',
+        html: true,
+        template: '<div class="tooltip tooltip-letra" role="tooltip"><div class="tooltip-inner tooltip-inner-info"></div></div>'
+    }).tooltip('show');
+
+    setTimeout(function () {
+        tooltips.tooltip('dispose');
+    }, 1000);
+}
+
 function selecionaMusica(elemento) {
     let artista = elemento.attr('data-artista'),
         musica = elemento.attr('data-musica'),
@@ -315,7 +325,15 @@ function selecionaMusica(elemento) {
         imageCapa = elemento.attr('data-capa'),
         tipo = elemento.attr('data-tipo');
 
-    executaMusica(elemento, artista, musica, duracao, imageCapa, idMusica, tipo);
+    if (totalCredito > 0) {
+        executaMusica(elemento, artista, musica, duracao, imageCapa, idMusica, tipo);
+        totalCredito--;
+        credito.text(totalCredito);
+    } else if (desenv) {
+        executaMusica(elemento, artista, musica, duracao, imageCapa, idMusica, tipo);
+    } else {
+        AbreToastInfo('Favor comprar créditos.')
+    }
 }
 
 function removerAcentos(newStringComAcento) {

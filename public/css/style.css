@@ -11,6 +11,7 @@
 .tooltip-letra {
     min-width: 150px;
     margin-bottom: 12px;
+    max-width: 500px;
 }
 
 .tooltip-inner-letra {
@@ -255,6 +256,22 @@
     margin-right: 1px;
     border-top-right-radius: 3px;
     text-align: center;
+}
+
+#info {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+}
+
+.tooltip-inner.tooltip-inner-info {
+    font-size: 40px;
+    background-color: #000000a1;
+}
+
+.msg-info {
+    font-size: 80px;
+    font-weight: bold;
 }
 
 @media (min-height: 769px)
