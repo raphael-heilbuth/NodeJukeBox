@@ -4,7 +4,7 @@ dotenv.config();
 const express = require('express')
 const app = express();
 const http = require('http').Server(app);
-const io = require('socket.io')(http);
+global.io = require('socket.io')(http);
 const mm = require('music-metadata');
 const musicFolder = (process.env.FOLDER_MUSIC || "/home/raphael/Downloads/MUSICAS VS PRODUTOS");
 const ytdl = require('ytdl-core');
@@ -239,8 +239,6 @@ const getRandomInteger = (max) => {
 }
 
 abrirNavegador('http://localhost:8000');
-
-exports.SocketIO = io;
 
 exports.retornaListaArtista = function retornaListaArtista() {
     if (Object.keys(musicasMeta).length > 0) {
