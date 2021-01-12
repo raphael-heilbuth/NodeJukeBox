@@ -87,11 +87,11 @@
 }
 
 .list-group.list-group-flush.list-musicas {
-    max-height: 448px;
+    max-height: 348px;
     overflow-y: auto;
     transform: none !important;
     overflow-x: hidden;
-    min-height: 448px;
+    min-height: 348px;
 }
 
 .titulo-musica {
@@ -135,7 +135,7 @@
 }
 
 .row-coverflow {
-    min-height: 548px;    
+    min-height: 448px;
 }
 
 #coverflow {
@@ -151,7 +151,7 @@
     height: 10px;
     position: absolute;
     bottom: 0;
-    width: 499px;
+    width: 398px;
     border-top-left-radius: 0;
     border-top-right-radius: 0;
     left: 1px;
@@ -212,7 +212,7 @@
     bottom: 0;
     left: 0;
     background-color: #ffffffb3;
-    width: 50vw;
+    width: 65vw;
     border-top-right-radius: 29px;
     padding-inline-start: 10px;
 }
@@ -228,8 +228,8 @@
 
 .capa-artista-list {
     position: absolute;
-    width: 500px;
-    height: 500px;
+    width: 400px;
+    height: 400px;
     opacity: 0.2;
 }
 
@@ -288,5 +288,27 @@
     .card-list {
         max-height: calc(100vh - 650px);
         min-height: calc(100vh - 650px);
+    }
+
+    .row-coverflow {
+        min-height: 548px;
+    }
+
+    .statusbar {
+        width: 50vw;
+    }
+
+    .progress-bar-capa {
+        width: 499px;
+    }
+
+    .list-group.list-group-flush.list-musicas {
+        max-height: 448px;
+        min-height: 448px;
+    }
+
+    .capa-artista-list {
+        width: 500px;
+        height: 500px;
     }
 }
