@@ -161,7 +161,7 @@
     position: absolute;
     top: 0;
     text-shadow: 2px 0 0 #fff, -2px 0 0 #fff, 0 2px 0 #fff, 0 -2px 0 #fff, 1px 1px #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff;
-    width: 500px;
+    width: 400px;
 }
 
 .padding-top-list-music {
@@ -310,5 +310,9 @@
     .capa-artista-list {
         width: 500px;
         height: 500px;
+    }
+
+    .titulo-musica-capa {
+        width: 500px;
     }
 }
