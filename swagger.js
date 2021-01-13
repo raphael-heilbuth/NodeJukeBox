@@ -19,6 +19,30 @@ let doc = {
         },
         Volume: {
             NivelVolume: 0.1
+        },
+        RetornaArtistas: [
+            {
+                Artista: "150 BPM",
+                Capa: "public/image/capas/150 BPM.jpg"
+            }
+        ],
+        RetornaMusicas: [
+            {
+                NomeMusica: "08. ADELE - 'Make You Feel My Love'.mp3",
+                Duracao: 246.4130612244898
+            }
+        ],
+        Success: {
+            Sucesso: true
+        },
+        RetornaDashboard: {
+            "TotalMusicas": 4981,
+            "MusicasTocadas": 530,
+            "TotalTocadas": 696
+        },
+        RetornaParametros: {
+            "Desenv": false,
+            "TempoRandom": 240000
         }
     },
     host: "localhost:8000",

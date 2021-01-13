@@ -96,14 +96,16 @@
             "schema": {
               "$ref": "#/definitions/Volume"
             }
-          },
-          {
-            "name": "NivelVolume",
-            "description": "O volume que a JukeBox vai setar.",
-            "type": "int"
           }
         ],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "Volume alterado com sucesso.",
+            "schema": {
+              "$ref": "#/definitions/Success"
+            }
+          }
+        }
       }
     },
     "/volumeMais": {
@@ -113,7 +115,14 @@
         ],
         "description": "Endpoint para diminuir o volume na Jukebox.",
         "parameters": [],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "Volume abaixado com sucesso.",
+            "schema": {
+              "$ref": "#/definitions/Success"
+            }
+          }
+        }
       }
     },
     "/volumeMenos": {
@@ -123,7 +132,14 @@
         ],
         "description": "Endpoint para aumentar o volume na Jukebox.",
         "parameters": [],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "Volume aumentado com sucesso.",
+            "schema": {
+              "$ref": "#/definitions/Success"
+            }
+          }
+        }
       }
     },
     "/mute": {
@@ -133,7 +149,14 @@
         ],
         "description": "Endpoint para mutar a Jukebox.",
         "parameters": [],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "Volume mutado com sucesso.",
+            "schema": {
+              "$ref": "#/definitions/Success"
+            }
+          }
+        }
       }
     },
     "/credito": {
@@ -154,7 +177,14 @@
             }
           }
         ],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "Crédito adicionado com sucesso.",
+            "schema": {
+              "$ref": "#/definitions/Success"
+            }
+          }
+        }
       }
     },
     "/proxima": {
@@ -164,7 +194,14 @@
         ],
         "description": "Endpoint para pular para próxima música na Jukebox.",
         "parameters": [],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "Pulado a música com sucesso.",
+            "schema": {
+              "$ref": "#/definitions/Success"
+            }
+          }
+        }
       }
     },
     "/selecionaMusica": {
@@ -185,7 +222,14 @@
             }
           }
         ],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "Música adicionada com sucesso.",
+            "schema": {
+              "$ref": "#/definitions/Success"
+            }
+          }
+        }
       }
     },
     "/listaArtista": {
@@ -195,7 +239,14 @@
         ],
         "description": "Endpoint para retornar a lista de artista da Jukebox.",
         "parameters": [],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "Artistas retornados com sucesso.",
+            "schema": {
+              "$ref": "#/definitions/RetornaArtistas"
+            }
+          }
+        }
       }
     },
     "/listaMusica": {
@@ -212,7 +263,14 @@
             "in": "query"
           }
         ],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "Músicas retornadas com sucesso.",
+            "schema": {
+              "$ref": "#/definitions/RetornaMusicas"
+            }
+          }
+        }
       }
     },
     "/getParametro": {
@@ -220,9 +278,16 @@
         "tags": [
           "Parametros"
         ],
-        "description": "Endpoint para retornar os parametros configurados na Jukebox.",
+        "description": "Endpoint para retornar os parâmetros configurados na Jukebox.",
         "parameters": [],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "Parâmetros retornadas com sucesso.",
+            "schema": {
+              "$ref": "#/definitions/RetornaParametros"
+            }
+          }
+        }
       }
     },
     "/dashboard": {
@@ -232,7 +297,14 @@
         ],
         "description": "Endpoint para retornar os dados da dashboard da Jukebox.",
         "parameters": [],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "Dados dashboard retornados com sucesso.",
+            "schema": {
+              "$ref": "#/definitions/RetornaDashboard"
+            }
+          }
+        }
       }
     }
   },
@@ -275,6 +347,92 @@
       },
       "xml": {
         "name": "Volume"
+      }
+    },
+    "RetornaArtistas": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "Artista": {
+            "type": "string",
+            "example": "150 BPM"
+          },
+          "Capa": {
+            "type": "string",
+            "example": "public/image/capas/150 BPM.jpg"
+          }
+        }
+      },
+      "xml": {
+        "name": "RetornaArtistas"
+      }
+    },
+    "RetornaMusicas": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "NomeMusica": {
+            "type": "string",
+            "example": "08. ADELE - 'Make You Feel My Love'.mp3"
+          },
+          "Duracao": {
+            "type": "number",
+            "example": 246.4130612244898
+          }
+        }
+      },
+      "xml": {
+        "name": "RetornaMusicas"
+      }
+    },
+    "Success": {
+      "type": "object",
+      "properties": {
+        "Sucesso": {
+          "type": "boolean",
+          "example": true
+        }
+      },
+      "xml": {
+        "name": "Success"
+      }
+    },
+    "RetornaDashboard": {
+      "type": "object",
+      "properties": {
+        "TotalMusicas": {
+          "type": "number",
+          "example": 4981
+        },
+        "MusicasTocadas": {
+          "type": "number",
+          "example": 530
+        },
+        "TotalTocadas": {
+          "type": "number",
+          "example": 696
+        }
+      },
+      "xml": {
+        "name": "RetornaDashboard"
+      }
+    },
+    "RetornaParametros": {
+      "type": "object",
+      "properties": {
+        "Desenv": {
+          "type": "boolean",
+          "example": false
+        },
+        "TempoRandom": {
+          "type": "number",
+          "example": 240000
+        }
+      },
+      "xml": {
+        "name": "RetornaParametros"
       }
     }
   }
