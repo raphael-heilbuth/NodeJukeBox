@@ -5,7 +5,7 @@
     "title": "Node JukeBox API",
     "description": "API de JukeBox"
   },
-  "host": "localhost:3000",
+  "host": "localhost:8000",
   "basePath": "/",
   "tags": [],
   "schemes": [
@@ -82,75 +82,118 @@
     },
     "/volume": {
       "post": {
-        "tags": [],
-        "description": "",
-        "parameters": [],
+        "tags": [
+          "Controles"
+        ],
+        "description": "Endpoint para setar um volume na Jukebox.",
+        "parameters": [
+          {
+            "name": "NivelVolume",
+            "description": "O volume que a JukeBox vai setar.",
+            "type": "int"
+          }
+        ],
         "responses": {}
       }
     },
     "/volumeMais": {
       "post": {
-        "tags": [],
-        "description": "",
+        "tags": [
+          "Controles"
+        ],
+        "description": "Endpoint para diminuir o volume na Jukebox.",
         "parameters": [],
         "responses": {}
       }
     },
     "/volumeMenos": {
       "post": {
-        "tags": [],
-        "description": "",
+        "tags": [
+          "Controles"
+        ],
+        "description": "Endpoint para aumentar o volume na Jukebox.",
         "parameters": [],
         "responses": {}
       }
     },
     "/mute": {
       "post": {
-        "tags": [],
-        "description": "",
+        "tags": [
+          "Controles"
+        ],
+        "description": "Endpoint para mutar a Jukebox.",
         "parameters": [],
         "responses": {}
       }
     },
     "/credito": {
       "post": {
-        "tags": [],
-        "description": "",
-        "parameters": [],
+        "tags": [
+          "Controles"
+        ],
+        "description": "Endpoint para adicionar créditos na Jukebox.",
+        "parameters": [
+          {
+            "name": "QtdCredito",
+            "description": "A quantidade de crédito que vai ser inserido na JukeBox.",
+            "type": "int"
+          }
+        ],
         "responses": {}
       }
     },
     "/proxima": {
       "get": {
-        "tags": [],
-        "description": "",
+        "tags": [
+          "Musica"
+        ],
+        "description": "Endpoint para pular para próxima música na Jukebox.",
         "parameters": [],
         "responses": {}
       }
     },
     "/selecionaMusica": {
       "post": {
-        "tags": [],
-        "description": "",
-        "parameters": [],
+        "tags": [
+          "Musica"
+        ],
+        "description": "Endpoint para adicionar uma música Jukebox.",
+        "parameters": [
+          {
+            "name": "Artista",
+            "description": "O artista da música que deva ser tocada na JukeBox.",
+            "type": "string"
+          },
+          {
+            "name": "Musica",
+            "description": "A música que deve ser tocada na JukeBox.",
+            "type": "string"
+          }
+        ],
         "responses": {}
       }
     },
     "/listaArtista": {
       "get": {
-        "tags": [],
-        "description": "",
+        "tags": [
+          "Musica"
+        ],
+        "description": "Endpoint para retornar a lista de artista da Jukebox.",
         "parameters": [],
         "responses": {}
       }
     },
     "/listaMusica": {
       "get": {
-        "tags": [],
-        "description": "",
+        "tags": [
+          "Musica"
+        ],
+        "description": "Endpoint para retornar a lista de música de um artista da Jukebox.",
         "parameters": [
           {
             "name": "Artista",
+            "description": "O artista para qual vai ser retornado a lista de música da JukeBox.",
+            "type": "string",
             "in": "query"
           }
         ],
@@ -159,16 +202,20 @@
     },
     "/getParametro": {
       "get": {
-        "tags": [],
-        "description": "",
+        "tags": [
+          "Parametros"
+        ],
+        "description": "Endpoint para retornar os parametros configurados na Jukebox.",
         "parameters": [],
         "responses": {}
       }
     },
     "/dashboard": {
       "get": {
-        "tags": [],
-        "description": "",
+        "tags": [
+          "Dashboard"
+        ],
+        "description": "Endpoint para retornar os dados da dashboard da Jukebox.",
         "parameters": [],
         "responses": {}
       }

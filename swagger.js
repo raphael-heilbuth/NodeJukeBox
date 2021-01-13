@@ -9,14 +9,13 @@ let doc = {
         title: "Node JukeBox API",
         description: "API de JukeBox"
     },
-    host: "localhost:3000",
+    host: "localhost:8000",
     basePath: "/",
     schemes: ['http'],
     consumes: ['application/json'],
     produces: ['application/json']
 };
 
-swaggerAutogen(outputFile, endpointsFiles,doc).
-then(()=>{
-
-});
+swaggerAutogen(outputFile, endpointsFiles, doc).then(() => {
+    require('./index.js')
+})
