@@ -16,6 +16,14 @@ rotas.post("/volume", function (req, res) {
     // #swagger.tags = ['Controles']
     // #swagger.description = 'Endpoint para setar um volume na Jukebox.'
 
+    /*	#swagger.parameters['obj'] = {
+      in: 'body',
+      description: 'O volume que vai ser setado na JukeBox',
+      required: true,
+      type: 'object',
+      schema: { $ref: "#/definitions/Volume" }
+    } */
+
     /* #swagger.parameters['NivelVolume'] = {
            description: 'O volume que a JukeBox vai setar.',
            type: 'int'
@@ -50,10 +58,14 @@ rotas.post("/credito", function (req, res) {
     // #swagger.tags = ['Controles']
     // #swagger.description = 'Endpoint para adicionar créditos na Jukebox.'
 
-    /* #swagger.parameters['QtdCredito'] = {
-           description: 'A quantidade de crédito que vai ser inserido na JukeBox.',
-           type: 'int'
+    /*	#swagger.parameters['obj'] = {
+      in: 'body',
+      description: 'A quantidade de crédito que vai ser inserido na JukeBox.',
+      required: true,
+      type: 'object',
+      schema: { $ref: "#/definitions/Creditos" }
     } */
+
     let credito = parseInt(req.body.QtdCredito);
     res.json({'Sucesso': true});
     io.emit('credito', credito);
@@ -70,14 +82,14 @@ rotas.post("/selecionaMusica", function (req, res) {
     // #swagger.tags = ['Musica']
     // #swagger.description = 'Endpoint para adicionar uma música Jukebox.'
 
-    /* #swagger.parameters['Artista'] = {
-           description: 'O artista da música que deva ser tocada na JukeBox.',
-           type: 'string'
-    } */
-    /* #swagger.parameters['Musica'] = {
-           description: 'A música que deve ser tocada na JukeBox.',
-           type: 'string'
-    } */
+    /*	#swagger.parameters['obj'] = {
+          in: 'body',
+          description: 'Informações da música a ser tocada.',
+          required: true,
+          type: 'object',
+          schema: { $ref: "#/definitions/SelecionaMusica" }
+  } */
+
     let musica = funcoes.buscaMusica(req.body.Artista, req.body.Musica);
 
     res.json({'Sucesso': musica !== {}});

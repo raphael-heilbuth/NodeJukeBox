@@ -132,6 +132,16 @@
         "description": "Endpoint para setar um volume na Jukebox.",
         "parameters": [
           {
+            "name": "obj",
+            "in": "body",
+            "description": "O volume que vai ser setado na JukeBox",
+            "required": true,
+            "type": "object",
+            "schema": {
+              "$ref": "#/definitions/Volume"
+            }
+          },
+          {
             "name": "NivelVolume",
             "description": "O volume que a JukeBox vai setar.",
             "type": "int"
@@ -178,9 +188,14 @@
         "description": "Endpoint para adicionar créditos na Jukebox.",
         "parameters": [
           {
-            "name": "QtdCredito",
+            "name": "obj",
+            "in": "body",
             "description": "A quantidade de crédito que vai ser inserido na JukeBox.",
-            "type": "int"
+            "required": true,
+            "type": "object",
+            "schema": {
+              "$ref": "#/definitions/Creditos"
+            }
           }
         ],
         "responses": {}
@@ -204,14 +219,14 @@
         "description": "Endpoint para adicionar uma música Jukebox.",
         "parameters": [
           {
-            "name": "Artista",
-            "description": "O artista da música que deva ser tocada na JukeBox.",
-            "type": "string"
-          },
-          {
-            "name": "Musica",
-            "description": "A música que deve ser tocada na JukeBox.",
-            "type": "string"
+            "name": "obj",
+            "in": "body",
+            "description": "Informações da música a ser tocada.",
+            "required": true,
+            "type": "object",
+            "schema": {
+              "$ref": "#/definitions/SelecionaMusica"
+            }
           }
         ],
         "responses": {}
@@ -265,5 +280,46 @@
       }
     }
   },
-  "definitions": {}
+  "definitions": {
+    "SelecionaMusica": {
+      "type": "object",
+      "properties": {
+        "Artista": {
+          "type": "string",
+          "example": "Adele"
+        },
+        "Musica": {
+          "type": "string",
+          "example": "08. ADELE - 'Make You Feel My Love'.mp3"
+        }
+      },
+      "xml": {
+        "name": "SelecionaMusica"
+      }
+    },
+    "Creditos": {
+      "type": "object",
+      "properties": {
+        "QtdCredito": {
+          "type": "number",
+          "example": 10
+        }
+      },
+      "xml": {
+        "name": "Creditos"
+      }
+    },
+    "Volume": {
+      "type": "object",
+      "properties": {
+        "NivelVolume": {
+          "type": "number",
+          "example": 0.1
+        }
+      },
+      "xml": {
+        "name": "Volume"
+      }
+    }
+  }
 }

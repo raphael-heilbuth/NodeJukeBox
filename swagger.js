@@ -9,6 +9,18 @@ let doc = {
         title: "Node JukeBox API",
         description: "API de JukeBox"
     },
+    definitions: {
+        SelecionaMusica: {
+            Artista: "Adele",
+            Musica: "08. ADELE - 'Make You Feel My Love'.mp3"
+        },
+        Creditos: {
+            QtdCredito: 10
+        },
+        Volume: {
+            NivelVolume: 0.1
+        }
+    },
     host: "localhost:8000",
     basePath: "/",
     schemes: ['http'],
