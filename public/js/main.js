@@ -66,6 +66,11 @@ jQuery(function () {
         executaMusica(null, value["Artista"], value["Musica"], value["Duracao"], null, null, value["Tipo"]);
     });
 
+    socket.on('proxima', function() {
+        Next();
+        AbreToastInfo('Próxima');
+    });
+
     $.get("/getList", function (data) {
         listaMusicas = data["ListaMusica"];
 
