@@ -12,6 +12,8 @@ const youtubeSearch = require('youtube-sr');
 const fs = require('fs');
 const path = require('path');
 const abrirNavegador = require('open');
+const swaggerUi = require('swagger-ui-express');
+const swaggerFile = require('./swagger_output.json')
 
 
 let musicasMeta = {},
@@ -25,6 +27,8 @@ app.use(express.static(__dirname + '/views'));
 app.use(express.static(__dirname + '/'));
 
 app.use(require('./rotas'));
+
+app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerFile))
 
 http.listen(8000, function () {
     console.log('Rodando na porta 8000')
