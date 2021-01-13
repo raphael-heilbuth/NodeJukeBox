@@ -84,13 +84,24 @@ app.get("/getList", async function (req, res) {
 });
 
 app.get("/playMusic", function (req, res) {
+    // #swagger.tags = ['Musica']
+    // #swagger.description = 'Endpoint para enviar música pra tocar'
+    /* #swagger.parameters['artista'] = {
+          description: 'Nome do artista da música',
+          type: 'string'
+   } */
+    /* #swagger.parameters['musica'] = {
+          description: 'Nome do música',
+          type: 'string'
+   } */
+
     let returnData = {};
 
-    fs.readFile(musicFolder + '/' + req.query["artista"] + '/' + req.query["musica"], function (err, file) {
+    fs.readFile(musicFolder + '/' + req.query.artista + '/' + req.query.musica, function (err, file) {
         if (err) {
             returnData.success = false;
         } else {
-            global.db.CountMusica(req.query["artista"], req.query["musica"]);
+            global.db.CountMusica(req.query.artista, req.query.musica);
             let base64File = new Buffer.from(file, 'binary').toString('base64');
 
             returnData.success = true;
@@ -101,20 +112,37 @@ app.get("/playMusic", function (req, res) {
 });
 
 app.get("/tocaYoutube", function (req, res) {
+    // #swagger.tags = ['Youtube']
+    // #swagger.description = 'Endpoint para enviar para o site música do youtube a ser tocada'
+
     ytdl(req.query.IdMusica, {highWaterMark: 1 << 25}).pipe(res);
 });
 
 app.get("/buscaYoutube", function (req, res) {
-    retornaMusicaYoutube(req.query["busca"])
+    // #swagger.tags = ['Youtube']
+    // #swagger.description = 'Endpoint para retornar as primeiras 5 músicas da pesquisa'
+    /* #swagger.parameters['busca'] = {
+          description: 'Música a ser buscada',
+          type: 'string'
+   } */
+
+    retornaMusicaYoutube(req.query.busca)
         .then(listaYoutube => {
             res.json(listaYoutube);
         })
 });
 
 app.get("/randomMusica", function (req, res) {
+    // #swagger.tags = ['Musica']
+    // #swagger.description = 'Endpoint para retornar músicas aleatórias'
+    /* #swagger.parameters['Quantidade'] = {
+          description: 'Quantidade de músicas a serem buscadas',
+          type: 'string'
+   } */
+
     let random = [];
 
-    for (let i = 0; i < parseInt(req.query["Quantidade"].replace("Random", "")); i++) {
+    for (let i = 0; i < parseInt(req.query.Quantidade.replace("Random", "")); i++) {
         let artista = Object.keys(musicasMeta)[getRandomInteger(Object.keys(musicasMeta).length)],
             musicas = musicasMeta[artista]["Musicas"][getRandomInteger(musicasMeta[artista]["Musicas"].length)],
             item = {
@@ -131,8 +159,15 @@ app.get("/randomMusica", function (req, res) {
 });
 
 app.get("/topMusica", async function (req, res) {
+    // #swagger.tags = ['Musica']
+    // #swagger.description = 'Endpoint para retornar a quantidade de músicas mais tocadas'
+    /* #swagger.parameters['Quantidade'] = {
+          description: 'Quantidade de músicas a serem buscadas',
+          type: 'string'
+   } */
+
     let top = [],
-        arrayTop = await global.db.RetornaTopMusicas(parseInt(req.query["Quantidade"].replace("Top", "")));
+        arrayTop = await global.db.RetornaTopMusicas(parseInt(req.query.Quantidade.replace("Top", "")));
 
     Array.from(arrayTop).forEach(el => {
         let musicas = musicasMeta[el["Artista"]["0"]["name"]]["Musicas"].find(x => x.Musica === el["title"]),

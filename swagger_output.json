@@ -29,16 +29,33 @@
     },
     "/playMusic": {
       "get": {
-        "tags": [],
-        "description": "",
-        "parameters": [],
+        "tags": [
+          "Musica"
+        ],
+        "description": "Endpoint para enviar música pra tocar",
+        "parameters": [
+          {
+            "name": "artista",
+            "description": "Nome do artista da música",
+            "type": "string",
+            "in": "query"
+          },
+          {
+            "name": "musica",
+            "description": "Nome do música",
+            "type": "string",
+            "in": "query"
+          }
+        ],
         "responses": {}
       }
     },
     "/tocaYoutube": {
       "get": {
-        "tags": [],
-        "description": "",
+        "tags": [
+          "Youtube"
+        ],
+        "description": "Endpoint para enviar para o site música do youtube a ser tocada",
         "parameters": [
           {
             "name": "IdMusica",
@@ -50,25 +67,52 @@
     },
     "/buscaYoutube": {
       "get": {
-        "tags": [],
-        "description": "",
-        "parameters": [],
+        "tags": [
+          "Youtube"
+        ],
+        "description": "Endpoint para retornar as primeiras 5 músicas da pesquisa",
+        "parameters": [
+          {
+            "name": "busca",
+            "description": "Música a ser buscada",
+            "type": "string",
+            "in": "query"
+          }
+        ],
         "responses": {}
       }
     },
     "/randomMusica": {
       "get": {
-        "tags": [],
-        "description": "",
-        "parameters": [],
+        "tags": [
+          "Musica"
+        ],
+        "description": "Endpoint para retornar músicas aleatórias",
+        "parameters": [
+          {
+            "name": "Quantidade",
+            "description": "Quantidade de músicas a serem buscadas",
+            "type": "string",
+            "in": "query"
+          }
+        ],
         "responses": {}
       }
     },
     "/topMusica": {
       "get": {
-        "tags": [],
-        "description": "",
-        "parameters": [],
+        "tags": [
+          "Musica"
+        ],
+        "description": "Endpoint para retornar a quantidade de músicas mais tocadas",
+        "parameters": [
+          {
+            "name": "Quantidade",
+            "description": "Quantidade de músicas a serem buscadas",
+            "type": "string",
+            "in": "query"
+          }
+        ],
         "responses": {}
       }
     },
