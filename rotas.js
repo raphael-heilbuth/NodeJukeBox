@@ -34,7 +34,7 @@ rotas.post("/mute", function (req, res) {
 });
 
 rotas.post("/credito", function (req, res) {
-    let credito = parseInt(req.body.qtdCredito);
+    let credito = parseInt(req.body.QtdCredito);
     res.json({'Sucesso': true});
     io.emit('credito', credito);
 });
