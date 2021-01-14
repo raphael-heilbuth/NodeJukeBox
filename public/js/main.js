@@ -56,6 +56,21 @@ jQuery(function () {
         AbreToastInfo('Volume', 'Mute');
     });
 
+    socket.on('pause',function (){
+        audio.pause();
+        AbreToastInfo('Música', 'Pause');
+    });
+
+    socket.on('pause',function (){
+        audio.pause();
+        AbreToastInfo('Música', 'Pause');
+    });
+
+    socket.on('resume',function (){
+        audio.play();
+        AbreToastInfo('Música', 'Despausar');
+    });
+
     socket.on('credito', function (qtd) {
         totalCredito += qtd;
         credito.text(totalCredito);

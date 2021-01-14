@@ -203,6 +203,40 @@
         }
       }
     },
+    "/pause": {
+      "post": {
+        "tags": [
+          "Controles"
+        ],
+        "description": "Endpoint para pausar a Jukebox.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Música pausada com sucesso.",
+            "schema": {
+              "$ref": "#/definitions/Success"
+            }
+          }
+        }
+      }
+    },
+    "/resume": {
+      "post": {
+        "tags": [
+          "Controles"
+        ],
+        "description": "Endpoint para despausar a Jukebox.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Música despausada com sucesso.",
+            "schema": {
+              "$ref": "#/definitions/Success"
+            }
+          }
+        }
+      }
+    },
     "/credito": {
       "post": {
         "tags": [
