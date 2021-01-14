@@ -58,17 +58,12 @@ jQuery(function () {
 
     socket.on('pause',function (){
         audio.pause();
-        AbreToastInfo('Música', 'Pause');
-    });
-
-    socket.on('pause',function (){
-        audio.pause();
-        AbreToastInfo('Música', 'Pause');
+        AbreToastInfo('Música', '', 'fas fa-pause');
     });
 
     socket.on('resume',function (){
         audio.play();
-        AbreToastInfo('Música', 'Despausar');
+        AbreToastInfo('Música', '', 'fas fa-play');
     });
 
     socket.on('credito', function (qtd) {
