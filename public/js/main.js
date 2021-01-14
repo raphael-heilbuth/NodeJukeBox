@@ -74,6 +74,7 @@ jQuery(function () {
 
     socket.on('musica', function (value) {
         executaMusica(null, value["Artista"], value["Musica"], value["Duracao"], null, null, value["Tipo"]);
+        AbreToastInfo('Música', '', 'fas fa-plus');
     });
 
     socket.on('proxima', function() {
