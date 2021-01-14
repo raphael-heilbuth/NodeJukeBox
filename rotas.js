@@ -71,6 +71,32 @@ rotas.post("/mute", function (req, res) {
     io.emit('volume', 0.0);
 });
 
+rotas.post("/pause",function (req,res){
+    // #swagger.tags = ['Controles']
+    // #swagger.description = 'Endpoint para pausar a Jukebox.'
+
+
+    /* #swagger.responses[200] = {
+    schema: { "$ref": "#/definitions/Success" },
+    description: "Música pausada com sucesso." }
+    */
+    res.status(200).json({'Sucesso': true});
+    io.emit('pause', {'Pausar': true});
+});
+
+rotas.post("/resume",function (req,res){
+    // #swagger.tags = ['Controles']
+    // #swagger.description = 'Endpoint para despausar a Jukebox.'
+
+
+    /* #swagger.responses[200] = {
+    schema: { "$ref": "#/definitions/Success" },
+    description: "Música despausada com sucesso." }
+    */
+    res.status(200).json({'Sucesso': true});
+    io.emit('resume', {'Despausar': true});
+});
+
 rotas.post("/credito", function (req, res) {
     // #swagger.tags = ['Controles']
     // #swagger.description = 'Endpoint para adicionar créditos na Jukebox.'
