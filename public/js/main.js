@@ -68,7 +68,7 @@ jQuery(function () {
 
     socket.on('proxima', function() {
         Next();
-        AbreToastInfo('Próxima');
+        AbreToastInfo('Música', '', 'fas fa-forward');
     });
 
     $.get("/getList", function (data) {
@@ -305,9 +305,9 @@ jQuery(function () {
     });
 });
 
-function AbreToastInfo(titulo, valor = '') {
+function AbreToastInfo(titulo, valor = '', icon = '') {
     let tooltips = $('#info').tooltip({
-        title: titulo + '<div class="msg-info">' + valor + '</div>',
+        title: titulo + '<div class="msg-info">' +(icon !== '' ? '<i class="'+icon+'"></i>': valor) + '</div>',
         container: '#info',
         html: true,
         template: '<div class="tooltip tooltip-letra" role="tooltip"><div class="tooltip-inner tooltip-inner-info"></div></div>'
