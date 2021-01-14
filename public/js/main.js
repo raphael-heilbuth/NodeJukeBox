@@ -53,7 +53,7 @@ jQuery(function () {
 
     socket.on('mute', function () {
         audio.volume = 0.0;
-        AbreToastInfo('Volume', 'Mute');
+        AbreToastInfo('Volume', '', 'fas fa-volume-mute');
     });
 
     socket.on('pause',function (){
