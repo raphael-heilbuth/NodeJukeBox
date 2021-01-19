@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { Artista, Musica } = require('./models');
+const { Artista, Musica, Parametros } = require('./models');
 
 mongoose.connect('mongodb://localhost/JukeBox', {useNewUrlParser: true,useUnifiedTopology: true}).then(() => {});
 
@@ -107,4 +107,36 @@ const MusicasTocadas = () => new Promise((success) => {
     });
 });
 
-module.exports = { TotalTocadas, PopularidadeArtista, PopularidadeMusica, CountMusica, RetornaTopMusicas, MusicasTocadas }
+const SalvaParametros = (modo, valorCredito, topMusicas, randomMusicas, youtubeMusicas, timeRandom) => new Promise((success, reject) => {
+    const newParametros = new Parametros({
+        _id: 1,
+        modo: modo,
+        valorCredito: valorCredito,
+        topMusicas: topMusicas,
+        randomMusicas: randomMusicas,
+        youtubeMusicas: youtubeMusicas,
+        timeRandom: timeRandom
+    });
+
+    if (newParametros.errors !== undefined) {
+        reject(newParametros.errors)
+        return false;
+    }
+
+    Parametros.updateOne({
+        _id: 1
+    }, newParametros, {upsert: true, setDefaultsOnInsert: true, runValidators: true}, function(err, res) {
+        if (err) {
+            reject(err)
+            return false;
+        }
+        console.log(res);
+        success(res);
+    });
+});
+
+const RetornaParametros = () => new Promise((success) => {
+    Parametros.findOne({'_id': 1}).then(r => success(r));
+});
+
+module.exports = { TotalTocadas, PopularidadeArtista, PopularidadeMusica, CountMusica, RetornaTopMusicas, MusicasTocadas, SalvaParametros, RetornaParametros }

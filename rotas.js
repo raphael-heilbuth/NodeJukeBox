@@ -183,6 +183,32 @@ rotas.get("/listaMusica", function (req, res) {
     res.status(200).json(lista);
 });
 
+rotas.post("/setParametro",function (req,res){
+    // #swagger.tags = ['Parametros']
+    // #swagger.description = 'Endpoint para salvar os parâmetros na Jukebox.'
+
+    /*	#swagger.parameters['obj'] = {
+          in: 'body',
+          description: 'Parametros a ser usado na JukeBox.',
+          required: true,
+          type: 'object',
+          schema: { $ref: "#/definitions/RetornaParametros" }
+    } */
+
+    /* #swagger.responses[200] = {
+    schema: { "$ref": "#/definitions/Success" },
+    description: "Música adicionada com sucesso." }
+    */
+
+    funcoes.salvaParametros(req.body.modo, req.body.valorCredito, req.body.topMusicas, req.body.randomMusicas, req.body.youtubeMusicas, req.body.timeRandom)
+        .then(() => {
+            res.status(200).json({'Sucesso': true});
+        })
+        .catch(err => {
+            res.status(400).json(err);
+        });
+})
+
 rotas.get("/getParametro",function (req,res){
     // #swagger.tags = ['Parametros']
     // #swagger.description = 'Endpoint para retornar os parâmetros configurados na Jukebox.'
@@ -191,7 +217,10 @@ rotas.get("/getParametro",function (req,res){
     schema: { "$ref": "#/definitions/RetornaParametros" },
     description: "Parâmetros retornadas com sucesso." }
     */
-    res.status(200).json({'Desenv' : (process.env.DESENV === "true"), 'TempoRandom' : process.env.TIMERANDOM || 240000});
+
+    funcoes.retornaParametros().then(r => {
+        res.status(200).json(r);
+    });
 })
 
 rotas.get("/dashboard", function (req, res) {

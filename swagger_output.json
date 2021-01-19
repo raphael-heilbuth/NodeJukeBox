@@ -351,6 +351,37 @@
         }
       }
     },
+    "/setParametro": {
+      "post": {
+        "tags": [
+          "Parametros"
+        ],
+        "description": "Endpoint para salvar os parâmetros na Jukebox.",
+        "parameters": [
+          {
+            "name": "obj",
+            "in": "body",
+            "description": "Parametros a ser usado na JukeBox.",
+            "required": true,
+            "type": "object",
+            "schema": {
+              "$ref": "#/definitions/RetornaParametros"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Música adicionada com sucesso.",
+            "schema": {
+              "$ref": "#/definitions/Success"
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
     "/getParametro": {
       "get": {
         "tags": [
@@ -500,11 +531,27 @@
     "RetornaParametros": {
       "type": "object",
       "properties": {
-        "Desenv": {
-          "type": "boolean",
-          "example": false
+        "modo": {
+          "type": "string",
+          "example": "Ficha"
         },
-        "TempoRandom": {
+        "valorCredito": {
+          "type": "number",
+          "example": 0.5
+        },
+        "topMusicas": {
+          "type": "boolean",
+          "example": true
+        },
+        "randomMusicas": {
+          "type": "boolean",
+          "example": true
+        },
+        "youtubeMusicas": {
+          "type": "boolean",
+          "example": true
+        },
+        "timeRandom": {
           "type": "number",
           "example": 240000
         }

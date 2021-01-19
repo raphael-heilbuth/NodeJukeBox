@@ -35,7 +35,8 @@ http.listen(8000, function () {
 });
 
 app.get("/getList", async function (req, res) {
-    let listaMusicas = RetornaMusicas();
+    let parametros = await retornaParametros();
+        listaMusicas = RetornaMusicas();
 
     musicasTocadas = await global.db.MusicasTocadas();
     totalTocadas = await global.db.TotalTocadas();
@@ -43,29 +44,37 @@ app.get("/getList", async function (req, res) {
 
     musicasMeta = await RetornaListaMetaData(listaMusicas, totalTocadas);
 
-    musicasMeta["Youtube"] = {
-        "Musicas": [
-            {"Musica": "Pesquisar", "Meta": null}
-        ]
-    };
-    musicasMeta["TOP"] = {
-        "Musicas": [
-            {"Musica": "Top 10", "Meta": null},
-            {"Musica": "Top 20", "Meta": null},
-            {"Musica": "Top 30", "Meta": null},
-            {"Musica": "Top 40", "Meta": null},
-            {"Musica": "Top 50", "Meta": null},
-            {"Musica": "Top 100", "Meta": null}
-        ]
-    };
-    musicasMeta["Random"] = {
-        "Musicas": [
-            {"Musica": "Random 1", "Meta": null},
-            {"Musica": "Random 3", "Meta": null},
-            {"Musica": "Random 5", "Meta": null},
-            {"Musica": "Random 10", "Meta": null}
-        ]
-    };
+    if (parametros["youtubeMusicas"]) {
+        musicasMeta["Youtube"] = {
+            "Musicas": [
+                {"Musica": "Pesquisar", "Meta": null}
+            ]
+        };
+    }
+
+    if (parametros["topMusicas"]) {
+        musicasMeta["TOP"] = {
+            "Musicas": [
+                {"Musica": "Top 10", "Meta": null},
+                {"Musica": "Top 20", "Meta": null},
+                {"Musica": "Top 30", "Meta": null},
+                {"Musica": "Top 40", "Meta": null},
+                {"Musica": "Top 50", "Meta": null},
+                {"Musica": "Top 100", "Meta": null}
+            ]
+        };
+    }
+
+    if (parametros["randomMusicas"]) {
+        musicasMeta["Random"] = {
+            "Musicas": [
+                {"Musica": "Random 1", "Meta": null},
+                {"Musica": "Random 3", "Meta": null},
+                {"Musica": "Random 5", "Meta": null},
+                {"Musica": "Random 10", "Meta": null}
+            ]
+        };
+    }
 
     let orderedListaMusicas = {};
 
@@ -214,6 +223,23 @@ function RetornaMusicas() {
     return readDir(musicFolder);
 }
 
+async function retornaParametros() {
+    let parametros = await global.db.RetornaParametros();
+
+    if (parametros === null) {
+        parametros = {
+            modo: 'Ficha',
+            valorCredito: 0.50,
+            topMusicas: true,
+            randomMusicas: true,
+            youtubeMusicas: true,
+            timeRandom: 240000
+        }
+    }
+
+    return parametros;
+}
+
 const RetornaListaMetaData = (lista, totalTocadas) => new Promise(async (success) => {
     let retornoMeta = [];
 
@@ -244,6 +270,7 @@ const RetornaListaMetaData = (lista, totalTocadas) => new Promise(async (success
     }
     success(retornoMeta);
 });
+
 const RetornaMetaData = (file) => new Promise((success, reject) => {
     mm.parseFile(file)
         .then(metadata => {
@@ -277,7 +304,7 @@ const getRandomInteger = (max) => {
     return Math.floor(Math.random() * max);
 }
 
-abrirNavegador('http://localhost:8000');
+//abrirNavegador('http://localhost:8000');
 
 exports.retornaListaArtista = function retornaListaArtista() {
     if (Object.keys(musicasMeta).length > 0) {
@@ -309,6 +336,12 @@ exports.retornaDadosDashboard = function retornaDadosDashboard() {
         'TotalTocadas': totalTocadas
     }
 }
+
+exports.salvaParametros = function salvaParametros(modo, valorCredito, topMusica, randomMusicas, youtubeMusicas, timeRandom) {
+    return global.db.SalvaParametros(modo, valorCredito, topMusica, randomMusicas, youtubeMusicas, timeRandom);
+}
+
+exports.retornaParametros = retornaParametros;
 
 exports.buscaMusica = function buscaMusica(artista, musica) {
     if (Object.keys(musicasMeta).length > 0) {

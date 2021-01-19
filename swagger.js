@@ -37,12 +37,15 @@ let doc = {
         },
         RetornaDashboard: {
             "TotalMusicas": 4981,
-            "MusicasTocadas": 530,
             "TotalTocadas": 696
         },
         RetornaParametros: {
-            "Desenv": false,
-            "TempoRandom": 240000
+            "modo": 'Ficha',
+            "valorCredito": 0.50,
+            "topMusicas": true,
+            "randomMusicas": true,
+            "youtubeMusicas": true,
+            "timeRandom": 240000
         }
     },
     host: "localhost:8000",

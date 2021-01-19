@@ -14,7 +14,8 @@ let audio = document.getElementById("myVideo"),
     socket = io(),
     modoLivre = false,
     totalCredito = 0,
-    tempoRandom = 240000;
+    tempoRandom = 240000,
+    valorCredito = 0;
 
 $('body').loading({
     stoppable: false,
@@ -82,6 +83,16 @@ jQuery(function () {
         AbreToastInfo('Música', '', 'fas fa-forward');
     });
 
+    $.get("/getParametro",function (parametro){
+        modoLivre = parametro['modo'] === 'Livre';
+        tempoRandom = parametro['timeRandom'];
+        valorCredito = parametro['valorCredito'];
+
+        if (modoLivre) {
+            $('.jukebox-modo').removeClass('d-none');
+        }
+    });
+
     $.get("/getList", function (data) {
         listaMusicas = data["ListaMusica"];
 
@@ -143,11 +154,6 @@ jQuery(function () {
 
         timeRandomInit();
     });
-
-    $.get("/getParametro",function (parametro){
-        modoLivre = parametro['Desenv'];
-        tempoRandom =  parametro['TempoRandom'];
-    })
 
     $(document).on('click', '.flipster__item--current', function () {
         if (!$(this).find('.back').is(':visible')) {
