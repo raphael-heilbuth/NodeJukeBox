@@ -162,6 +162,8 @@
     top: 0;
     text-shadow: 2px 0 0 #fff, -2px 0 0 #fff, 0 2px 0 #fff, 0 -2px 0 #fff, 1px 1px #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff;
     width: 400px;
+    padding-right: 50px;
+    padding-left: 50px;
 }
 
 .padding-top-list-music {
@@ -274,6 +276,33 @@
     font-weight: bold;
 }
 
+.blink_me {
+    animation: blinker 3s linear infinite;
+    color: red !important;
+}
+
+.card-creditos {
+    max-height: calc(100vh - 616px);
+    min-height: calc(100vh - 616px);
+}
+
+.title-credito {
+    font-size: 50px;
+    font-weight: bold;
+}
+
+.qtd_credito{
+    color: green;
+    font-size: 130px;
+    font-weight: bold;
+    margin-bottom: 30px;
+}
+
+.valor-credio {
+    font-size: 25px;
+    font-weight: bold;
+}
+
 @media (min-height: 769px)
 {
     .img-capa {
@@ -286,8 +315,8 @@
     }
 
     .card-list {
-        max-height: calc(100vh - 650px);
-        min-height: calc(100vh - 650px);
+        max-height: calc(100vh - 666px);
+        min-height: calc(100vh - 666px);
     }
 
     .row-coverflow {
