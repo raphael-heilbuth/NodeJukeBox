@@ -272,7 +272,7 @@ const RetornaListaMetaData = (lista, totalTocadas) => new Promise(async (success
 });
 
 const RetornaMetaData = (file) => new Promise((success, reject) => {
-    mm.parseFile(file)
+    mm.parseFile(file,{skipCovers : true})
         .then(metadata => {
             success(metadata);
         })
