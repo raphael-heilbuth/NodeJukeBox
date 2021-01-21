@@ -110,7 +110,7 @@ jQuery(function () {
         let list = $('.flip-items');
 
         alfabeto = Object.keys(listaMusicas).map(function (artista) {
-            return removerAcentos(artista.substr(0, 1));
+            return artista.substr(0, 1);
         }).filter(function (itm, i, a) {
             return i === a.indexOf(itm);
         });
@@ -142,7 +142,7 @@ jQuery(function () {
             onItemSwitch: function (currentItem, previousItem) {
                 $(previousItem).find('.front').removeClass('d-none').end().find('.back').addClass('d-none');
 
-                let letra = removerAcentos($(currentItem).attr('data-flip-title').substr(0, 1));
+                let letra = $(currentItem).attr('data-flip-title').substr(0, 1);
                 if (letraAnt !== letra) {
                     letraAnt = letra;
                     let tooltips = $('.line-cover-flow').tooltip({
@@ -410,7 +410,7 @@ function RetornaCapa(index, popularidade = null, qtdMusica = null, capa = true) 
             break;
     }
 
-    return '<li data-flip-title="' + index + '" data-letra="' + removerAcentos(index.substr(0, 1)) + '">' +
+    return '<li data-flip-title="' + index + '" data-letra="' + index.substr(0, 1) + '">' +
         '     <div class="flip-content">' +
         '        <div class="front">' +
         '           <h1 class="text-center titulo-musica-capa">' + index + '</h1>' +
@@ -615,7 +615,7 @@ function executaMusica(elemento, artista, musica, duracao, imageCapa, idMusica, 
                         info.removeClass('d-none');
                         $('.background-image').css('background-image', 'url(' + imageUrl + ')');
                         $('.capa-atual').attr("src", imageUrl);
-                        $('#title-musica').html('<i class="fas fa-compact-disc"></i>&nbsp;' + musica);
+                        $('#title-musica').html('<i class="fas '+ (tipo === '.mp3' ? 'fa-compact-disc' : 'fa-video') +'"></i>&nbsp;' + musica);
                         $('#artista-musica').html(artista);
 
                         if (tipo === ".mp4") {
@@ -670,7 +670,7 @@ function timeRandomInit() {
         if (audio.paused) {
             $.get("/randomMusica?Quantidade=1", function (response) {
                 $.each(response, function (index, value) {
-                    executaMusica(null, value["Artista"], value["Musica"], value["Duracao"], null, null, null);
+                    executaMusica(null, value["Artista"], value["Musica"], value["Duracao"], null, null, value["Tipo"]);
                 });
             });
         }
