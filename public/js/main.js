@@ -605,7 +605,7 @@ function executaMusica(elemento, artista, musica, duracao, imageCapa, idMusica, 
             if (audio.paused) {
                 carregando.removeClass('d-none');
 
-                $.get('/playMusic?artista=' + artista + '&musica=' + musica, function (response) {
+                $.get('/playMusic?artista=' + encodeURIComponent(artista) + '&musica=' + encodeURIComponent(musica), function (response) {
                     carregando.addClass('d-none');
 
                     if (response.success) {
