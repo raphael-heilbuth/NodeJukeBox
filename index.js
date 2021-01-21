@@ -15,7 +15,6 @@ const abrirNavegador = require('open');
 const swaggerUi = require('swagger-ui-express');
 const swaggerFile = require('./swagger_output.json')
 
-
 let musicasMeta = {},
     totalMusica = 0,
     musicasTocadas = 0,
@@ -86,7 +85,7 @@ app.get("/getList", async function (req, res) {
         'ListaMusica': orderedListaMusicas,
         'TotalMusicas': totalMusica,
         'MusicasTocas': musicasTocadas,
-        'TotalReproducao': totalTocadas
+        'TotalAlbum': Object.keys(musicasMeta).length
     }
 
     res.json(lista);
@@ -157,7 +156,7 @@ app.get("/randomMusica", function (req, res) {
             item = {
                 'Artista': artista,
                 'Musica': musicas["Musica"],
-                'Duracao': musicas["Meta"]["format"]["duration"],
+                'Duracao': musicas["Meta"]["duration"],
                 'Tipo': path.extname(musicas["Musica"])
             }
 
@@ -183,7 +182,7 @@ app.get("/topMusica", async function (req, res) {
             item = {
                 'Artista': el["Artista"]["0"]["name"],
                 'Musica': musicas["Musica"],
-                'Duracao': musicas["Meta"]["format"]["duration"],
+                'Duracao': musicas["Meta"]["duration"],
                 'Tipo': path.extname(musicas["Musica"])
             }
 
@@ -201,7 +200,7 @@ function RetornaMusicas() {
             .readdirSync(dir)
             .forEach(file => {
                 if (fs.lstatSync(dir + "/" + file).isFile()) {
-                    if (path.extname(file) === '.jpg' || path.extname(file) === '.JPG') {
+                    if (path.extname(file).toLowerCase() === '.jpg' || path.extname(file).toLowerCase() === '.jpge') {
                         let diretorios = dir.split('/'),
                             artista = diretorios[diretorios.length - 1];
                         fs.copyFile(dir + "/" + file, 'public/image/capas/' + artista + '.jpg', (err) => {
@@ -255,9 +254,9 @@ const RetornaListaMetaData = (lista, totalTocadas) => new Promise(async (success
                             retornoMusica.push({
                                 'Musica': musica[0],
                                 'Tipo': path.extname(musica[0]),
-                                'Meta': meta,
-                                'PopularidadeGlobal': (100 / totalTocadas) * tocadasMusica,
-                                'PopularidadeArtista': (100 / tocadasArtista) * tocadasMusica
+                                'Meta': { container: meta.format.container, codec: meta.format.codec, duration: meta.format.duration},
+                                'PopularidadeGlobal': totalTocadas > 0 ? (100 / totalTocadas) * tocadasMusica : 0,
+                                'PopularidadeArtista': tocadasArtista > 0 ? (100 / tocadasArtista) * tocadasMusica : 0
                             });
                         })
                     })
@@ -304,8 +303,6 @@ const getRandomInteger = (max) => {
     return Math.floor(Math.random() * max);
 }
 
-//abrirNavegador('http://localhost:8000');
-
 exports.retornaListaArtista = function retornaListaArtista() {
     if (Object.keys(musicasMeta).length > 0) {
         return Object.keys(musicasMeta).map(x => {
@@ -321,7 +318,7 @@ exports.retornaListaMusica = function retornaListaMusica(artista) {
         return Object.values(musicasMeta[artista]["Musicas"].map(x => {
             return {
                 'NomeMusica': x["Musica"],
-                'Duracao': x["Meta"]["format"]["duration"]
+                'Duracao': x["Meta"]["duration"]
             }
         }));
     } else {
@@ -351,7 +348,7 @@ exports.buscaMusica = function buscaMusica(artista, musica) {
             return {
                 'Artista': artista,
                 'Musica': musicas["Musica"],
-                'Duracao': musicas["Meta"]["format"]["duration"],
+                'Duracao': musicas["Meta"]["duration"],
                 'Tipo': path.extname(musicas["Musica"])
             }
         } else {
@@ -361,3 +358,5 @@ exports.buscaMusica = function buscaMusica(artista, musica) {
         return {};
     }
 }
+
+abrirNavegador('http://localhost:8000');

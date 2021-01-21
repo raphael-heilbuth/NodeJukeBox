@@ -162,3 +162,12 @@
         transform: scale(0.5);
     }
 }
+
+/**
+ * ----------------------------------------
+ * animation scale-down-center
+ * ----------------------------------------
+ */
+@keyframes blinker {
+    50% { opacity: 0; }
+}

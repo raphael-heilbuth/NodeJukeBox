@@ -29,16 +29,21 @@
     </div>
     <hr class="line-cover-flow"/>
     <div class="form-row">
+        <div class="col-2 div-creditos d-none">
+            <div class="card card-creditos">
+                <div class="card-body">
+                    <div class="text-center title-credito">Créditos</div>
+                    <div class="text-center qtd_credito blink_me">0</div>
+                    <div class="text-center valor-credio">Cada música R$ 0,50</div>
+                </div>
+            </div>
+        </div>
         <div class="col">
             <div class="card">
                 <div class="card-header">
                     <div class="row">
                         <div class="col">
                             Tocando Agora
-                        </div>
-                        <div class="col-auto">
-                            <label class="text-right" id="qtdCredito">Créditos</label>
-                            <span class="badge badge-secondary" id="badge-creditos">0</span>
                         </div>
                     </div>
                 </div>
@@ -102,14 +107,14 @@
             <div class="col text-center border-right jukebox-modo d-none">
                 Modo: <span class="text-danger">Livre</span>
             </div>
+            <div class="col text-center  border-right">
+                Álbuns: <span id="total-album">0</span>
+            </div>
             <div class="col text-center border-right">
                 Musicas: <span id="total-musica">0</span>
             </div>
-            <div class="col text-center border-right">
-                Tocadas: <span id="tocadas">0</span>
-            </div>
             <div class="col text-center">
-                Total Reprodução: <span id="total-reproducao">0</span>
+                Tocadas: <span id="tocadas">0</span>
             </div>
         </div>
     </div>

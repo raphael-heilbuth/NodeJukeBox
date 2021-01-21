@@ -1,5 +1,5 @@
 let audio = document.getElementById("myVideo"),
-    credito = $('#badge-creditos'),
+    credito = $('.qtd_credito'),
     listaMusicas,
     listaProximasMusicas = [],
     coverflow,
@@ -70,6 +70,11 @@ jQuery(function () {
     socket.on('credito', function (qtd) {
         totalCredito += qtd;
         credito.text(totalCredito);
+
+        if (totalCredito > 0) {
+            credito.removeClass('blink_me');
+        }
+
         AbreToastInfo('Crédito', qtd);
     });
 
@@ -90,6 +95,8 @@ jQuery(function () {
 
         if (modoLivre) {
             $('.jukebox-modo').removeClass('d-none');
+        } else {
+            $('.div-creditos').removeClass('d-none');
         }
     });
 
@@ -98,7 +105,7 @@ jQuery(function () {
 
         $('#total-musica').html(data["TotalMusicas"]).countAnimation(data["TotalMusicas"]);
         $('#tocadas').html(data["MusicasTocas"]).countAnimation(data["MusicasTocas"]);
-        $('#total-reproducao').html(data["TotalReproducao"]).countAnimation(data["TotalReproducao"]);
+        $('#total-album').html(data["TotalAlbum"]).countAnimation(data["TotalAlbum"]);
 
         let list = $('.flip-items');
 
@@ -167,7 +174,7 @@ jQuery(function () {
             $.each(listaMusicas[artista]["Musicas"], function (index, value) {
 
                 let meta = value["Meta"],
-                    item = RetornaMusica(artista, value["Musica"], (meta !== null ? meta["format"]["duration"] : meta), null, null, null, value["PopularidadeGlobal"], value["PopularidadeArtista"], value["Tipo"]);
+                    item = RetornaMusica(artista, value["Musica"], (meta !== null ? meta["duration"] : meta), null, null, null, value["PopularidadeGlobal"], value["PopularidadeArtista"], value["Tipo"]);
 
                 listaMusicaArtista.append(item);
             });
@@ -347,6 +354,10 @@ function selecionaMusica(elemento) {
         executaMusica(elemento, artista, musica, duracao, imageCapa, idMusica, tipo);
         totalCredito--;
         credito.text(totalCredito);
+
+        if (totalCredito <= 0) {
+            credito.addClass('blink_me');
+        }
     } else if (modoLivre) {
         executaMusica(elemento, artista, musica, duracao, imageCapa, idMusica, tipo);
     } else {
@@ -404,14 +415,14 @@ function RetornaCapa(index, popularidade = null, qtdMusica = null, capa = true) 
         '        <div class="front">' +
         '           <h1 class="text-center titulo-musica-capa">' + index + '</h1>' +
         '           <div class="qtd-musica">' + qtdMusica + '</div>' +
-        '           <img src="' + (capa ? "../public/image/capas/" : "../public/image/default/") + index + '.jpg" class="img-capa" alt="capa">' +
+        '           <img src="' + (capa ? "../public/image/capas/" : "../public/image/default/") + encodeURI(index) + '.jpg" class="img-capa" alt="capa">' +
         '           <div class="progress progress-bar-capa">' +
         '               <div class="progress-bar ' + classBar + '" role="progressbar" aria-valuenow="' + popularidade + '" aria-valuemin="0" aria-valuemax="100" style="width: ' + popularidade + '%;"></div>' +
         '           </div>' +
         '        </div>' +
         '        <div class="back img-capa d-none">' +
         '           <div class="card">' +
-        '                <img src="' + (capa ? "../public/image/capas/" : "../public/image/default/") + index + '.jpg" class="capa-artista-list" alt="capa">' +
+        '                <img src="' + (capa ? "../public/image/capas/" : "../public/image/default/") + encodeURI(index) + '.jpg" class="capa-artista-list" alt="capa">' +
         '                <div class="card-header">' +
         '                   <div class="form-row">' +
         '                       <div class="col title-artista">' +
@@ -452,7 +463,7 @@ function MaisVolume() {
     }
 }
 
-function RetornaMusica(artista, index, duracao = null, idMusica = null, capa = null, excluir = false, popularidadeGloba = null, popularidadeArtista = null, tipo = null) {
+function RetornaMusica(artista, index, duracao = null, idMusica = null, capa = null, excluir = false, popularidadeGloba = null, popularidadeArtista = null, tipo = '.mp3') {
     let item = '<li class="list-group-item item-musica ' + (excluir ? 'item-exclude' : '') + '" data-artista="' + artista + '" data-musica="' + index + '" data-id-musica="' + idMusica + '" data-capa="' + capa + '" data-duracao="' + duracao + '" data-tipo="' + tipo + '">' +
         '   <div class="form-row">' +
         '        <div class="col-auto">';
