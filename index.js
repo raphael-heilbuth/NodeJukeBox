@@ -109,7 +109,9 @@ app.get("/playMusic", function (req, res) {
         if (err) {
             returnData.success = false;
         } else {
-            global.db.CountMusica(req.query.artista, req.query.musica);
+            if (!req.query.random) {
+                global.db.CountMusica(req.query.artista, req.query.musica);
+            }
             let base64File = new Buffer.from(file, 'binary').toString('base64');
 
             returnData.success = true;

@@ -541,7 +541,7 @@ function ItemProximaMusica(artista, musica, duracao, idMusica, imageCapa, tipo) 
     };
 }
 
-function executaMusica(elemento, artista, musica, duracao, imageCapa, idMusica, tipo) {
+function executaMusica(elemento, artista, musica, duracao, imageCapa, idMusica, tipo, random = false) {
     let carregando = $('#music-carregando'),
         info = $('#music-info');
 
@@ -605,7 +605,7 @@ function executaMusica(elemento, artista, musica, duracao, imageCapa, idMusica, 
             if (audio.paused) {
                 carregando.removeClass('d-none');
 
-                $.get('/playMusic?artista=' + encodeURIComponent(artista) + '&musica=' + encodeURIComponent(musica), function (response) {
+                $.get('/playMusic?artista=' + encodeURIComponent(artista) + '&musica=' + encodeURIComponent(musica) + '&random=' + random, function (response) {
                     carregando.addClass('d-none');
 
                     if (response.success) {
@@ -615,7 +615,7 @@ function executaMusica(elemento, artista, musica, duracao, imageCapa, idMusica, 
                         info.removeClass('d-none');
                         $('.background-image').css('background-image', 'url(' + imageUrl + ')');
                         $('.capa-atual').attr("src", imageUrl);
-                        $('#title-musica').html('<i class="fas '+ (tipo === '.mp3' ? 'fa-compact-disc' : 'fa-video') +'"></i>&nbsp;' + musica);
+                        $('#title-musica').html('<i class="fas '+ (random ? 'fa-random' : (tipo === '.mp3' ? 'fa-compact-disc' : 'fa-video')) +'"></i>&nbsp;' + musica);
                         $('#artista-musica').html(artista);
 
                         if (tipo === ".mp4") {
@@ -670,7 +670,7 @@ function timeRandomInit() {
         if (audio.paused) {
             $.get("/randomMusica?Quantidade=1", function (response) {
                 $.each(response, function (index, value) {
-                    executaMusica(null, value["Artista"], value["Musica"], value["Duracao"], null, null, value["Tipo"]);
+                    executaMusica(null, value["Artista"], value["Musica"], value["Duracao"], null, null, value["Tipo"], true);
                 });
             });
         }
