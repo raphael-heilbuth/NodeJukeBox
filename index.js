@@ -109,7 +109,7 @@ app.get("/playMusic", function (req, res) {
         if (err) {
             returnData.success = false;
         } else {
-            if (!req.query.random) {
+            if (!getBoolean((typeof req.query.random  === "undefined" ? false : req.query.random))) {
                 global.db.CountMusica(req.query.artista, req.query.musica);
             }
             let base64File = new Buffer.from(file, 'binary').toString('base64');
@@ -239,6 +239,20 @@ async function retornaParametros() {
     }
 
     return parametros;
+}
+
+function getBoolean(value){
+    switch(value){
+        case true:
+        case "true":
+        case 1:
+        case "1":
+        case "on":
+        case "yes":
+            return true;
+        default:
+            return false;
+    }
 }
 
 const RetornaListaMetaData = (lista, totalTocadas) => new Promise(async (success) => {
