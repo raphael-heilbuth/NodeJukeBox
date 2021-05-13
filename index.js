@@ -14,11 +14,13 @@ const path = require('path');
 const abrirNavegador = require('open');
 const swaggerUi = require('swagger-ui-express');
 const swaggerFile = require('./swagger_output.json')
+const R = require('ramda');
 
-let musicasMeta = {},
+let listaMusicasBanco = {},
     totalMusica = 0,
     musicasTocadas = 0,
-    totalTocadas = 0;
+    totalTocadas = 0,
+    totalAlbum = 0;
 
 global.db = require('./db');
 
@@ -33,59 +35,73 @@ http.listen(8000, function () {
     console.log('Rodando na porta 8000')
 });
 
-app.get("/getList", async function (req, res) {
+
+app.get("/getList", async function (_req, res) {
     let parametros = await retornaParametros();
         listaMusicas = RetornaMusicas();
 
     musicasTocadas = await global.db.MusicasTocadas();
     totalTocadas = await global.db.TotalTocadas();
-    totalMusica = 0;
+    totalMusica = await global.db.TotalMusicas();
+    totalAlbum = await global.db.TotalArtistas();
 
-    musicasMeta = await RetornaListaMetaData(listaMusicas, totalTocadas);
+    listaMusicasBanco = await global.db.RetornaMusicas();
+
+    let teste = listaMusicasBanco.map(x => {
+        {return {"Artista": x.name, "Musicas": x.Musicas.map(y => {return y.title})}}
+    });
+
+    let difference = listaMusicas.filter(x=> !teste.some(item => item.Artista === x.Artista));
+
+    for (const artistas of listaMusicas) {
+        let musicas = artistas.Musicas.filter(x=> !teste.find(y => y.Artista === artistas.Artista).Musicas.some(item => item === x));
+
+        if (musicas.length > 0) {
+            difference.push({"Artista": artistas.Artista, "Musicas": musicas});
+        }
+    }
+
+    if (difference.length > 0) {
+        await RetornaListaMetaData(difference);
+
+        listaMusicasBanco = await global.db.RetornaMusicas();
+    }
+
 
     if (parametros["youtubeMusicas"]) {
-        musicasMeta["Youtube"] = {
-            "Musicas": [
-                {"Musica": "Pesquisar", "Meta": null}
-            ]
-        };
+        listaMusicasBanco.push({"name": "Youtube", "Musicas": [{"Musica": "Pesquisar", "title": "Pesquisar", "Meta": null}]});
     }
 
     if (parametros["topMusicas"]) {
-        musicasMeta["TOP"] = {
-            "Musicas": [
-                {"Musica": "Top 10", "Meta": null},
-                {"Musica": "Top 20", "Meta": null},
-                {"Musica": "Top 30", "Meta": null},
-                {"Musica": "Top 40", "Meta": null},
-                {"Musica": "Top 50", "Meta": null},
-                {"Musica": "Top 100", "Meta": null}
-            ]
-        };
+        listaMusicasBanco.push({"name": "TOP", "Musicas": [
+            {"Musica": "Top 10", "title": "10", "Meta": null},
+            {"Musica": "Top 20", "title": "20", "Meta": null},
+            {"Musica": "Top 30", "title": "30", "Meta": null},
+            {"Musica": "Top 40", "title": "40", "Meta": null},
+            {"Musica": "Top 50", "title": "50", "Meta": null},
+            {"Musica": "Top 100", "title": "100", "Meta": null}
+        ]});
     }
+
 
     if (parametros["randomMusicas"]) {
-        musicasMeta["Random"] = {
-            "Musicas": [
-                {"Musica": "Random 1", "Meta": null},
-                {"Musica": "Random 3", "Meta": null},
-                {"Musica": "Random 5", "Meta": null},
-                {"Musica": "Random 10", "Meta": null}
-            ]
-        };
+        listaMusicasBanco.push({"name": "Random", "Musicas": [
+            {"Musica": "Random 1", "title": "1", "Meta": null},
+            {"Musica": "Random 3", "title": "3", "Meta": null},
+            {"Musica": "Random 5", "title": "5", "Meta": null},
+            {"Musica": "Random 10", "title": "10", "Meta": null}
+        ]});
     }
 
-    let orderedListaMusicas = {};
-
-    Object.keys(musicasMeta).sort().forEach(function (v) {
-        orderedListaMusicas[v] = musicasMeta[v];
+    listaMusicasBanco = listaMusicasBanco.sort(function(a,b) {
+        return a.name < b.name ? -1 : a.name > b.name ? 1 : 0;
     });
 
     let lista = {
-        'ListaMusica': orderedListaMusicas,
+        'ListaMusica': listaMusicasBanco,
         'TotalMusicas': totalMusica,
         'MusicasTocas': musicasTocadas,
-        'TotalAlbum': Object.keys(musicasMeta).length
+        'TotalAlbum': totalAlbum
     }
 
     res.json(lista);
@@ -153,13 +169,16 @@ app.get("/randomMusica", function (req, res) {
     let random = [];
 
     for (let i = 0; i < parseInt(req.query.Quantidade.replace("Random", "")); i++) {
-        let artista = Object.keys(musicasMeta)[getRandomInteger(Object.keys(musicasMeta).length)],
-            musicas = musicasMeta[artista]["Musicas"][getRandomInteger(musicasMeta[artista]["Musicas"].length)],
+        let posArtista = getRandomInteger(listaMusicasBanco.length),
+            posMusicas = getRandomInteger(listaMusicasBanco[posArtista].Musicas.length),
+            artista = listaMusicasBanco[posArtista],
+            musica = artista.Musicas[posMusicas],
             item = {
-                'Artista': artista,
-                'Musica': musicas["Musica"],
-                'Duracao': musicas["Meta"]["duration"],
-                'Tipo': path.extname(musicas["Musica"])
+                'Artista': artista.name,
+                'Musica': musica.Musica,
+                'Titulo': musica.title,
+                'Duracao': musica.Meta.duration,
+                'Tipo': musica.Tipo
             }
 
         random.push(item);
@@ -194,9 +213,9 @@ app.get("/topMusica", async function (req, res) {
     res.json(top);
 });
 
-function RetornaMusicas() {
+function RetornaMusicas() {    
     function readDir(dir) {
-        let struct = {}
+        let artistasArquivos = [];
 
         fs
             .readdirSync(dir)
@@ -209,15 +228,17 @@ function RetornaMusicas() {
                             if (err) throw err;
                         });
                     } else {
-                        struct[file] = path.extname(file);
+                        if (path.extname(file).toLowerCase() === '.mp3' || path.extname(file).toLowerCase() === '.mp4') {
+                            artistasArquivos.push(file);
+                        }
                     }
                 } else if (fs.lstatSync(dir + "/" + file).isDirectory()) {
-                    struct[file] = readDir(dir + "/" + file)
+                    artistasArquivos.push({"Artista": file, "Musicas": readDir(dir + "/" + file)});
                 }
 
             })
 
-        return struct
+        return artistasArquivos
 
     }
 
@@ -255,36 +276,28 @@ function getBoolean(value){
     }
 }
 
-const RetornaListaMetaData = (lista, totalTocadas) => new Promise(async (success) => {
-    let retornoMeta = [];
+async function RetornaListaMetaData(lista)  {
+    for (const artista of lista) { 
+        for (const musica of artista.Musicas) {             
+            if (musica.toLowerCase().includes('.mp3') || musica.toLowerCase().includes('.mp4')) {
+                await RetornaMetaData(musicFolder + "/" + artista.Artista + "/" + musica)
+                    .then(async (meta) => {
+                            let objMusica = {
+                                'Musica': musica.slice(0, -4),
+                                'Tipo': path.extname(musica),
+                                'Meta': { container: meta.format.container, codec: meta.format.codec, duration: meta.format.duration}
+                            };
 
-    for (const pasta of Object.keys(lista)) {
-        let retornoMusica = [],
-            tocadasArtista = await global.db.PopularidadeArtista(pasta);
-        for (let musica of Object.entries(lista[pasta])) {
-            if (musica[0].includes('.mp3') || musica[0].includes('.mp4')) {
-                await RetornaMetaData(musicFolder + "/" + pasta + "/" + musica[0])
-                    .then(meta => {
-                        totalMusica++;
-                        global.db.PopularidadeMusica(pasta, musica[0]).then(tocadasMusica => {
-                            retornoMusica.push({
-                                'Musica': musica[0],
-                                'Tipo': path.extname(musica[0]),
-                                'Meta': { container: meta.format.container, codec: meta.format.codec, duration: meta.format.duration},
-                                'PopularidadeGlobal': totalTocadas > 0 ? (100 / totalTocadas) * tocadasMusica : 0,
-                                'PopularidadeArtista': tocadasArtista > 0 ? (100 / tocadasArtista) * tocadasMusica : 0
-                            });
-                        })
+                            await global.db.SalvaMusica(artista.Artista, musica, objMusica).then(() => {});
                     })
                     .catch(err => {
                         console.log(err)
-                    })
+                    });
             }
         }
-        retornoMeta[pasta] = {'Musicas': retornoMusica, 'Popularidade': (100 / totalTocadas) * tocadasArtista}
     }
-    success(retornoMeta);
-});
+    return true;
+}
 
 const RetornaMetaData = (file) => new Promise((success, reject) => {
     mm.parseFile(file,{skipCovers : true})

@@ -79,7 +79,7 @@ jQuery(function () {
     });
 
     socket.on('musica', function (value) {
-        executaMusica(null, value["Artista"], value["Musica"], value["Duracao"], null, null, value["Tipo"]);
+        executaMusica(null, value["Artista"], value["Titulo"], value["Musica"], value["Duracao"], null, null, value["Tipo"]);
         AbreToastInfo('Música', '', 'fas fa-plus');
     });
 
@@ -109,23 +109,21 @@ jQuery(function () {
 
         let list = $('.flip-items');
 
-        alfabeto = Object.keys(listaMusicas).map(function (artista) {
-            return artista.substr(0, 1);
-        }).filter(function (itm, i, a) {
-            return i === a.indexOf(itm);
-        });
-
-        $.each(listaMusicas, function (index, value) {
-            switch (index) {
+        alfabeto = listaMusicas.map(x => {
+            switch (x.name) {
                 case 'Youtube':
                 case 'TOP':
                 case 'Random':
-                    list.append(RetornaCapa(index, null, value["Musicas"].length, false));
+                    list.append(RetornaCapa(x.name, null, x.Musicas.length, false));
                     break;
                 default:
-                    list.append(RetornaCapa(index, value["Popularidade"], value["Musicas"].length));
+                    list.append(RetornaCapa(x.name, 0, x.Musicas.length));
                     break;
             }
+            
+            return x.name.substr(0, 1)
+        }).filter(function (itm, i, a) {
+            return i === a.indexOf(itm);
         });
 
         coverflow = $("#coverflow").flipster({
@@ -171,15 +169,11 @@ jQuery(function () {
 
             listaMusicaArtista.empty();
 
-            $.each(listaMusicas[artista]["Musicas"], function (index, value) {
-
-                let meta = value["Meta"],
-                    item = RetornaMusica(artista, value["Musica"], (meta !== null ? meta["duration"] : meta), null, null, null, value["PopularidadeGlobal"], value["PopularidadeArtista"], value["Tipo"]);
-
-                listaMusicaArtista.append(item);
+            listaMusicas.find(x => x.name === artista).Musicas.map(y => { 
+                listaMusicaArtista.append(RetornaMusica(artista, y.title, y.Musica, (y.Meta !== null ? y.Meta.duration : null), null, null, null, 0, 0, y.Tipo));
             });
 
-            listaMusicaArtista.focus();
+            listaMusicaArtista.trigger('focus');
 
             firstIndex = listaMusicaArtista.find('.item-musica').first().index();
             lastIndex = listaMusicaArtista.find('.item-musica').last().index();
@@ -345,13 +339,14 @@ function AbreToastInfo(titulo, valor = '', icon = '') {
 function selecionaMusica(elemento) {
     let artista = elemento.attr('data-artista'),
         musica = elemento.attr('data-musica'),
+        titulo = elemento.attr('data-titulo'),
         duracao = elemento.attr('data-duracao'),
         idMusica = elemento.attr('data-id-musica'),
         imageCapa = elemento.attr('data-capa'),
         tipo = elemento.attr('data-tipo');
 
     if (totalCredito > 0) {
-        executaMusica(elemento, artista, musica, duracao, imageCapa, idMusica, tipo);
+        executaMusica(elemento, artista, musica, titulo, duracao, imageCapa, idMusica, tipo);
         totalCredito--;
         credito.text(totalCredito);
 
@@ -359,7 +354,7 @@ function selecionaMusica(elemento) {
             credito.addClass('blink_me');
         }
     } else if (modoLivre) {
-        executaMusica(elemento, artista, musica, duracao, imageCapa, idMusica, tipo);
+        executaMusica(elemento, artista, musica, titulo, duracao, imageCapa, idMusica, tipo);
     } else {
         AbreToastInfo('Favor comprar créditos.')
     }
@@ -463,8 +458,8 @@ function MaisVolume() {
     }
 }
 
-function RetornaMusica(artista, index, duracao = null, idMusica = null, capa = null, excluir = false, popularidadeGloba = null, popularidadeArtista = null, tipo = '.mp3') {
-    let item = '<li class="list-group-item item-musica ' + (excluir ? 'item-exclude' : '') + '" data-artista="' + artista + '" data-musica="' + index + '" data-id-musica="' + idMusica + '" data-capa="' + capa + '" data-duracao="' + duracao + '" data-tipo="' + tipo + '">' +
+function RetornaMusica(artista, nomeArquivo, titulo = null, duracao = null, idMusica = null, capa = null, excluir = false, popularidadeGloba = null, popularidadeArtista = null, tipo = '.mp3') {
+    let item = '<li class="list-group-item item-musica ' + (excluir ? 'item-exclude' : '') + '" data-artista="' + artista + '" data-musica="' + nomeArquivo + '" data-titulo="'+ (titulo !== null ? titulo : nomeArquivo)  +'" data-id-musica="' + idMusica + '" data-capa="' + capa + '" data-duracao="' + duracao + '" data-tipo="' + tipo + '">' +
         '   <div class="form-row">' +
         '        <div class="col-auto">';
 
@@ -486,7 +481,7 @@ function RetornaMusica(artista, index, duracao = null, idMusica = null, capa = n
     item += '        </div>';
 
     item += '        <div class="col titulo-musica">';
-    item += '            <span>' + index + '</span>';
+    item += '            <span>' + (titulo !== null ? titulo : nomeArquivo) + '</span>';
     item += '        </div>';
 
     if (popularidadeGloba !== null || popularidadeArtista !== null) {
@@ -526,14 +521,15 @@ function listaProximas() {
     $('#badge-proximas').html(listaProximasMusicas.length);
 
     $.each(listaProximasMusicas, function (index, value) {
-        lista.append(RetornaMusica(value["Artista"], value["Musica"], value["Duracao"], value["IdMusica"], value["ImagemCapa"], value["IdMusica"] !== null, null, null, value["Tipo"]));
+        lista.append(RetornaMusica(value["Artista"], value["Titulo"], value["Musica"], value["Duracao"], value["IdMusica"], value["ImagemCapa"], value["IdMusica"] !== null, null, null, value["Tipo"]));
     });
 }
 
-function ItemProximaMusica(artista, musica, duracao, idMusica, imageCapa, tipo) {
+function ItemProximaMusica(artista, nomeArquivo, musica, duracao, idMusica, imageCapa, tipo) {
     return {
         'Artista': artista,
         'Musica': musica,
+        'Titulo': nomeArquivo,
         'Duracao': duracao,
         'IdMusica': idMusica,
         'ImagemCapa': imageCapa,
@@ -541,29 +537,29 @@ function ItemProximaMusica(artista, musica, duracao, idMusica, imageCapa, tipo) 
     };
 }
 
-function executaMusica(elemento, artista, musica, duracao, imageCapa, idMusica, tipo, random = false) {
+function executaMusica(elemento, artista, nomeArquivo, musica, duracao, imageCapa, idMusica, tipo, random = false) {
     let carregando = $('#music-carregando'),
         info = $('#music-info');
 
     switch (artista) {
         case 'Random': {
-            $.get("/randomMusica?Quantidade=" + musica, function (response) {
+            $.get("/randomMusica?Quantidade=" + nomeArquivo, function (response) {
                 $.each(response, function (index, value) {
-                    executaMusica(null, value["Artista"], value["Musica"], value["Duracao"], null, null, value["Tipo"]);
+                    executaMusica(null, value["Artista"], value["Titulo"], value["Musica"], value["Duracao"], null, null, value["Tipo"]);
                 });
             });
         }
             break;
         case 'TOP': {
-            $.get("/topMusica?Quantidade=" + musica, function (response) {
+            $.get("/topMusica?Quantidade=" + nomeArquivo, function (response) {
                 $.each(response, function (index, value) {
-                    executaMusica(null, value["Artista"], value["Musica"], value["Duracao"], null, null, value["Tipo"]);
+                    executaMusica(null, value["Artista"], value["Titulo"],value["Musica"], value["Duracao"], null, null, value["Tipo"]);
                 });
             });
         }
             break;
         case 'Youtube':
-            switch (musica) {
+            switch (nomeArquivo) {
                 case 'Pesquisar':
                     if ($('#pesquisa-youtube').length === 0) {
                         elemento.append('<input class="form-control col-auto" id="pesquisa-youtube">');
@@ -583,7 +579,7 @@ function executaMusica(elemento, artista, musica, duracao, imageCapa, idMusica, 
                                 carregando.addClass('d-none');
                                 info.removeClass('d-none');
                                 $('.capa-atual').attr("src", imageCapa);
-                                $('#title-musica').html('<i class="fab fa-youtube"></i>&nbsp;' + musica);
+                                $('#title-musica').html('<i class="fab fa-youtube"></i>&nbsp;' + nomeArquivo);
                                 $('#artista-musica').html(artista);
                                 audio.classList.remove("d-none");
 
@@ -594,7 +590,7 @@ function executaMusica(elemento, artista, musica, duracao, imageCapa, idMusica, 
 
                             })
                     } else {
-                        listaProximasMusicas.push(ItemProximaMusica(artista, musica, duracao, idMusica, imageCapa));
+                        listaProximasMusicas.push(ItemProximaMusica(artista, nomeArquivo, nomeArquivo, duracao, idMusica, imageCapa));
 
                         listaProximas();
                     }
@@ -605,7 +601,7 @@ function executaMusica(elemento, artista, musica, duracao, imageCapa, idMusica, 
             if (audio.paused) {
                 carregando.removeClass('d-none');
 
-                $.get('/playMusic?artista=' + encodeURIComponent(artista) + '&musica=' + encodeURIComponent(musica) + '&random=' + random, function (response) {
+                $.get('/playMusic?artista=' + encodeURIComponent(artista) + '&musica=' + encodeURIComponent(nomeArquivo) + '&random=' + random, function (response) {
                     carregando.addClass('d-none');
 
                     if (response.success) {
@@ -630,7 +626,7 @@ function executaMusica(elemento, artista, musica, duracao, imageCapa, idMusica, 
                     }
                 });
             } else {
-                listaProximasMusicas.push(ItemProximaMusica(artista, musica, duracao, null, null, tipo));
+                listaProximasMusicas.push(ItemProximaMusica(artista, nomeArquivo, musica, duracao, null, null, tipo));
 
                 listaProximas();
             }
@@ -642,7 +638,7 @@ function ExecutaProxima() {
     if (listaProximasMusicas.length > 0) {
         let proxima = listaProximasMusicas.shift();
 
-        executaMusica(null, proxima["Artista"], proxima["Musica"], proxima["Duracao"], proxima["ImagemCapa"], proxima["IdMusica"], proxima["Tipo"]);
+        executaMusica(null, proxima["Artista"], proxima["Titulo"], proxima["Musica"], proxima["Duracao"], proxima["ImagemCapa"], proxima["IdMusica"], proxima["Tipo"]);
 
         listaProximas();
     }
@@ -669,8 +665,12 @@ function timeRandomInit() {
     timeRandom = window.setInterval(() => {
         if (audio.paused && (audio.ended || isNaN(audio.duration))) {
             $.get("/randomMusica?Quantidade=1", function (response) {
-                $.each(response, function (index, value) {
-                    executaMusica(null, value["Artista"], value["Musica"], value["Duracao"], null, null, value["Tipo"], true);
+                for (const random of response) {
+                    executaMusica(null, random["Artista"], random["Titulo"], random["Musica"], random["Duracao"], null, null, random["Tipo"], true);
+                }
+
+                $.each(response, function (_index, value) {
+                    executaMusica(null, value["Artista"], value["Titulo"], value["Musica"], value["Duracao"], null, null, value["Tipo"], true);
                 });
             });
         }
@@ -691,7 +691,7 @@ function pesquisaYoutube(query) {
 
     $.get("/buscaYoutube?busca=" + encodeURI(query), function (retornoLista) {
         $.each(retornoLista, function (index, value) {
-            list.append(RetornaMusica('Youtube', value["Titulo"], value["Duracao"], value["IdMusica"], value["Capa"], true));
+            list.append(RetornaMusica('Youtube', value["Titulo"], value["Titulo"], value["Duracao"], value["IdMusica"], value["Capa"], true));
         })
     });
 }

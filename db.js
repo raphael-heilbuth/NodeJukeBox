@@ -7,62 +7,56 @@ const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', () => console.log("Conectado"));
 
-function CountMusica(artista, musica) {
+function SalvaMusicasBD(musica, newArtista, dadosMusica, success, reject) {
+    Musica.findOne({'title': musica, 'artista': newArtista._id}, function (err, retornoMusica) {
+        if (retornoMusica === null) {
+            const newMusica = retornaMusica(musica, newArtista._id, dadosMusica);
+
+            newMusica.save()
+                .then(() => {
+                    console.log("Musica %s salva", musica);
+                    success(true);
+                }).catch((err) => {
+                    reject(err);
+                    return console.log(err);
+            })
+        }
+    });
+}
+
+const SalvaMusica = (artista, musica, dadosMusica) => new Promise((success, reject) => {
     Artista.findOne({'name': artista}, function (err, retornoArtista) {
-        if (err) return console.log(err);
+        if (err) { reject(err); return console.log(err); }
         if (retornoArtista === null) {
             const newArtista = new Artista({
                 _id: new mongoose.Types.ObjectId(),
                 name: artista,
-                reproduzida: 1
+                reproduzida: 0
             });
 
-            newArtista.save(function (err) {
-                if (err) return console.log(err);
-
-                console.log('Artista %s salvo', artista);
-
-                Musica.findOne({'title': musica, 'artista': newArtista._id}, function (err, retornoMusica) {
-                    if (err) return console.log(err);
-
-                    if (retornoMusica === null) {
-                        const newMusica = new Musica({
-                            title: musica,
-                            reproduzida: 1,
-                            artista: newArtista._id
-                        });
-
-                        newMusica.save(function (err) {
-                            if (err) return console.log(err);
-                            console.log("Musica %s salva", musica);
-                        });
-                    }
-                });
-            });
+            newArtista.save()
+                .then(() => {
+                    console.log('Artista %s salvo', artista);
+                    SalvaMusicasBD(musica, newArtista, dadosMusica, success, reject);
+            }).catch((err) => {
+                reject(err);
+                return console.log(err);
+            })
         } else {
-            Artista.updateOne({'_id': retornoArtista._id}, {$inc: {reproduzida: 1}}).exec().then(r => console.log(r));
-
-            Musica.findOne({'title': musica, 'artista': retornoArtista._id}, function (err, retornoMusica) {
-                if (err) return console.log(err);
-
-                if (retornoMusica === null) {
-                    const newMusica = new Musica({
-                        title: musica,
-                        reproduzida: 1,
-                        artista: retornoArtista._id
-                    });
-
-                    newMusica.save(function (err) {
-                        if (err) return console.log(err);
-                        console.log("Musica %s salva", musica);
-                    });
-                } else {
-                    Musica.updateOne({'_id': retornoMusica._id}, {$inc: {reproduzida: 1}}).exec().then(r => console.log(r));
-                }
-            });
+            SalvaMusicasBD(musica, retornoArtista, dadosMusica, success, reject);
         }
     });
-}
+});
+
+const CountMusica = (artista, musica) => new Promise(() => {
+    Artista.findOne({'name': artista}, function (err, retornoArtista) {
+        if (err) return console.log(err);
+        if (retornoArtista !== null) {
+            Artista.updateOne({'_id': retornoArtista._id}, {$inc: {reproduzida: 1}}).exec().then(r => console.log(r));
+            Musica.updateOne({'title': musica, 'artista': retornoArtista._id}, {$inc: {reproduzida: 1}}).exec().then(r => console.log(r));
+        }
+    });
+});
 
 const TotalTocadas = () => new Promise((success) => {
    Artista.aggregate([
@@ -92,6 +86,15 @@ const PopularidadeMusica = (artista, musica) => new Promise((success) => {
     });
 });
 
+const RetornaMusicas = () => new Promise((success) => {
+    Artista.aggregate([{ '$lookup': {
+        'from': 'musicas',
+        'localField': '_id',
+        'foreignField': 'artista',
+        'as': 'Musicas'
+    }}]).exec().then(r => success(r));
+});
+
 const RetornaTopMusicas = (qtd) => new Promise((success) => {
     Musica.aggregate([{ '$lookup': {
             'from': 'artistas',
@@ -102,6 +105,18 @@ const RetornaTopMusicas = (qtd) => new Promise((success) => {
 });
 
 const MusicasTocadas = () => new Promise((success) => {
+    Musica.find({reproduzida: {$gt: 0}}).exec(function (err, results) {
+        success(results !== undefined ? results.length : 0);    
+      });
+});
+
+const TotalArtistas = () => new Promise((success) => {
+    Artista.countDocuments({}, function( err, count){
+        success(count);
+    });
+});
+
+const TotalMusicas = () => new Promise((success) => {
     Musica.countDocuments({}, function( err, count){
         success(count);
     });
@@ -139,4 +154,32 @@ const RetornaParametros = () => new Promise((success) => {
     Parametros.findOne({'_id': 1}).then(r => success(r));
 });
 
-module.exports = { TotalTocadas, PopularidadeArtista, PopularidadeMusica, CountMusica, RetornaTopMusicas, MusicasTocadas, SalvaParametros, RetornaParametros }
+function retornaMusica(musica, newArtista, dados) {
+    return new Musica({
+        title: musica,
+        reproduzida: 0,
+        artista: newArtista,
+        Musica: dados.Musica,
+        Tipo: dados.Tipo,
+        Meta: {
+            container: dados.Meta.container,
+            codec: dados.Meta.codec,
+            duration: dados.Meta.duration
+        }
+    });
+}
+
+module.exports = {
+    TotalArtistas, 
+    TotalMusicas,
+    TotalTocadas, 
+    PopularidadeArtista, 
+    PopularidadeMusica, 
+    SalvaMusica, 
+    RetornaTopMusicas,      
+    MusicasTocadas, 
+    SalvaParametros, 
+    RetornaParametros, 
+    RetornaMusicas,
+    CountMusica
+}

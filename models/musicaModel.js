@@ -11,6 +11,23 @@ const musicaModel = mongoose.Schema({
     artista: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Artista'
+    },
+    Musica: {
+        type: String
+    },
+    Tipo: {
+        type: String
+    },
+    Meta: {
+        container: {
+            type: String
+        },
+        codec: {
+            type: String
+        },
+        duration: {
+            type: Number
+        }
     }
 }, {
     timestamps: true
