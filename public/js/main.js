@@ -35,8 +35,6 @@ jQuery(function () {
 
     audio.volume = 0.1;
 
-    $('#ranger-volume').val(audio.volume);
-
     socket.on('volume', function (volume) {
         audio.volume = volume;
         AbreToastInfo('Volume', Math.round(audio.volume * 10));
@@ -44,12 +42,10 @@ jQuery(function () {
 
     socket.on('volumeMais', function () {
         MaisVolume();
-        AbreToastInfo('Volume', Math.round(audio.volume * 10));
     });
 
     socket.on('volumeMenos', function () {
         MenosVolume();
-        AbreToastInfo('Volume', Math.round(audio.volume * 10));
     });
 
     socket.on('mute', function () {
@@ -85,7 +81,6 @@ jQuery(function () {
 
     socket.on('proxima', function() {
         Next();
-        AbreToastInfo('Música', '', 'fas fa-forward');
     });
 
     $.get("/getParametro",function (parametro){
@@ -209,21 +204,6 @@ jQuery(function () {
 
         clearInterval(timeRandom);
         timeRandomInit();
-    });
-
-    $("#ranger-volume").on('change', function () {
-        audio.volume = $(this).val();
-    });
-
-    audio.addEventListener('volumechange', () => {
-        $('#ranger-volume').val(audio.volume);
-        if (audio.volume === 0) {
-            $('.icon-volume').removeClass('fa-volume-down').removeClass('fa-volume-up').addClass('fa-volume-off');
-        } else if (audio.volume >= 0.5) {
-            $('.icon-volume').removeClass('fa-volume-off').removeClass('fa-volume-down').addClass('fa-volume-up');
-        } else {
-            $('.icon-volume').removeClass('fa-volume-off').removeClass('fa-volume-up').addClass('fa-volume-down');
-        }
     });
 
     document.addEventListener("keydown", (event) => {
@@ -440,23 +420,27 @@ function RetornaCapa(index, popularidade = null, qtdMusica = null, capa = true) 
 }
 
 function Pause() {
+    audio.paused ? AbreToastInfo('Música', '', 'fas fa-play') : AbreToastInfo('Música', '', 'fas fa-pause');
     audio.paused ? audio.play() : audio.pause();
 }
 
 function Next() {
     audio.currentTime = audio.duration;
+    AbreToastInfo('Música', '', 'fas fa-forward');
 }
 
 function MenosVolume() {
     if (audio.volume >= 0.1) {
         audio.volume -= 0.1;
     }
+    AbreToastInfo('Volume', Math.round(audio.volume * 10));
 }
 
 function MaisVolume() {
     if (audio.volume < 0.9) {
         audio.volume += 0.1;
     }
+    AbreToastInfo('Volume', Math.round(audio.volume * 10));
 }
 
 function RetornaMusica(artista, nomeArquivo, titulo = null, duracao = null, idMusica = null, capa = null, excluir = false, popularidadeGloba = null, popularidadeArtista = null, tipo = '.mp3') {
