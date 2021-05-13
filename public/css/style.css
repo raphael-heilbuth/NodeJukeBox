@@ -72,7 +72,7 @@
     opacity: 0.5;
 }
 
-.capa-atual {
+.capa-atual, .capa-no-music {
     width: 125px;
 }
 
