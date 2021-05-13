@@ -199,6 +199,7 @@ jQuery(function () {
 
     audio.addEventListener('ended', () => {
         $('#music-info').addClass('d-none');
+        $('#no-music-info').removeClass('d-none');
         let imageCapa = '../public/image/default/NodeJukebox.png';
         $('.background-image').css('background-image', 'url(' + imageCapa + ')');
 
@@ -539,6 +540,7 @@ function ItemProximaMusica(artista, nomeArquivo, musica, duracao, idMusica, imag
 
 function executaMusica(elemento, artista, nomeArquivo, musica, duracao, imageCapa, idMusica, tipo, random = false) {
     let carregando = $('#music-carregando'),
+        no_music = $('#no-music-info'),
         info = $('#music-info');
 
     switch (artista) {
@@ -578,6 +580,7 @@ function executaMusica(elemento, artista, nomeArquivo, musica, duracao, imageCap
                             .then(blob => {
                                 carregando.addClass('d-none');
                                 info.removeClass('d-none');
+                                no_music.addClass('d-none');
                                 $('.capa-atual').attr("src", imageCapa);
                                 $('#title-musica').html('<i class="fab fa-youtube"></i>&nbsp;' + nomeArquivo);
                                 $('#artista-musica').html(artista);
@@ -609,6 +612,7 @@ function executaMusica(elemento, artista, nomeArquivo, musica, duracao, imageCap
                             audioSrc = 'data:audio/' + (tipo === null ? 'mp3' : tipo.replace('.', '')) + ';base64,' + response.fileContent;
 
                         info.removeClass('d-none');
+                        no_music.addClass('d-none');
                         $('.background-image').css('background-image', 'url(' + imageUrl + ')');
                         $('.capa-atual').attr("src", imageUrl);
                         $('#title-musica').html('<i class="fas '+ (random ? 'fa-random' : (tipo === '.mp3' ? 'fa-compact-disc' : 'fa-video')) +'"></i>&nbsp;' + musica);
