@@ -37,7 +37,7 @@ http.listen(8000, function () {
 
 
 app.get("/getList", async function (_req, res) {
-    let parametros = await retornaParametros();
+    let parametros = await retornaParametros(),
         listaMusicas = RetornaMusicas();
 
     musicasTocadas = await global.db.MusicasTocadas();
@@ -221,7 +221,7 @@ function RetornaMusicas() {
             .readdirSync(dir)
             .forEach(file => {
                 if (fs.lstatSync(dir + "/" + file).isFile()) {
-                    if (path.extname(file).toLowerCase() === '.jpg' || path.extname(file).toLowerCase() === '.jpge') {
+                    if (path.extname(file).toLowerCase() === '.jpg' || path.extname(file).toLowerCase() === '.jpeg') {
                         let diretorios = dir.split('/'),
                             artista = diretorios[diretorios.length - 1];
                         fs.copyFile(dir + "/" + file, 'public/image/capas/' + artista + '.jpg', (err) => {
