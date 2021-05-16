@@ -112,7 +112,7 @@ jQuery(function () {
                     list.append(RetornaCapa(x.name, null, x.Musicas.length, false));
                     break;
                 default:
-                    list.append(RetornaCapa(x.name, 0, x.Musicas.length));
+                    list.append(RetornaCapa(x.name, 0, x.Musicas.length, true, x.formatos));
                     break;
             }
             
@@ -368,8 +368,9 @@ function removerAcentos(newStringComAcento) {
     return string;
 }
 
-function RetornaCapa(index, popularidade = null, qtdMusica = null, capa = true) {
-    let classBar;
+function RetornaCapa(index, popularidade = null, qtdMusica = null, capa = true, tipos = null) {
+    let classBar,
+        htmlTipos = '';
 
     switch (true) {
         case (popularidade < 25):
@@ -386,10 +387,31 @@ function RetornaCapa(index, popularidade = null, qtdMusica = null, capa = true) 
             break;
     }
 
+    if (Array.isArray(tipos)) {
+        htmlTipos = '<div class="tipos-formato">';
+
+        let i = 0;
+
+        tipos.forEach((item) => {
+            switch (item) {
+                case '.mp3':
+                    htmlTipos += '<i class="fas fa-music'+ (i > 0 ? " fa-space-left" : "") + '"></i>';
+                    break;
+                case '.mp4':
+                    htmlTipos += '<i class="fas fa-video'+ (i > 0 ? " fa-space-left" : "") + '"></i>';
+                    break;
+            }
+            i++;
+        });
+
+        htmlTipos += '</div>';
+    }
+
     return '<li data-flip-title="' + index + '" data-letra="' + index.substr(0, 1) + '">' +
         '     <div class="flip-content">' +
         '        <div class="front">' +
         '           <h1 class="text-center titulo-musica-capa">' + index + '</h1>' +
+        htmlTipos +
         '           <div class="qtd-musica">' + qtdMusica + '</div>' +
         '           <img src="' + (capa ? "../public/image/capas/" : "../public/image/default/") + encodeURI(index) + '.jpg" class="img-capa" alt="capa">' +
         '           <div class="progress progress-bar-capa">' +
@@ -554,6 +576,7 @@ function executaMusica(elemento, artista, nomeArquivo, musica, duracao, imageCap
                 default:
                     if (audio.paused) {
                         carregando.removeClass('d-none');
+                        no_music.addClass('d-none');
 
                         $('.background-image').css('background-image', 'url(' + imageCapa + ')');
 
@@ -564,7 +587,6 @@ function executaMusica(elemento, artista, nomeArquivo, musica, duracao, imageCap
                             .then(blob => {
                                 carregando.addClass('d-none');
                                 info.removeClass('d-none');
-                                no_music.addClass('d-none');
                                 $('.capa-atual').attr("src", imageCapa);
                                 $('#title-musica').html('<i class="fab fa-youtube"></i>&nbsp;' + nomeArquivo);
                                 $('#artista-musica').html(artista);
@@ -587,6 +609,7 @@ function executaMusica(elemento, artista, nomeArquivo, musica, duracao, imageCap
         default:
             if (audio.paused) {
                 carregando.removeClass('d-none');
+                no_music.addClass('d-none');
 
                 $.get('/playMusic?artista=' + encodeURIComponent(artista) + '&musica=' + encodeURIComponent(nomeArquivo) + '&random=' + random, function (response) {
                     carregando.addClass('d-none');
@@ -596,7 +619,6 @@ function executaMusica(elemento, artista, nomeArquivo, musica, duracao, imageCap
                             audioSrc = 'data:audio/' + (tipo === null ? 'mp3' : tipo.replace('.', '')) + ';base64,' + response.fileContent;
 
                         info.removeClass('d-none');
-                        no_music.addClass('d-none');
                         $('.background-image').css('background-image', 'url(' + imageUrl + ')');
                         $('.capa-atual').attr("src", imageUrl);
                         $('#title-musica').html('<i class="fas '+ (random ? 'fa-random' : (tipo === '.mp3' ? 'fa-compact-disc' : 'fa-video')) +'"></i>&nbsp;' + musica);

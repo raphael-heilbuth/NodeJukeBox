@@ -14,7 +14,6 @@ const path = require('path');
 const abrirNavegador = require('open');
 const swaggerUi = require('swagger-ui-express');
 const swaggerFile = require('./swagger_output.json')
-const R = require('ramda');
 
 let listaMusicasBanco = {},
     totalMusica = 0,
@@ -67,10 +66,7 @@ app.get("/getList", async function (_req, res) {
         listaMusicasBanco = await global.db.RetornaMusicas();
     }
 
-
-    if (parametros["youtubeMusicas"]) {
-        listaMusicasBanco.push({"name": "Youtube", "Musicas": [{"Musica": "Pesquisar", "title": "Pesquisar", "Meta": null}]});
-    }
+    listaMusicasBanco = listaMusicasBanco.map((x) => {return Object.assign(x, {'formatos' : [...new Set(x.Musicas.map(item => item.Tipo))]})});
 
     if (parametros["topMusicas"]) {
         listaMusicasBanco.push({"name": "TOP", "Musicas": [
@@ -82,7 +78,6 @@ app.get("/getList", async function (_req, res) {
             {"Musica": "Top 100", "title": "100", "Meta": null}
         ]});
     }
-
 
     if (parametros["randomMusicas"]) {
         listaMusicasBanco.push({"name": "Random", "Musicas": [
