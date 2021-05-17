@@ -194,12 +194,13 @@ app.get("/topMusica", async function (req, res) {
         arrayTop = await global.db.RetornaTopMusicas(parseInt(req.query.Quantidade.replace("Top", "")));
 
     Array.from(arrayTop).forEach(el => {
-        let musicas = musicasMeta[el["Artista"]["0"]["name"]]["Musicas"].find(x => x.Musica === el["title"]),
+        let musicas = listaMusicasBanco.find(a => a.name === el["Artista"]["0"]["name"]).Musicas.find(b => b.title === el["title"]),
             item = {
                 'Artista': el["Artista"]["0"]["name"],
                 'Musica': musicas["Musica"],
+                'Titulo': musicas["title"],
                 'Duracao': musicas["Meta"]["duration"],
-                'Tipo': path.extname(musicas["Musica"])
+                'Tipo': musicas["Tipo"]
             }
 
         top.push(item);
@@ -300,7 +301,8 @@ const RetornaMetaData = (file) => new Promise((success, reject) => {
             success(metadata);
         })
         .catch(err => {
-            reject(console.error(err.message));
+            console.error(err.message)
+            reject(err);
         });
 });
 
@@ -328,9 +330,9 @@ const getRandomInteger = (max) => {
 }
 
 exports.retornaListaArtista = function retornaListaArtista() {
-    if (Object.keys(musicasMeta).length > 0) {
-        return Object.keys(musicasMeta).map(x => {
-            return {'Artista': x, 'Capa': 'public/image/capas/' + x + '.jpg'};
+    if (listaMusicasBanco.length > 0) {
+        return listaMusicasBanco.map(x => {
+            return {'Artista': x.name, 'Capa': 'public/image/capas/' + x.name + '.jpg'};
         });
     } else {
         return {};
@@ -338,13 +340,13 @@ exports.retornaListaArtista = function retornaListaArtista() {
 }
 
 exports.retornaListaMusica = function retornaListaMusica(artista) {
-    if (Object.keys(musicasMeta).length > 0) {
-        return Object.values(musicasMeta[artista]["Musicas"].map(x => {
+    if (listaMusicasBanco.length > 0) {
+        return listaMusicasBanco.find(a => a.name === artista).Musicas.map(x => {
             return {
-                'NomeMusica': x["Musica"],
+                'NomeMusica': x["title"],
                 'Duracao': x["Meta"]["duration"]
             }
-        }));
+        });
     } else {
         return {};
     }
@@ -365,15 +367,16 @@ exports.salvaParametros = function salvaParametros(modo, valorCredito, topMusica
 exports.retornaParametros = retornaParametros;
 
 exports.buscaMusica = function buscaMusica(artista, musica) {
-    if (Object.keys(musicasMeta).length > 0) {
-        let musicas = musicasMeta[artista]["Musicas"].find(x => x.Musica === musica);
+    if (listaMusicasBanco.length > 0) {
+        let musicas = listaMusicasBanco.find(a => a.name === artista).Musicas.find(x => x.title === musica);
 
         if (musica) {
             return {
                 'Artista': artista,
                 'Musica': musicas["Musica"],
+                'Titulo': musicas["title"],
                 'Duracao': musicas["Meta"]["duration"],
-                'Tipo': path.extname(musicas["Musica"])
+                'Tipo': musicas["Tipo"]
             }
         } else {
             return {};

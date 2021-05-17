@@ -393,7 +393,7 @@ function RetornaCapa(index, popularidade = null, qtdMusica = null, capa = true, 
         let i = 0;
 
         tipos.forEach((item) => {
-            switch (item) {
+            switch (item.toLowerCase()) {
                 case '.mp3':
                     htmlTipos += '<i class="fas fa-music'+ (i > 0 ? " fa-space-left" : "") + '"></i>';
                     break;
@@ -675,10 +675,6 @@ function timeRandomInit() {
     timeRandom = window.setInterval(() => {
         if (audio.paused && (audio.ended || isNaN(audio.duration))) {
             $.get("/randomMusica?Quantidade=1", function (response) {
-                for (const random of response) {
-                    executaMusica(null, random["Artista"], random["Titulo"], random["Musica"], random["Duracao"], null, null, random["Tipo"], true);
-                }
-
                 $.each(response, function (_index, value) {
                     executaMusica(null, value["Artista"], value["Titulo"], value["Musica"], value["Duracao"], null, null, value["Tipo"], true);
                 });
