@@ -35,38 +35,64 @@ http.listen(8000, function () {
 });
 
 
-app.get("/getList", async function (_req, res) {
-    let parametros = await retornaParametros(),
-        listaMusicas = RetornaMusicas();
-
-    musicasTocadas = await global.db.MusicasTocadas();
-    totalTocadas = await global.db.TotalTocadas();
-    totalMusica = await global.db.TotalMusicas();
-    totalAlbum = await global.db.TotalArtistas();
+app.get("/getNewMusicas", async function (_req, res) {
+    let listaMusicas = RetornaMusicas();
 
     listaMusicasBanco = await global.db.RetornaMusicas();
 
     let teste = listaMusicasBanco.map(x => {
-        {return {"Artista": x.name, "Musicas": x.Musicas.map(y => {return y.title})}}
+        {
+            return {
+                "Artista": x.name, "Musicas": x.Musicas.map(y => {
+                    return y.title
+                })
+            }
+        }
     });
 
-    let difference = listaMusicas.filter(x=> !teste.some(item => item.Artista === x.Artista));
+    let difference = listaMusicas.filter(x => !teste.some(item => item.Artista === x.Artista));
 
     for (const artistas of listaMusicas) {
-        let musicas = artistas.Musicas.filter(x=> !teste.find(y => y.Artista === artistas.Artista).Musicas.some(item => item === x));
+        let musicas = artistas.Musicas.filter(x => !teste.find(y => y.Artista === artistas.Artista).Musicas.some(item => item === x));
 
         if (musicas.length > 0) {
             difference.push({"Artista": artistas.Artista, "Musicas": musicas});
         }
     }
 
+    let listaNewMusicas = {
+        'ListaMusica': difference,
+        'TotalArtistas': difference.length,
+        'TotalMusicas': difference.length > 0 ?difference.map(x => {
+            return x.Musicas
+        }).reduce((a, b) => a.concat(b)).length : 0
+    }
+
+    res.json(listaNewMusicas);
+
+});
+
+app.get("/addMusicasBanco", async function (_req, res) {
     if (difference.length > 0) {
         await RetornaListaMetaData(difference);
 
         listaMusicasBanco = await global.db.RetornaMusicas();
     }
+});
+
+app.get("/getList", async function (_req, res) {
+    let parametros = await retornaParametros();
+
+    musicasTocadas = await global.db.MusicasTocadas();
+    totalTocadas = await global.db.TotalTocadas();
+    totalMusica = await global.db.TotalMusicas();
+    totalAlbum = await global.db.TotalArtistas();
 
     listaMusicasBanco = listaMusicasBanco.map((x) => {return Object.assign(x, {'formatos' : [...new Set(x.Musicas.map(item => item.Tipo))]})});
+
+    if (parametros["youtubeMusicas"]) {
+        listaMusicasBanco.push({"name": "Youtube", "Musicas": [{"Musica": "Pesquisar", "title": "Pesquisar", "Meta": null}]});
+    }
 
     if (parametros["topMusicas"]) {
         listaMusicasBanco.push({"name": "TOP", "Musicas": [
@@ -96,7 +122,8 @@ app.get("/getList", async function (_req, res) {
         'ListaMusica': listaMusicasBanco,
         'TotalMusicas': totalMusica,
         'MusicasTocas': musicasTocadas,
-        'TotalAlbum': totalAlbum
+        'TotalAlbum': totalAlbum,
+        'Parametros': parametros
     }
 
     res.json(lista);

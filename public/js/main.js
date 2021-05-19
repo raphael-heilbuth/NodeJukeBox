@@ -17,9 +17,28 @@ let audio = document.getElementById("myVideo"),
     tempoRandom = 240000,
     valorCredito = 0;
 
+toastr.options = {
+    "closeButton": false,
+    "debug": false,
+    "newestOnTop": true,
+    "progressBar": false,
+    "positionClass": "toast-top-center",
+    "preventDuplicates": false,
+    "onclick": null,
+    "showDuration": "1000",
+    "hideDuration": "1000",
+    "timeOut": "1000",
+    "extendedTimeOut": "1000",
+    "showEasing": "swing",
+    "hideEasing": "linear",
+    "showMethod": "fadeIn",
+    "hideMethod": "fadeOut",
+    "target": ".line-cover-flow"
+};
+
 $('body').loading({
     stoppable: false,
-    onStop: function (loading) {
+    onStop: function(loading) {
         loading.overlay.slideUp(400);
     },
     overlay: $(".loading"),
@@ -28,6 +47,92 @@ $('body').loading({
 
 $.fn.countAnimation = function (valor) {
     animationCount($(this), valor);
+}
+
+function ListaMusicasBanco() {
+    $.get("/getList", function (data) {
+        $(".text-loading").html("Carregando Musicas...")
+        listaMusicas = data["ListaMusica"];
+        let parametros = data["Parametros"];
+
+        modoLivre = parametros['modo'] === 'Livre';
+        tempoRandom = parametros['timeRandom'];
+        valorCredito = parametros['valorCredito'];
+
+        if (modoLivre) {
+            $('.jukebox-modo').removeClass('d-none');
+        } else {
+            $('.div-creditos').removeClass('d-none');
+        }
+
+        $('#total-musica').html(data["TotalMusicas"]).countAnimation(data["TotalMusicas"]);
+        $('#tocadas').html(data["MusicasTocas"]).countAnimation(data["MusicasTocas"]);
+        $('#total-album').html(data["TotalAlbum"]).countAnimation(data["TotalAlbum"]);
+
+        let list = $('.flip-items');
+
+        alfabeto = listaMusicas.map(x => {
+            switch (x.name) {
+                case 'Youtube':
+                case 'TOP':
+                case 'Random':
+                    list.append(RetornaCapa(x.name, null, x.Musicas.length, false));
+                    break;
+                default:
+                    list.append(RetornaCapa(x.name, 0, x.Musicas.length, true, x.formatos));
+                    break;
+            }
+
+            return x.name.substr(0, 1)
+        }).filter(function (itm, i, a) {
+            return i === a.indexOf(itm);
+        });
+
+        coverflow = $("#coverflow").flipster({
+            style: 'carousel',
+            spacing: -0.15,
+            buttons: true,
+            loop: true,
+            fadeIn: 0,
+            start: 0,
+            keyboard: false,
+            scrollwheel: false,
+            buttonPrev: 'Anterior',
+            buttonNext: 'Próxima',
+            onItemSwitch: function (currentItem, previousItem) {
+                $(previousItem).find('.front').removeClass('d-none').end().find('.back').addClass('d-none');
+
+                let letra = $(currentItem).attr('data-flip-title').substr(0, 1);
+                if (letraAnt !== letra) {
+                    letraAnt = letra;
+                    toastr.error('',letraAnt, {iconClass:"toast-custom"});
+                }
+            }
+        });
+
+        $('body').loading('stop');
+
+        timeRandomInit();
+    });
+}
+
+function CaminhaMusicas(tecla) {
+    let index = currentArtista.find('.active').index();
+
+    index = (tecla === 'up' ? (index === firstIndex ? lastIndex : index - 1) : (index === lastIndex ? 0 : index + 1));
+
+    currentArtista.find('.active').removeClass('active');
+    let itemAtual = currentArtista.find('.list-group-item:eq( ' + index + ' )').addClass('active');
+    itemAtual.find('.titulo-musica').addClass('active');
+
+    if (itemAtual.find('#pesquisa-youtube').length > 0) {
+        itemAtual.find('#pesquisa-youtube').trigger('focus');
+    }
+
+    itemAtual.get(0).scrollIntoView({
+        behavior: "smooth", // or "auto" or "instant"
+        block: (tecla === 'up' ? "start" : "end") // or "start" or "end"
+    });
 }
 
 jQuery(function () {
@@ -83,76 +188,18 @@ jQuery(function () {
         Next();
     });
 
-    $.get("/getParametro",function (parametro){
-        modoLivre = parametro['modo'] === 'Livre';
-        tempoRandom = parametro['timeRandom'];
-        valorCredito = parametro['valorCredito'];
+    let textLoading = $(".text-loading");
+    textLoading.html("Lendo Musicas...");
 
-        if (modoLivre) {
-            $('.jukebox-modo').removeClass('d-none');
+    $.get('/getNewMusicas', function (newMusicas) {
+        if (newMusicas["ListaMusica"].length > 0) {
+            textLoading.html("Adicionado " + newMusicas["TotalMusicas"] + " novas músicas de " + newMusicas["TotalArtistas"] + " artistas");
+            $.get('/addMusicasBanco', { novas: newMusicas["ListaMusica"]}, function () {
+                ListaMusicasBanco();
+            })
         } else {
-            $('.div-creditos').removeClass('d-none');
+            ListaMusicasBanco();
         }
-    });
-
-    $.get("/getList", function (data) {
-        listaMusicas = data["ListaMusica"];
-
-        $('#total-musica').html(data["TotalMusicas"]).countAnimation(data["TotalMusicas"]);
-        $('#tocadas').html(data["MusicasTocas"]).countAnimation(data["MusicasTocas"]);
-        $('#total-album').html(data["TotalAlbum"]).countAnimation(data["TotalAlbum"]);
-
-        let list = $('.flip-items');
-
-        alfabeto = listaMusicas.map(x => {
-            switch (x.name) {
-                case 'Youtube':
-                case 'TOP':
-                case 'Random':
-                    list.append(RetornaCapa(x.name, null, x.Musicas.length, false));
-                    break;
-                default:
-                    list.append(RetornaCapa(x.name, 0, x.Musicas.length, true, x.formatos));
-                    break;
-            }
-            
-            return x.name.substr(0, 1)
-        }).filter(function (itm, i, a) {
-            return i === a.indexOf(itm);
-        });
-
-        coverflow = $("#coverflow").flipster({
-            style: 'carousel',
-            spacing: -0.15,
-            buttons: true,
-            loop: true,
-            fadeIn: 0,
-            start: 0,
-            keyboard: false,
-            scrollwheel: false,
-            buttonPrev: 'Anterior',
-            buttonNext: 'Próxima',
-            onItemSwitch: function (currentItem, previousItem) {
-                $(previousItem).find('.front').removeClass('d-none').end().find('.back').addClass('d-none');
-
-                let letra = $(currentItem).attr('data-flip-title').substr(0, 1);
-                if (letraAnt !== letra) {
-                    letraAnt = letra;
-                    let tooltips = $('.line-cover-flow').tooltip({
-                        title: letraAnt,
-                        template: '<div class="tooltip tooltip-letra" role="tooltip"><div class="tooltip-inner tooltip-inner-letra"></div></div>'
-                    }).tooltip('show');
-
-                    setTimeout(function () {
-                        tooltips.tooltip('dispose');
-                    }, 1000);
-                }
-            }
-        });
-
-        $('body').loading('stop');
-
-        timeRandomInit();
     });
 
     $(document).on('click', '.flipster__item--current', function () {
@@ -177,10 +224,12 @@ jQuery(function () {
         }
     });
 
-    $(document).on('keydown', '#pesquisa-youtube', function () {
-        clearTimeout(timePesquisaYoutube);
+    $(document).on('keydown', '#pesquisa-youtube', function (event) {
+        if (event.altKey === false) {
+            clearTimeout(timePesquisaYoutube);
 
-        timeYoutube($(this).val());
+            timeYoutube($(this).val());
+        }
     });
 
     $(document).on('click', '.item-musica', function () {
@@ -215,25 +264,12 @@ jQuery(function () {
             if ($('.flipster__item--current').find('.front').is(':visible')) {
                 ProximaLetra(letraAnt);
             } else {
-                let index = currentArtista.find('.active').index();
-
-                index = (index === firstIndex ? lastIndex : index - 1);
-
-                currentArtista[0].scrollIntoView();
-
-                currentArtista.find('.active').removeClass('active');
-                let itemAtual = currentArtista.find('.list-group-item:eq( ' + index + ' )').addClass('active');
-                itemAtual.find('.titulo-musica').addClass('active');
-                itemAtual.get(0).scrollIntoView({
-                    behavior: "smooth", // or "auto" or "instant"
-                    block: "start" // or "start" or "end"
-                });
+                CaminhaMusicas('up');
             }
 
             audio.classList.add("Utilizando");
 
             clearTimeout(timeVideo);
-
 
             invocation();
         }
@@ -241,17 +277,7 @@ jQuery(function () {
             if ($('.flipster__item--current').find('.front').is(':visible')) {
                 LetraAnterior(letraAnt);
             } else {
-                let index = currentArtista.find('.active').index();
-
-                index = (index === lastIndex ? 0 : index + 1);
-
-                currentArtista.find('.active').removeClass('active');
-                let itemAtual = currentArtista.find('.list-group-item:eq( ' + index + ' )').addClass('active');
-                itemAtual.find('.titulo-musica').addClass('active');
-                itemAtual.get(0).scrollIntoView({
-                    behavior: "smooth", // or "auto" or "instant"
-                    block: "end" // or "end"
-                });
+                CaminhaMusicas('down');
             }
             audio.classList.add("Utilizando");
 
@@ -281,8 +307,8 @@ jQuery(function () {
             if (flipCurrent.find('.front').is(':visible')) {
                 flipCurrent.trigger('click');
             } else {
-                if (currentArtista.find('.active').length > 0) {
-                    selecionaMusica(currentArtista.find('.active'));
+                if (currentArtista.find('.item-musica.active').length > 0) {
+                    selecionaMusica(currentArtista.find('.item-musica.active'));
                 } else {
                     let tooltips = $('body').tooltip({
                         title: 'Nenhuma musica selecionada.',
@@ -339,33 +365,6 @@ function selecionaMusica(elemento) {
     } else {
         AbreToastInfo('Favor comprar créditos.')
     }
-}
-
-function removerAcentos(newStringComAcento) {
-    let string = newStringComAcento;
-    const mapaAcentosHex = {
-        a: /[\xE0-\xE6]/g,
-        A: /[\xC0-\xC6]/g,
-        e: /[\xE8-\xEB]/g,
-        E: /[\xC8-\xCB]/g,
-        i: /[\xEC-\xEF]/g,
-        I: /[\xCC-\xCF]/g,
-        o: /[\xF2-\xF6]/g,
-        O: /[\xD2-\xD6]/g,
-        u: /[\xF9-\xFC]/g,
-        U: /[\xD9-\xDC]/g,
-        c: /\xE7/g,
-        C: /\xC7/g,
-        n: /\xF1/g,
-        N: /\xD1/g,
-    };
-
-    for (let letra in mapaAcentosHex) {
-        let expressaoRegular = mapaAcentosHex[letra];
-        string = string.replace(expressaoRegular, letra);
-    }
-
-    return string;
 }
 
 function RetornaCapa(index, popularidade = null, qtdMusica = null, capa = true, tipos = null) {
@@ -571,6 +570,7 @@ function executaMusica(elemento, artista, nomeArquivo, musica, duracao, imageCap
                 case 'Pesquisar':
                     if ($('#pesquisa-youtube').length === 0) {
                         elemento.append('<input class="form-control col-auto" id="pesquisa-youtube">');
+                        $('#pesquisa-youtube').trigger('focus');
                     }
                     break;
                 default:
@@ -691,7 +691,7 @@ function timeYoutube(query) {
 }
 
 function pesquisaYoutube(query) {
-    let list = $('#pesquisa-youtube').offsetParent();
+    let list = $('#pesquisa-youtube').offsetParent().offsetParent();
 
     $('.item-exclude').remove();
 
@@ -699,6 +699,8 @@ function pesquisaYoutube(query) {
         $.each(retornoLista, function (index, value) {
             list.append(RetornaMusica('Youtube', value["Titulo"], value["Titulo"], value["Duracao"], value["IdMusica"], value["Capa"], true));
         })
+        firstIndex = list.find('.item-musica').first().index();
+        lastIndex = list.find('.item-musica').last().index();
     });
 }
 
