@@ -323,6 +323,25 @@
     font-weight: bold;
 }
 
+.center-logo {
+    position: absolute;
+    right: 40%;
+    bottom: 50%;
+}
+
+.toast {
+    font-size: 80px;
+    background-color: #00000070 !important;
+    min-width: 160px !important;
+    margin-bottom: 12px !important;
+    max-width: 160px !important;
+}
+
+.toast-top-center {
+    position: relative !important;
+    top: -180px;
+}
+
 @media (min-height: 769px)
 {
     .img-capa {
@@ -354,6 +373,7 @@
     .list-group.list-group-flush.list-musicas {
         max-height: 448px;
         min-height: 448px;
+        height: 448px !important;
     }
 
     .capa-artista-list {
