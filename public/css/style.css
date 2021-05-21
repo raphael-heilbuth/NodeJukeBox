@@ -74,6 +74,7 @@
 
 .capa-atual, .capa-no-music {
     width: 125px;
+    height: 125px;
 }
 
 #title-musica {
