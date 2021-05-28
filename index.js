@@ -53,10 +53,12 @@ app.get("/getNewMusicas", async function (_req, res) {
     let difference = listaMusicas.filter(x => !teste.some(item => item.Artista === x.Artista));
 
     for (const artistas of listaMusicas) {
-        let musicas = artistas.Musicas.filter(x => !teste.find(y => y.Artista === artistas.Artista).Musicas.some(item => item === x));
+        if (difference.filter(x => x.Artista === artistas.Artista).length === 0) {
+            let musicas = artistas.Musicas.filter(x => !teste.find(y => y.Artista === artistas.Artista).Musicas.some(item => item === x));
 
-        if (musicas.length > 0) {
-            difference.push({"Artista": artistas.Artista, "Musicas": musicas});
+            if (musicas.length > 0) {
+                difference.push({"Artista": artistas.Artista, "Musicas": musicas});
+            }
         }
     }
 
@@ -73,10 +75,11 @@ app.get("/getNewMusicas", async function (_req, res) {
 });
 
 app.get("/addMusicasBanco", async function (_req, res) {
-    if (difference.length > 0) {
-        await RetornaListaMetaData(difference);
+    if (_req.query.novas.length > 0) {
+        await RetornaListaMetaData(_req.query.novas);
 
         listaMusicasBanco = await global.db.RetornaMusicas();
+        res.json(true);
     }
 });
 
@@ -115,7 +118,7 @@ app.get("/getList", async function (_req, res) {
     }
 
     listaMusicasBanco = listaMusicasBanco.sort(function(a,b) {
-        return a.name < b.name ? -1 : a.name > b.name ? 1 : 0;
+        return a.name.localeCompare(b.name);
     });
 
     let lista = {
