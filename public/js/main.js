@@ -524,7 +524,8 @@ function listaProximas() {
 
     lista.empty();
 
-    $('#badge-proximas').html(listaProximasMusicas.length);
+    $('#badge-tempo-proximas').html(display(listaProximasMusicas.reduce((a, b) => a + +b.Duracao, 0)));
+    $('#badge-proximas').html(listaProximasMusicas.length.toString());
 
     $.each(listaProximasMusicas, function (index, value) {
         lista.append(RetornaMusica(value["Artista"], value["Titulo"], value["Musica"], value["Duracao"], value["IdMusica"], value["ImagemCapa"], value["IdMusica"] !== null, null, null, value["Tipo"]));
@@ -546,7 +547,8 @@ function ItemProximaMusica(artista, nomeArquivo, musica, duracao, idMusica, imag
 function executaMusica(elemento, artista, nomeArquivo, musica, duracao, imageCapa, idMusica, tipo, random = false) {
     let carregando = $('#music-carregando'),
         no_music = $('#no-music-info'),
-        info = $('#music-info');
+        info = $('#music-info'),
+        pesquisa_youtube = $('#pesquisa-youtube');
 
     switch (artista) {
         case 'Random': {
@@ -568,9 +570,9 @@ function executaMusica(elemento, artista, nomeArquivo, musica, duracao, imageCap
         case 'Youtube':
             switch (nomeArquivo) {
                 case 'Pesquisar':
-                    if ($('#pesquisa-youtube').length === 0) {
+                    if (pesquisa_youtube.length === 0) {
                         elemento.append('<input class="form-control col-auto" id="pesquisa-youtube">');
-                        $('#pesquisa-youtube').trigger('focus');
+                        pesquisa_youtube.trigger('focus');
                     }
                     break;
                 default:
