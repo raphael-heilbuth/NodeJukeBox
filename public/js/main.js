@@ -15,7 +15,8 @@ let audio = document.getElementById("myVideo"),
     modoLivre = false,
     totalCredito = 0,
     tempoRandom = 240000,
-    valorCredito = 0;
+    valorCredito = 0,
+    iniciandoMusica = false;
 
 toastr.options = {
     "closeButton": false,
@@ -576,12 +577,12 @@ function executaMusica(elemento, artista, nomeArquivo, musica, duracao, imageCap
                     }
                     break;
                 default:
-                    if (audio.paused) {
+                    if (audio.paused && !iniciandoMusica) {
                         carregando.removeClass('d-none');
                         no_music.addClass('d-none');
 
                         $('.background-image').css('background-image', 'url(' + imageCapa + ')');
-
+                        iniciandoMusica = true;
                         fetch("/tocaYoutube?IdMusica=" + encodeURI(idMusica))
                             .then(res => {
                                 return res.blob();
@@ -597,8 +598,9 @@ function executaMusica(elemento, artista, nomeArquivo, musica, duracao, imageCap
                                 audio.src = URL.createObjectURL(blob);
 
                                 audio.load();
-                                audio.play();
-
+                                audio.play().then(() => {
+                                    iniciandoMusica = false;
+                                });
                             })
                     } else {
                         listaProximasMusicas.push(ItemProximaMusica(artista, nomeArquivo, nomeArquivo, duracao, idMusica, imageCapa));
@@ -609,10 +611,11 @@ function executaMusica(elemento, artista, nomeArquivo, musica, duracao, imageCap
             }
             break;
         default:
-            if (audio.paused) {
+            if (audio.paused && !iniciandoMusica) {
                 carregando.removeClass('d-none');
                 no_music.addClass('d-none');
 
+                iniciandoMusica = true;
                 $.get('/playMusic?artista=' + encodeURIComponent(artista) + '&musica=' + encodeURIComponent(nomeArquivo) + '&random=' + random, function (response) {
                     carregando.addClass('d-none');
 
@@ -632,7 +635,9 @@ function executaMusica(elemento, artista, nomeArquivo, musica, duracao, imageCap
 
                         audio.src = audioSrc;
                         audio.load();
-                        audio.play();
+                        audio.play().then(() => {
+                            iniciandoMusica = false;
+                        });
                     } else {
                         ExecutaProxima();
                     }
