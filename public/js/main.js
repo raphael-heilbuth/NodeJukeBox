@@ -413,14 +413,14 @@ function RetornaCapa(index, popularidade = null, qtdMusica = null, capa = true, 
         '           <h1 class="text-center titulo-musica-capa">' + index + '</h1>' +
         htmlTipos +
         '           <div class="qtd-musica">' + qtdMusica + '</div>' +
-        '           <img src="' + (capa ? "../public/image/capas/" : "../public/image/default/") + encodeURI(index) + '.jpg" class="img-capa" alt="capa">' +
+        '           <img src="' + (capa ? "../public/image/capas/" : "../public/image/default/") + encodeURI(index) + '.jpg" onerror="this.src=\'../public/image/default/CapaPadrao.jpg\';" class="img-capa" alt="capa">' +
         '           <div class="progress progress-bar-capa">' +
         '               <div class="progress-bar ' + classBar + '" role="progressbar" aria-valuenow="' + popularidade + '" aria-valuemin="0" aria-valuemax="100" style="width: ' + popularidade + '%;"></div>' +
         '           </div>' +
         '        </div>' +
         '        <div class="back img-capa d-none">' +
         '           <div class="card">' +
-        '                <img src="' + (capa ? "../public/image/capas/" : "../public/image/default/") + encodeURI(index) + '.jpg" class="capa-artista-list" alt="capa">' +
+        '                <img src="' + (capa ? "../public/image/capas/" : "../public/image/default/") + encodeURI(index) + '.jpg" onerror="this.src=\'../public/image/default/CapaPadrao.jpg\';" class="capa-artista-list" alt="capa">' +
         '                <div class="card-header">' +
         '                   <div class="form-row">' +
         '                       <div class="col title-artista">' +
