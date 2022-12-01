@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { Artista, Musica, Parametros } = require('./models');
+const { Artista, Musica, Parametros } = require('../models');
 
 mongoose.connect('mongodb://localhost/JukeBox', {useNewUrlParser: true,useUnifiedTopology: true}).then(() => {});
 
@@ -106,7 +106,7 @@ const RetornaTopMusicas = (qtd) => new Promise((success) => {
 
 const MusicasTocadas = () => new Promise((success) => {
     Musica.find({reproduzida: {$gt: 0}}).exec(function (err, results) {
-        success(results !== undefined ? results.length : 0);    
+        success(results !== undefined ? results.length : 0);
       });
 });
 
@@ -170,16 +170,16 @@ function retornaMusica(musica, newArtista, dados) {
 }
 
 module.exports = {
-    TotalArtistas, 
+    TotalArtistas,
     TotalMusicas,
-    TotalTocadas, 
-    PopularidadeArtista, 
-    PopularidadeMusica, 
-    SalvaMusica, 
-    RetornaTopMusicas,      
-    MusicasTocadas, 
-    SalvaParametros, 
-    RetornaParametros, 
+    TotalTocadas,
+    PopularidadeArtista,
+    PopularidadeMusica,
+    SalvaMusica,
+    RetornaTopMusicas,
+    MusicasTocadas,
+    SalvaParametros,
+    RetornaParametros,
     RetornaMusicas,
     CountMusica
 }

@@ -7,11 +7,9 @@
   },
   "host": "localhost:8000",
   "basePath": "/",
-  "tags": [],
   "schemes": [
     "http"
   ],
-  "securityDefinitions": {},
   "consumes": [
     "application/json"
   ],
@@ -19,111 +17,6 @@
     "application/json"
   ],
   "paths": {
-    "/getList": {
-      "get": {
-        "tags": [],
-        "description": "",
-        "parameters": [],
-        "responses": {}
-      }
-    },
-    "/playMusic": {
-      "get": {
-        "tags": [
-          "Musica"
-        ],
-        "description": "Endpoint para enviar música pra tocar",
-        "parameters": [
-          {
-            "name": "artista",
-            "description": "Nome do artista da música",
-            "type": "string",
-            "in": "query"
-          },
-          {
-            "name": "musica",
-            "description": "Nome do música",
-            "type": "string",
-            "in": "query"
-          }
-        ],
-        "responses": {}
-      }
-    },
-    "/tocaYoutube": {
-      "get": {
-        "tags": [
-          "Youtube"
-        ],
-        "description": "Endpoint para enviar para o site música do youtube a ser tocada",
-        "parameters": [
-          {
-            "name": "IdMusica",
-            "in": "query"
-          }
-        ],
-        "responses": {}
-      }
-    },
-    "/buscaYoutube": {
-      "get": {
-        "tags": [
-          "Youtube"
-        ],
-        "description": "Endpoint para retornar as primeiras 5 músicas da pesquisa",
-        "parameters": [
-          {
-            "name": "busca",
-            "description": "Música a ser buscada",
-            "type": "string",
-            "in": "query"
-          }
-        ],
-        "responses": {}
-      }
-    },
-    "/randomMusica": {
-      "get": {
-        "tags": [
-          "Musica"
-        ],
-        "description": "Endpoint para retornar músicas aleatórias",
-        "parameters": [
-          {
-            "name": "Quantidade",
-            "description": "Quantidade de músicas a serem buscadas",
-            "type": "string",
-            "in": "query"
-          }
-        ],
-        "responses": {}
-      }
-    },
-    "/topMusica": {
-      "get": {
-        "tags": [
-          "Musica"
-        ],
-        "description": "Endpoint para retornar a quantidade de músicas mais tocadas",
-        "parameters": [
-          {
-            "name": "Quantidade",
-            "description": "Quantidade de músicas a serem buscadas",
-            "type": "string",
-            "in": "query"
-          }
-        ],
-        "responses": {}
-      }
-    },
-    "/": {
-      "get": {
-        "tags": [],
-        "description": "",
-        "parameters": [],
-        "responses": {}
-      }
-    },
     "/volume": {
       "post": {
         "tags": [
@@ -136,7 +29,6 @@
             "in": "body",
             "description": "O volume que vai ser setado na JukeBox",
             "required": true,
-            "type": "object",
             "schema": {
               "$ref": "#/definitions/Volume"
             }
@@ -249,7 +141,6 @@
             "in": "body",
             "description": "A quantidade de crédito que vai ser inserido na JukeBox.",
             "required": true,
-            "type": "object",
             "schema": {
               "$ref": "#/definitions/Creditos"
             }
@@ -261,6 +152,34 @@
             "schema": {
               "$ref": "#/definitions/Success"
             }
+          }
+        }
+      }
+    },
+    "/dashboard": {
+      "get": {
+        "tags": [
+          "Dashboard"
+        ],
+        "description": "Endpoint para retornar os dados da dashboard da Jukebox.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Dados dashboard retornados com sucesso.",
+            "schema": {
+              "$ref": "#/definitions/RetornaDashboard"
+            }
+          }
+        }
+      }
+    },
+    "/": {
+      "get": {
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
           }
         }
       }
@@ -294,7 +213,6 @@
             "in": "body",
             "description": "Informações da música a ser tocada.",
             "required": true,
-            "type": "object",
             "schema": {
               "$ref": "#/definitions/SelecionaMusica"
             }
@@ -351,6 +269,119 @@
         }
       }
     },
+    "/topMusica": {
+      "get": {
+        "tags": [
+          "Musica"
+        ],
+        "description": "Endpoint para retornar a quantidade de músicas mais tocadas",
+        "parameters": [
+          {
+            "name": "Quantidade",
+            "description": "Quantidade de músicas a serem buscadas",
+            "type": "string",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/randomMusica": {
+      "get": {
+        "tags": [
+          "Musica"
+        ],
+        "description": "Endpoint para retornar músicas aleatórias",
+        "parameters": [
+          {
+            "name": "Quantidade",
+            "description": "Quantidade de músicas a serem buscadas",
+            "type": "string",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/playMusic": {
+      "get": {
+        "tags": [
+          "Musica"
+        ],
+        "description": "Endpoint para enviar música pra tocar",
+        "parameters": [
+          {
+            "name": "artista",
+            "description": "Nome do artista da música",
+            "type": "string",
+            "in": "query"
+          },
+          {
+            "name": "random",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "musica",
+            "description": "Nome do música",
+            "type": "string",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/getNewMusicas": {
+      "get": {
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/addMusicasBanco": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "novas",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/getList": {
+      "get": {
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/setParametro": {
       "post": {
         "tags": [
@@ -363,7 +394,6 @@
             "in": "body",
             "description": "Parametros a ser usado na JukeBox.",
             "required": true,
-            "type": "object",
             "schema": {
               "$ref": "#/definitions/RetornaParametros"
             }
@@ -376,8 +406,8 @@
               "$ref": "#/definitions/Success"
             }
           },
-          "400": {
-            "description": "Bad Request"
+          "500": {
+            "description": "Internal Server Error"
           }
         }
       }
@@ -395,23 +425,46 @@
             "schema": {
               "$ref": "#/definitions/RetornaParametros"
             }
+          },
+          "500": {
+            "description": "Internal Server Error"
           }
         }
       }
     },
-    "/dashboard": {
+    "/tocaYoutube": {
       "get": {
         "tags": [
-          "Dashboard"
+          "Youtube"
         ],
-        "description": "Endpoint para retornar os dados da dashboard da Jukebox.",
-        "parameters": [],
+        "description": "Endpoint para enviar para o site música do youtube a ser tocada",
+        "parameters": [
+          {
+            "name": "IdMusica",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/buscaYoutube": {
+      "get": {
+        "tags": [
+          "Youtube"
+        ],
+        "description": "Endpoint para retornar as primeiras 5 músicas da pesquisa",
+        "parameters": [
+          {
+            "name": "busca",
+            "description": "Música a ser buscada",
+            "type": "string",
+            "in": "query"
+          }
+        ],
         "responses": {
           "200": {
-            "description": "Dados dashboard retornados com sucesso.",
-            "schema": {
-              "$ref": "#/definitions/RetornaDashboard"
-            }
+            "description": "OK"
           }
         }
       }
@@ -429,9 +482,6 @@
           "type": "string",
           "example": "08. ADELE - 'Make You Feel My Love'.mp3"
         }
-      },
-      "xml": {
-        "name": "SelecionaMusica"
       }
     },
     "Creditos": {
@@ -441,9 +491,6 @@
           "type": "number",
           "example": 10
         }
-      },
-      "xml": {
-        "name": "Creditos"
       }
     },
     "Volume": {
@@ -453,9 +500,6 @@
           "type": "number",
           "example": 0.1
         }
-      },
-      "xml": {
-        "name": "Volume"
       }
     },
     "RetornaArtistas": {
@@ -472,9 +516,6 @@
             "example": "public/image/capas/150 BPM.jpg"
           }
         }
-      },
-      "xml": {
-        "name": "RetornaArtistas"
       }
     },
     "RetornaMusicas": {
@@ -491,9 +532,6 @@
             "example": 246.4130612244898
           }
         }
-      },
-      "xml": {
-        "name": "RetornaMusicas"
       }
     },
     "Success": {
@@ -503,9 +541,6 @@
           "type": "boolean",
           "example": true
         }
-      },
-      "xml": {
-        "name": "Success"
       }
     },
     "RetornaDashboard": {
@@ -515,17 +550,10 @@
           "type": "number",
           "example": 4981
         },
-        "MusicasTocadas": {
-          "type": "number",
-          "example": 530
-        },
         "TotalTocadas": {
           "type": "number",
           "example": 696
         }
-      },
-      "xml": {
-        "name": "RetornaDashboard"
       }
     },
     "RetornaParametros": {
@@ -555,9 +583,6 @@
           "type": "number",
           "example": 240000
         }
-      },
-      "xml": {
-        "name": "RetornaParametros"
       }
     }
   }

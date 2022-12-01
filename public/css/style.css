@@ -31,7 +31,7 @@
     height: 500px;
     max-height: 500px;
     max-width: 500px;
-    display: none;    
+    display: none;
 }
 
 #music-time {
@@ -57,7 +57,7 @@
     -ms-filter: blur(5px);
     background-size: calc(100vw + 20px);
     /*opacity: 0.7;*/
-    top: -9px;    
+    top: -9px;
     background-image: url('../image/default/NodeJukebox.png');
 }
 
@@ -65,7 +65,7 @@
 #canvas {
     position: fixed;
     left: 0;
-    bottom: calc(100vh - 464px);    
+    bottom: calc(100vh - 464px);
     width: 100%;
     height: 100%;
     z-index: -500;
@@ -313,9 +313,8 @@
 
 .qtd_credito{
     color: green;
-    font-size: 130px;
+    font-size: 14vh;
     font-weight: bold;
-    margin-bottom: 30px;
 }
 
 .valor-credio {

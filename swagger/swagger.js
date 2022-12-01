@@ -1,7 +1,7 @@
+const {listaArquivosPasta} = require("../uteis/util");
 const swaggerAutogen = require('swagger-autogen')()
-
-const outputFile = './swagger_output.json'
-const endpointsFiles = ['./index.js','./rotas.js']
+const outputFile = './swagger/swagger_output.json'
+const endpointsFiles = listaArquivosPasta('./routes')
 
 let doc = {
     info: {
@@ -56,5 +56,5 @@ let doc = {
 };
 
 swaggerAutogen(outputFile, endpointsFiles, doc).then(() => {
-    require('./index.js')
+    require('../index.js')
 })

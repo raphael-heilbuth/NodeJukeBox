@@ -3,7 +3,7 @@ public/image/capas/*.jpg
 
 # Config
 config.json
-.env
+config/.env
 
 # Logs
 logs
@@ -76,7 +76,7 @@ typings/
 .yarn-integrity
 
 # dotenv environment variables file
-.env
+config/.env
 .env.test
 
 # parcel-bundler cache (https://parceljs.org/)
