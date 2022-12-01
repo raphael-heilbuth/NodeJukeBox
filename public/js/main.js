@@ -145,8 +145,8 @@ jQuery(function () {
             listaMusicas.find(x => x.name === artista).Musicas.map(y => {
                 listaMusicaArtista.append(RetornaMusica(artista, y.title, {
                     titulo: y.Musica,
-                    Meta: (y.Meta !== null ? y.Meta.duration : null),
-                    Tipo: y.Tipo
+                    duracao: (y.Meta !== null ? y.Meta.duration : null),
+                    tipo: y.Tipo
                 }));
             });
 
