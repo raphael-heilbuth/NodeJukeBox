@@ -105,17 +105,32 @@ jQuery(function () {
     });
 
     let textLoading = $(".text-loading");
+
     textLoading.html("Lendo Musicas...");
 
     $.get('/getNewMusicas', function (newMusicas) {
         if (newMusicas["ListaMusica"].length > 0) {
-            textLoading.html("Adicionado " + newMusicas["TotalMusicas"] + " novas músicas de " + newMusicas["TotalArtistas"] + " artistas");
-            $.get('/addMusicasBanco', { novas: newMusicas["ListaMusica"]}, function () {
-                ListaMusicasBanco();
-            })
+            let i = 1;
+            textLoading.html('Encontrado ' + newMusicas["TotalMusicas"] + ' novas músicas de ' + newMusicas["TotalArtistas"] + ' artistas <small class="sub-text-loading text-center"></small>');
+            adicionaMusica(newMusicas["ListaMusica"], i, newMusicas["TotalArtistas"])
+                .then(() => {
+                    ListaMusicasBanco();
+                })
         } else {
             ListaMusicasBanco();
         }
+    });
+
+    const adicionaMusica = (listaMusicas, i, total) => new Promise((success, reject) => {
+        if (!listaMusicas.length) {
+            success(true);
+        }
+
+        $.post('/addMusicasBanco', { novas: listaMusicas.shift()}, function () {
+            $(".sub-text-loading").html("Adicionado " + i + " de " + total + " artistas");
+            i++;
+            success(adicionaMusica(listaMusicas, i, total));
+        })
     });
 
     $(document).on('click', '.flipster__item--current', function () {

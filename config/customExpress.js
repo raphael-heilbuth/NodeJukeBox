@@ -13,7 +13,7 @@ module.exports = () => {
     global.db = require('../data_base/db');
     app.use('views', express.static(path.join(__dirname, '../views')));
     app.use('/', express.static(path.join(__dirname, '../')));
-    app.use(express.urlencoded({extended: true}))
+    app.use(express.urlencoded({limit: "5mb", extended: true}));
     app.use(express.json({limit: "5mb"}));
     app.use('/swagger', swaggerUi.serve);
     app.get('/swagger', swaggerUi.setup(swaggerFile));

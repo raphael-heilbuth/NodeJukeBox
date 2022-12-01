@@ -16,7 +16,7 @@ exports.RetornaListaMusicas = function RetornaMusicas() {
                         let diretorios = dir.split('/'),
                             artista = diretorios[diretorios.length - 1];
                         fs.copyFile(dir + "/" + file, 'public/image/capas/' + artista + '.jpg', (err) => {
-                            if (err) throw err;
+                            if (err) {console.log(err)}
                         });
                     } else {
                         if (path.extname(file).toLowerCase() === '.mp3' || path.extname(file).toLowerCase() === '.mp4') {
@@ -58,7 +58,7 @@ exports.RetornaListaMetaData = async function RetornaListaMetaData(lista) {
                             'Meta': {container: meta.format.container, codec: meta.format.codec, duration: meta.format.duration}
                         };
 
-                        await global.db.SalvaMusica(artista.Artista, musica, objMusica).then(() => {
+                        await db.SalvaMusica(artista.Artista, musica, objMusica).then(() => {
                         });
                     })
                     .catch(err => {

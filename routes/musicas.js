@@ -100,7 +100,7 @@ module.exports = app => {
         MusicasController.getNewMusicas(_req, res);
     });
 
-    router.get("/addMusicasBanco", function (req, res) {
+    router.post("/addMusicasBanco", function (req, res) {
         MusicasController.adicionaMusicasBanco(req, res);
     });
 

@@ -135,8 +135,12 @@ class MusicasController {
     }
 
     adicionaMusicasBanco(req, res) {
-        if (req.query.novas.length > 0) {
-            RetornaListaMetaData(req.query.novas).then(() => {
+        if (Object.keys(req.body.novas).length > 0) {
+            let nova = [];
+
+            nova.push(req.body.novas);
+
+            RetornaListaMetaData(nova).then(() => {
                 db.RetornaMusicas()
                     .then(() => { res.json(true); })
                     .catch(() => { res.json(false); });
