@@ -32,10 +32,13 @@ function display(seconds) {
 }
 
 const CapaExiste = (capa) => new Promise((sucesso) => {
-    $.get(capa, function(retorno) {
-        let imagem = retorno.success ? {background: capa, case: capa} : {background: '../public/image/default/FundoPadrao.jpg', case: '../public/image/default/CapaPadrao.jpg'};
-        sucesso(imagem)
-    });
+    $.get(capa)
+        .done(function () {
+                sucesso({background: capa, case: capa});
+            })
+        .fail(function () {
+            sucesso({background: '../public/image/default/FundoPadrao.jpg', case: '../public/image/default/CapaPadrao.jpg'});
+            });
 });
 
 function ProximaLetra(letra) {

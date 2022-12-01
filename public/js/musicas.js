@@ -300,7 +300,7 @@ function ExecutaMusicaLista(carregando, artista, nomeArquivo, random, tipo, info
         carregando.addClass('d-none');
 
         if (response.success) {
-            CapaExiste().then((imageUrl) => {
+            CapaExiste('../public/image/capas/' + encodeURIComponent(artista) + '.jpg').then((imageUrl) => {
                 let audioSrc = 'data:audio/' + (tipo === null ? 'mp3' : tipo.replace('.', '')) + ';base64,' + response.fileContent;
 
                 info.removeClass('d-none');
