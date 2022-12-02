@@ -341,6 +341,11 @@
     top: -180px;
 }
 
+#pesquisa-carregando {
+    padding-top: 15px;
+    color: gray;
+}
+
 @media (min-height: 769px)
 {
     .img-capa {
