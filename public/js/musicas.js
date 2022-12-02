@@ -97,12 +97,15 @@ function selecionaMusica(elemento) {
         duracao = elemento.attr('data-duracao'),
         idMusica = elemento.attr('data-id-musica'),
         imageCapa = elemento.attr('data-capa'),
-        tipo = elemento.attr('data-tipo');
+        tipo = elemento.attr('data-tipo'),
+        presquisaYoutube = (artista === "Youtube" && musica === "Pesquisar");
 
-    if (totalCredito > 0) {
+    if (totalCredito > 0 || presquisaYoutube) {
         executaMusica(artista, musica, titulo, duracao, tipo, {elemento: elemento, imageCapa: imageCapa, idMusica: idMusica});
-        totalCredito--;
-        credito.text(totalCredito);
+        if (!presquisaYoutube) {
+            totalCredito--;
+            credito.text(totalCredito);
+        }
 
         if (totalCredito <= 0) {
             credito.addClass('blink_me');
@@ -352,8 +355,7 @@ function executaMusica(artista, nomeArquivo, musica, duracao, tipo, {elemento = 
         case 'Youtube':
             if (nomeArquivo === "Pesquisar") {
                 if (pesquisa_youtube.length === 0) {
-                    elemento.append('<input class="form-control col-auto" id="pesquisa-youtube">');
-                    pesquisa_youtube.trigger('focus');
+                    elemento.append('<input class="form-control col-auto" id="pesquisa-youtube">').trigger('focus');
                 }
             } else {
                 if (audio.paused && !iniciandoMusica) {
@@ -392,10 +394,19 @@ function ExecutaProxima() {
 function pesquisaYoutube(query) {
     let list = $('#pesquisa-youtube').offsetParent().offsetParent();
 
+    list.append(
+        '<div id="pesquisa-carregando" class="text-center">\n' +
+        '    <div class="spinner-border" role="status">\n' +
+        '        <span class="sr-only">Pesquisando...</span>\n' +
+        '    </div>\n' +
+        '</div>'
+    );
+
     $('.item-exclude').remove();
 
     $.get("/buscaYoutube?busca=" + encodeURI(query), function (retornoLista) {
         $.each(retornoLista, function (index, value) {
+            $('#pesquisa-carregando').remove();
             list.append(RetornaMusica('Youtube', value["Titulo"], {
                 titulo: value["Titulo"],
                 duracao: value["Duracao"],
