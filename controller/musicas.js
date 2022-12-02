@@ -55,19 +55,27 @@ class MusicasController {
         let random = [];
 
         for (let i = 0; i < parseInt(req.query["Quantidade"].replace("Random", "")); i++) {
-            let posArtista = getRandomInteger(listaMusicasBanco.length),
-                posMusicas = getRandomInteger(listaMusicasBanco[posArtista].Musicas.length),
-                artista = listaMusicasBanco[posArtista],
-                musica = artista.Musicas[posMusicas],
-                item = {
-                    'Artista': artista.name,
-                    'Musica': musica.Musica,
-                    'Titulo': musica.title,
-                    'Duracao': musica.Meta.duration,
-                    'Tipo': musica.Tipo
-                }
+            let tentativa = 0,
+                posArtista = getRandomInteger(listaMusicasBanco.length);
 
-            random.push(item);
+            do {
+                let posMusicas = getRandomInteger(listaMusicasBanco[posArtista].Musicas.length),
+                    artista = listaMusicasBanco[posArtista],
+                    musica = artista.Musicas[posMusicas],
+                        item = {
+                            'Artista': artista.name,
+                            'Musica': musica.Musica,
+                            'Titulo': musica.title,
+                            'Duracao': musica.Meta.duration,
+                            'Tipo': musica.Tipo
+                        };
+                    if (artista["artista"]) {
+                        random.push(item);
+                    } else {
+                        posArtista = getRandomInteger(listaMusicasBanco.length);
+                        tentativa++;
+                    }
+            } while (!listaMusicasBanco[posArtista]["artista"] && tentativa < 10);
         }
 
         res.json(random);
@@ -151,61 +159,62 @@ class MusicasController {
     }
 
     getList(_req, res) {
-            Promise.all([
-                ParametrosController.retornaParametros(),
-                db.MusicasTocadas(),
-                db.TotalTocadas(),
-                db.TotalMusicas(),
-                db.TotalArtistas()
-            ])
-            .then((retornos) => {
-                let parametros = retornos[0];
-                musicasTocadas = retornos[1];
-                totalTocadas = retornos[2];
-                totalMusica = retornos[3];
-                totalAlbum = retornos[4];
+        Promise.all([
+            ParametrosController.retornaParametros(),
+            db.MusicasTocadas(),
+            db.TotalTocadas(),
+            db.TotalMusicas(),
+            db.TotalArtistas()
+        ])
+        .then((retornos) => {
+            let parametros = retornos[0];
 
-                listaMusicasBanco = listaMusicasBanco.map((x) => {return Object.assign(x, {'formatos' : [...new Set(x.Musicas.map(item => item.Tipo))]})});
+            musicasTocadas = retornos[1];
+            totalTocadas = retornos[2];
+            totalMusica = retornos[3];
+            totalAlbum = retornos[4];
 
-                if (parametros["youtubeMusicas"]) {
-                    listaMusicasBanco.push({"name": "Youtube", "Musicas": [{"Musica": "Pesquisar", "title": "Pesquisar", "Meta": null}]});
-                }
+            listaMusicasBanco = listaMusicasBanco.map((x) => {return Object.assign(x, {'artista': true, 'formatos' : [...new Set(x.Musicas.map(item => item.Tipo))]})});
 
-                if (parametros["topMusicas"]) {
-                    listaMusicasBanco.push({"name": "TOP", "Musicas": [
-                            {"Musica": "Top 10", "title": "10", "Meta": null},
-                            {"Musica": "Top 20", "title": "20", "Meta": null},
-                            {"Musica": "Top 30", "title": "30", "Meta": null},
-                            {"Musica": "Top 40", "title": "40", "Meta": null},
-                            {"Musica": "Top 50", "title": "50", "Meta": null},
-                            {"Musica": "Top 100", "title": "100", "Meta": null}
-                        ]});
-                }
+            if (parametros["youtubeMusicas"]) {
+                listaMusicasBanco.push({"name": "Youtube", "artista": false, "Musicas": [{"Musica": "Pesquisar", "title": "Pesquisar", "Meta": null}]});
+            }
 
-                if (parametros["randomMusicas"]) {
-                    listaMusicasBanco.push({"name": "Random", "Musicas": [
-                            {"Musica": "Random 1", "title": "1", "Meta": null},
-                            {"Musica": "Random 3", "title": "3", "Meta": null},
-                            {"Musica": "Random 5", "title": "5", "Meta": null},
-                            {"Musica": "Random 10", "title": "10", "Meta": null}
-                        ]});
-                }
+            if (parametros["topMusicas"]) {
+                listaMusicasBanco.push({"name": "TOP", "artista": false, "Musicas": [
+                        {"Musica": "Top 10", "title": "10", "Meta": null},
+                        {"Musica": "Top 20", "title": "20", "Meta": null},
+                        {"Musica": "Top 30", "title": "30", "Meta": null},
+                        {"Musica": "Top 40", "title": "40", "Meta": null},
+                        {"Musica": "Top 50", "title": "50", "Meta": null},
+                        {"Musica": "Top 100", "title": "100", "Meta": null}
+                    ]});
+            }
 
-                listaMusicasBanco = listaMusicasBanco.sort(function(a,b) {
-                    return a.name.localeCompare(b.name);
-                });
+            if (parametros["randomMusicas"]) {
+                listaMusicasBanco.push({"name": "Random", "artista": false, "Musicas": [
+                        {"Musica": "Random 1", "title": "1", "Meta": null},
+                        {"Musica": "Random 3", "title": "3", "Meta": null},
+                        {"Musica": "Random 5", "title": "5", "Meta": null},
+                        {"Musica": "Random 10", "title": "10", "Meta": null}
+                    ]});
+            }
 
-                let lista = {
-                    'ListaMusica': listaMusicasBanco,
-                    'TotalMusicas': totalMusica,
-                    'MusicasTocas': musicasTocadas,
-                    'TotalAlbum': totalAlbum,
-                    'Parametros': parametros
-                }
+            listaMusicasBanco = listaMusicasBanco.sort(function(a,b) {
+                return a.name.localeCompare(b.name);
+            });
 
-                res.json(lista);
-            })
-            .catch(function erro (rej) { console.error(rej) })
+            let lista = {
+                'ListaMusica': listaMusicasBanco,
+                'TotalMusicas': totalMusica,
+                'MusicasTocas': musicasTocadas,
+                'TotalAlbum': totalAlbum,
+                'Parametros': parametros
+            }
+
+            res.json(lista);
+        })
+        .catch(function erro (rej) { console.error(rej) })
     }
 
     retornaDadosDashboard() {
