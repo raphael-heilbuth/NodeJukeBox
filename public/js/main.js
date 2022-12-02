@@ -121,7 +121,7 @@ jQuery(function () {
         }
     });
 
-    const adicionaMusica = (listaMusicas, i, total) => new Promise((success, reject) => {
+    const adicionaMusica = (listaMusicas, i, total) => new Promise((success) => {
         if (!listaMusicas.length) {
             success(true);
         }
@@ -191,14 +191,36 @@ jQuery(function () {
     });
 
     document.addEventListener("keydown", (event) => {
-        if (event.altKey === true && event.key === "p") Pause();
-        if (event.altKey === true && event.key === "n") Next();
-        if (event.altKey === true && event.key === ".") MaisVolume();
-        if (event.altKey === true && event.key === ",") MenosVolume();
-        if (event.altKey === true && event.key === 'ArrowUp') ArrowUp();
-        if (event.altKey === true && event.key === 'ArrowDown') ArrowDown();
-        if (event.altKey === true && event.key === 'ArrowRight') ArrowRight();
-        if (event.altKey === true && event.key === 'ArrowLeft') ArrowLeft();
-        if (event.altKey === true && event.key === 'Enter') Enter();
+        if (event.altKey === true) {
+            switch (event.key) {
+                case "p":
+                    Pause();
+                    break;
+                case "n":
+                    Next();
+                    break;
+                case ",":
+                    MenosVolume();
+                    break;
+                case ".":
+                    MaisVolume();
+                    break;
+                case "ArrowUp":
+                    ArrowUp();
+                    break;
+                case "ArrowDown":
+                    ArrowDown();
+                    break;
+                case "ArrowRight":
+                    ArrowRight();
+                    break;
+                case "ArrowLeft":
+                    ArrowLeft();
+                    break;
+                case "Enter":
+                    Enter();
+                    break;
+            }
+        }
     });
 });
