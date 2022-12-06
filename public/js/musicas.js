@@ -28,7 +28,7 @@ function ListaMusicasBanco() {
                     list.append(RetornaCapa(x.name, null, x.Musicas.length, false));
                     break;
                 default:
-                    list.append(RetornaCapa(x.name, 0, x.Musicas.length, true, x.formatos));
+                    list.append(RetornaCapa(x.name, x.popularidade ?? 0, x.Musicas.length, true, x.formatos));
                     break;
             }
 

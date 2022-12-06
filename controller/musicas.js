@@ -174,7 +174,13 @@ class MusicasController {
             totalMusica = retornos[3];
             totalAlbum = retornos[4];
 
-            listaMusicasBanco = listaMusicasBanco.map((x) => {return Object.assign(x, {'artista': true, 'formatos' : [...new Set(x.Musicas.map(item => item.Tipo))]})});
+            listaMusicasBanco = listaMusicasBanco.map((x) => {
+                x.Musicas.map(musica => {
+                    musica["popularidadeGloba"] = ((100 / totalTocadas ?? 1) * musica.reproduzida);
+                    musica["popularidadeArtista"] = ((100 / x.reproduzida ?? 1) * musica.reproduzida);
+                });
+                return Object.assign(x, {'popularidade': popularidadeArtista(x.reproduzida, totalTocadas),  'artista': true, 'formatos' : [...new Set(x.Musicas.map(item => item.Tipo))]})
+            });
 
             if (parametros["youtubeMusicas"]) {
                 listaMusicasBanco.push({"name": "Youtube", "artista": false, "Musicas": [{"Musica": "Pesquisar", "title": "Pesquisar", "Meta": null}]});
@@ -224,6 +230,10 @@ class MusicasController {
             'TotalTocadas': totalTocadas
         }
     }
+}
+
+function popularidadeArtista(tocadas, total) {
+    return (total > 0 ? (100 / total) * tocadas : 0);
 }
 
 function retornaListaArtista() {

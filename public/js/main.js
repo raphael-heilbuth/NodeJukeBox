@@ -146,7 +146,9 @@ jQuery(function () {
                 listaMusicaArtista.append(RetornaMusica(artista, y.title, {
                     titulo: y.Musica,
                     duracao: (y.Meta !== null ? y.Meta.duration : null),
-                    tipo: y.Tipo
+                    tipo: y.Tipo,
+                    popularidadeArtista: y.popularidadeArtista,
+                    popularidadeGloba: y.popularidadeGloba
                 }));
             });
 
