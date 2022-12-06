@@ -4,33 +4,49 @@ const path = require('path');
 
 const musicFolder = (process.env.FOLDER_MUSIC || "/home/raphael/Downloads/MUSICAS VS PRODUTOS");
 
+function GeraCapas(dir, file) {
+    let diretorios = dir.split('/'),
+        artista = diretorios[diretorios.length - 1];
+    if (!fs.existsSync('public/image/capas/' + artista + '.jpg')) {
+        fs.copyFile(dir + "/" + file, 'public/image/capas/' + artista + '.jpg', (err) => {
+            if (err) {
+                console.log(err)
+            }
+        });
+    }
+}
+
+function AdicionaMusicaLista(file, dir, artistasArquivos) {
+    if (path.extname(file).toLowerCase() === '.mp3' || path.extname(file).toLowerCase() === '.mp4') {
+        if (dir === musicFolder) {
+            let existeArtista = artistasArquivos.find(x => x.Artista === 'Vários Artistas');
+            if (typeof existeArtista === "undefined") {
+                artistasArquivos.push({"Artista": 'Vários Artistas', "Musicas": [file]});
+            } else {
+                existeArtista.Musicas.push(file);
+            }
+        } else {
+            artistasArquivos.push(file);
+        }
+    }
+}
+
 exports.RetornaListaMusicas = function RetornaMusicas() {
     function readDir(dir) {
         let artistasArquivos = [];
+
+        if (!fs.existsSync('public/image/capas')){
+            fs.mkdirSync('public/image/capas');
+        }
 
         fs
             .readdirSync(dir)
             .forEach(file => {
                 if (fs.lstatSync(dir + "/" + file).isFile()) {
                     if (path.extname(file).toLowerCase() === '.jpg' || path.extname(file).toLowerCase() === '.jpeg') {
-                        let diretorios = dir.split('/'),
-                            artista = diretorios[diretorios.length - 1];
-                        fs.copyFile(dir + "/" + file, 'public/image/capas/' + artista + '.jpg', (err) => {
-                            if (err) {console.log(err)}
-                        });
+                        GeraCapas(dir, file);
                     } else {
-                        if (path.extname(file).toLowerCase() === '.mp3' || path.extname(file).toLowerCase() === '.mp4') {
-                            if (dir === musicFolder) {
-                                let existeArtista = artistasArquivos.find(x => x.Artista === 'Vários Artistas');
-                                if (typeof existeArtista === "undefined") {
-                                    artistasArquivos.push({"Artista": 'Vários Artistas', "Musicas": [file]});
-                                } else {
-                                    existeArtista.Musicas.push(file);
-                                }
-                            } else {
-                                artistasArquivos.push(file);
-                            }
-                        }
+                        AdicionaMusicaLista(file, dir, artistasArquivos);
                     }
                 } else if (fs.lstatSync(dir + "/" + file).isDirectory()) {
                     artistasArquivos.push({"Artista": file, "Musicas": readDir(dir + "/" + file)});
