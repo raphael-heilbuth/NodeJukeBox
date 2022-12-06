@@ -87,12 +87,27 @@ const PopularidadeMusica = (artista, musica) => new Promise((success) => {
 });
 
 const RetornaMusicas = () => new Promise((success) => {
-    Artista.aggregate([{ '$lookup': {
-        'from': 'musicas',
-        'localField': '_id',
-        'foreignField': 'artista',
-        'as': 'Musicas'
-    }}]).exec().then(r => success(r));
+    Artista.aggregate([
+        {
+            '$sort': {
+                'name': 1
+            }
+        }, {
+            '$lookup': {
+                'from': 'musicas',
+                'localField': '_id',
+                'foreignField': 'artista',
+                'pipeline': [
+                    {
+                        '$sort': {
+                            'Musica': 1
+                        }
+                    }
+                ],
+                'as': 'Musicas'
+            }
+        }
+    ]).exec().then(r => success(r));
 });
 
 const RetornaTopMusicas = (qtd) => new Promise((success) => {
