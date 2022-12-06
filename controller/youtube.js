@@ -1,6 +1,11 @@
 const youtubeSearch = require('youtube-sr');
 
 const retornaMusicaYoutube = (busca) => new Promise((success, reject) => {
+    if (!busca) {
+        success([]);
+        return;
+    }
+
     youtubeSearch.search(busca, {limit: 5})
         .then(x => {
 
