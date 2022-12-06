@@ -192,6 +192,13 @@ jQuery(function () {
         timeRandomInit();
     });
 
+    audio.onerror = function () {
+        iniciandoMusica = false;
+        audio.src = '';
+        audio.currentSrc = '';
+        audio.dispatchEvent(new Event("ended", {"bubbles": true}));
+    }
+
     document.addEventListener("keydown", (event) => {
         if (event.altKey === true) {
             switch (event.key) {

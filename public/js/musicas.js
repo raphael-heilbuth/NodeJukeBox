@@ -324,6 +324,7 @@ function ExecutaMusicaLista(carregando, artista, nomeArquivo, random, tipo, info
                 });
             })
         } else {
+            iniciandoMusica = false;
             ExecutaProxima();
         }
     });
