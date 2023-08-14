@@ -19,7 +19,7 @@ class MusicasController {
     selecionaMusica(req, res) {
         let musica = buscaMusica(req.body.Artista, req.body.Musica);
 
-        res.status(200).json({'Sucesso': musica !== {}});
+        res.status(200).json({'Sucesso': Object.keys(musica).length > 0 });
         io.emit('musica', musica);
     }
 
@@ -100,7 +100,7 @@ class MusicasController {
                     //
                 });
 
-                let base64File = new Buffer.from(file).toString('base64');
+                let base64File = Buffer.from(file).toString('base64');
 
                 returnData.success = true;
                 returnData.fileContent = base64File;
@@ -184,8 +184,8 @@ class MusicasController {
 
             listaMusicasBanco = listaMusicasBanco.map((x) => {
                 x.Musicas.map(musica => {
-                    musica["popularidadeGloba"] = ((100 / totalTocadas ?? 1) * musica.reproduzida);
-                    musica["popularidadeArtista"] = ((100 / x.reproduzida ?? 1) * musica.reproduzida);
+                    musica["popularidadeGloba"] = ((100 / (totalTocadas ?? 1)) * musica.reproduzida);
+                    musica["popularidadeArtista"] = ((100 / (x.reproduzida ?? 1)) * musica.reproduzida);
                 });
                 return Object.assign(x, {'popularidade': popularidadeArtista(x.reproduzida, totalTocadas),  'artista': true, 'formatos' : [...new Set(x.Musicas.map(item => item.Tipo))]})
             });
