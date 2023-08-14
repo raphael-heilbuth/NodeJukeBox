@@ -1,4 +1,40 @@
-function ListaMusicasBanco() {
+function iniciaJukeBox(reload = false) {
+    abreLoading();
+    let textLoading = $(".text-loading");
+
+    textLoading.html("Lendo Musicas...");
+
+    $.get('/getNewMusicas', function (newMusicas) {
+        if (newMusicas["ListaMusica"].length > 0) {
+            let i = 1;
+            textLoading.html('Encontrado ' + newMusicas["TotalMusicas"] + ' novas músicas de ' + newMusicas["TotalArtistas"] + ' artistas <small class="sub-text-loading text-center"></small>');
+            adicionaMusica(newMusicas["ListaMusica"], i, newMusicas["TotalArtistas"])
+                .then(() => {
+                    ListaMusicasBanco(reload);
+                })
+        } else {
+            ListaMusicasBanco(reload);
+        }
+    });
+}
+
+const adicionaMusica = (listaMusicas, i, total) => new Promise((success) => {
+    if (!listaMusicas.length) {
+        success(true);
+    }
+
+    $.post('/addMusicasBanco', { novas: listaMusicas.shift()}, function () {
+        $(".sub-text-loading").html("Adicionado " + i + " de " + total + " artistas");
+        i++;
+        success(adicionaMusica(listaMusicas, i, total));
+    })
+});
+
+function ListaMusicasBanco(reload = false) {
+    if (reload) {
+        abreLoading();
+        coverflow.flipster('index');
+    }
     $.get("/getList", function (data) {
         $(".text-loading").html("Carregando Musicas...")
         listaMusicas = data["ListaMusica"];
@@ -63,7 +99,7 @@ function ListaMusicasBanco() {
             el.addEventListener('error', (event) => { event.target.src = '../public/image/default/CapaPadrao.jpg' });
         });
 
-        body.loading('stop');
+        fechaLoading();
 
         timeRandomInit();
     });
@@ -242,7 +278,7 @@ function listaProximas() {
 
     lista.empty();
 
-    $('#badge-tempo-proximas').html(display(listaProximasMusicas.reduce((a, b) => a + +b.Duracao, 0)));
+    $('#badge-tempo-proximas').html(display(listaProximasMusicas.reduce((a, b) => a + +isNaN(b.Duracao) ? 0 : b.Duracao, 0)));
     $('#badge-proximas').html(listaProximasMusicas.length.toString());
 
     $.each(listaProximasMusicas, function (index, value) {
@@ -330,7 +366,7 @@ function ExecutaMusicaLista(carregando, artista, nomeArquivo, random, tipo, info
     });
 }
 
-function executaMusica(artista, nomeArquivo, musica, duracao, tipo, {elemento = null, imageCapa = null, idMusica = null, random = false}) {
+function executaMusica(artista, nomeArquivo, musica, duracao, tipo, {elemento = null, imageCapa = null, idMusica = null, random = false} = {}) {
     let carregando = $('#music-carregando'),
         no_music = $('#no-music-info'),
         info = $('#music-info'),
@@ -340,7 +376,7 @@ function executaMusica(artista, nomeArquivo, musica, duracao, tipo, {elemento = 
         case 'Random': {
             $.get("/randomMusica?Quantidade=" + nomeArquivo, function (response) {
                 $.each(response, function (index, value) {
-                    executaMusica(value["Artista"], value["Titulo"], value["Musica"], value["Duracao"], value["Tipo"], {});
+                    executaMusica(value["Artista"], value["Titulo"], value["Musica"], value["Duracao"], value["Tipo"]);
                 });
             });
         }
@@ -348,7 +384,7 @@ function executaMusica(artista, nomeArquivo, musica, duracao, tipo, {elemento = 
         case 'TOP': {
             $.get("/topMusica?Quantidade=" + nomeArquivo, function (response) {
                 $.each(response, function (index, value) {
-                    executaMusica(value["Artista"], value["Titulo"],value["Musica"], value["Duracao"],value["Tipo"], {});
+                    executaMusica(value["Artista"], value["Titulo"],value["Musica"], value["Duracao"],value["Tipo"]);
                 });
             });
         }
@@ -356,7 +392,7 @@ function executaMusica(artista, nomeArquivo, musica, duracao, tipo, {elemento = 
         case 'Youtube':
             if (nomeArquivo === "Pesquisar") {
                 if (pesquisa_youtube.length === 0) {
-                    elemento.append('<input class="form-control col-auto" id="pesquisa-youtube">').trigger('focus');
+                    elemento.append('<input class="form-control col-auto" id="pesquisa-youtube" autofocus>').trigger('focus');
                 }
             } else {
                 if (audio.paused && !iniciandoMusica) {

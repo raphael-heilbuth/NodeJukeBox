@@ -1,5 +1,4 @@
-let body = $('body'),
-    audio = document.getElementById("myVideo"),
+let audio = document.getElementById("myVideo"),
     credito = $('.qtd_credito'),
     listaMusicas,
     listaProximasMusicas = [],
@@ -38,21 +37,14 @@ toastr.options = {
     "target": ".line-cover-flow"
 };
 
-body.loading({
-    stoppable: false,
-    onStop: function(loading) {
-        loading.overlay.slideUp(400);
-    },
-    overlay: $(".loading"),
-    start: true
-});
-
 $.fn.countAnimation = function (valor) {
     animationCount($(this), valor);
 }
 
 jQuery(function () {
     "use strict";
+
+    iniciaJukeBox();
 
     audio.volume = 0.1;
 
@@ -96,41 +88,12 @@ jQuery(function () {
     });
 
     socket.on('musica', function (value) {
-        executaMusica(value["Artista"], value["Titulo"], value["Musica"], value["Duracao"], value["Tipo"], {});
+        executaMusica(value["Artista"], value["Titulo"], value["Musica"], value["Duracao"], value["Tipo"]);
         AbreToastInfo('Música', '', 'fas fa-plus');
     });
 
     socket.on('proxima', function() {
         Next();
-    });
-
-    let textLoading = $(".text-loading");
-
-    textLoading.html("Lendo Musicas...");
-
-    $.get('/getNewMusicas', function (newMusicas) {
-        if (newMusicas["ListaMusica"].length > 0) {
-            let i = 1;
-            textLoading.html('Encontrado ' + newMusicas["TotalMusicas"] + ' novas músicas de ' + newMusicas["TotalArtistas"] + ' artistas <small class="sub-text-loading text-center"></small>');
-            adicionaMusica(newMusicas["ListaMusica"], i, newMusicas["TotalArtistas"])
-                .then(() => {
-                    ListaMusicasBanco();
-                })
-        } else {
-            ListaMusicasBanco();
-        }
-    });
-
-    const adicionaMusica = (listaMusicas, i, total) => new Promise((success) => {
-        if (!listaMusicas.length) {
-            success(true);
-        }
-
-        $.post('/addMusicasBanco', { novas: listaMusicas.shift()}, function () {
-            $(".sub-text-loading").html("Adicionado " + i + " de " + total + " artistas");
-            i++;
-            success(adicionaMusica(listaMusicas, i, total));
-        })
     });
 
     $(document).on('click', '.flipster__item--current', function () {
@@ -173,40 +136,23 @@ jQuery(function () {
         selecionaMusica($(this));
     });
 
-    audio.addEventListener('timeupdate', () => {
-        $('#music-bar').width(((audio.currentTime * 100) / audio.duration) + '%');
-        $('#music-time').html(display(audio.currentTime) + '/' + display(audio.duration));
-    });
-
-    audio.addEventListener('ended', () => {
-        $('#music-info').addClass('d-none');
-        $('#no-music-info').removeClass('d-none');
-        let imageCapa = '../public/image/default/NodeJukebox.png';
-        $('.background-image').css('background-image', 'url(' + imageCapa + ')');
-
-        audio.classList.add("d-none");
-
-        ExecutaProxima();
-
-        clearInterval(timeRandom);
-        timeRandomInit();
-    });
-
-    audio.onerror = function () {
-        iniciandoMusica = false;
-        audio.src = '';
-        audio.currentSrc = '';
-        audio.dispatchEvent(new Event("ended", {"bubbles": true}));
-    }
-
     document.addEventListener("keydown", (event) => {
         if (event.altKey === true) {
             switch (event.key) {
-                case "p":
-                    Pause();
+                case "g":
+                    //Todo: Agrupar lista
+                    break;
+                case "i":
+                    iniciaJukeBox(true);
                     break;
                 case "n":
                     Next();
+                    break;
+                case "p":
+                    Pause();
+                    break;
+                case "r":
+                    ListaMusicasBanco(true);
                     break;
                 case ",":
                     MenosVolume();
@@ -232,4 +178,30 @@ jQuery(function () {
             }
         }
     });
+
+    audio.addEventListener('timeupdate', () => {
+        $('#music-bar').width(((audio.currentTime * 100) / audio.duration) + '%');
+        $('#music-time').html(display(audio.currentTime) + '/' + display(audio.duration));
+    });
+
+    audio.addEventListener('ended', () => {
+        $('#music-info').addClass('d-none');
+        $('#no-music-info').removeClass('d-none');
+        let imageCapa = '../public/image/default/NodeJukebox.png';
+        $('.background-image').css('background-image', 'url(' + imageCapa + ')');
+
+        audio.classList.add("d-none");
+
+        ExecutaProxima();
+
+        clearInterval(timeRandom);
+        timeRandomInit();
+    });
+
+    audio.onerror = function () {
+        iniciandoMusica = false;
+        audio.src = '';
+        audio.removeAttribute('src');
+        audio.dispatchEvent(new Event("ended", {"bubbles": true}));
+    }
 });

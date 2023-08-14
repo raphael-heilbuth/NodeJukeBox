@@ -8,6 +8,9 @@ const artistaModel = mongoose.Schema({
     reproduzida: {
         type: Number
     },
+    random: {
+        type: Number
+    },
     Musicas: [
         { type: mongoose.Schema.Types.ObjectId, ref: 'musica' }
     ]

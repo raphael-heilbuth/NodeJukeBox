@@ -355,13 +355,20 @@
       }
     },
     "/addMusicasBanco": {
-      "get": {
+      "post": {
         "description": "",
         "parameters": [
           {
-            "name": "novas",
-            "in": "query",
-            "type": "string"
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "novas": {
+                  "example": "any"
+                }
+              }
+            }
           }
         ],
         "responses": {
@@ -548,11 +555,23 @@
       "properties": {
         "TotalMusicas": {
           "type": "number",
-          "example": 4981
+          "example": 14740
+        },
+        "MusicasTocadas": {
+          "type": "number",
+          "example": 17
         },
         "TotalTocadas": {
           "type": "number",
-          "example": 696
+          "example": 50
+        },
+        "TotalRandom": {
+          "type": "number",
+          "example": 255
+        },
+        "TotalGeral": {
+          "type": "number",
+          "example": 305
         }
       }
     },

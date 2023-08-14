@@ -1,3 +1,21 @@
+function abreLoading(seletor = 'body') {
+    let elemento = $(seletor);
+    elemento.loading({
+        stoppable: false,
+        onStop: function(loading) {
+            loading.overlay.slideUp(400);
+        },
+        overlay: $(".loading"),
+        start: false
+    });
+
+    elemento.loading('start');
+}
+
+function fechaLoading(seletor = 'body') {
+    $(seletor).loading('stop');
+}
+
 function AbreToastInfo(titulo, valor = '', icon = '') {
     let tooltips = $('#info').tooltip({
         title: titulo + '<div class="msg-info">' +(icon !== '' ? '<i class="'+icon+'"></i>': valor) + '</div>',
@@ -68,6 +86,8 @@ function timeRandomInit() {
                     executaMusica(value["Artista"], value["Titulo"], value["Musica"], value["Duracao"], value["Tipo"], {random: true});
                 });
             });
+        } else if (audio.paused) {
+            AbreToastInfo('Música', '', 'fas fa-pause');
         }
     }, tempoRandom);
 }
@@ -77,4 +97,12 @@ function timeYoutube(query) {
         function () {
             pesquisaYoutube(query)
         }, 1500);
+}
+
+function groupBy (array, key) {
+    return array.reduce((acc, item) => ({
+            ...acc,
+            [item[key]]: [...(acc[item[key]] ?? []), item],
+        }),
+        {})
 }

@@ -58,6 +58,10 @@ exports.RetornaListaMusicas = function RetornaMusicas() {
 
     }
 
+    if (!fs.existsSync(musicFolder)) {
+        return [];
+    }
+
     return readDir(musicFolder);
 }
 
@@ -71,7 +75,12 @@ exports.RetornaListaMetaData = async function RetornaListaMetaData(lista) {
                         let objMusica = {
                             'Musica': musica.slice(0, -4),
                             'Tipo': path.extname(musica),
-                            'Meta': {container: meta.format.container, codec: meta.format.codec, duration: meta.format.duration}
+                            'Meta': {
+                                container: meta.format.container,
+                                codec: meta.format.codec,
+                                duration: meta.format.duration,
+                                genero: meta.genre
+                            }
                         };
 
                         await db.SalvaMusica(artista.Artista, musica, objMusica).then(() => {

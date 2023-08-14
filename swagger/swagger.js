@@ -36,8 +36,11 @@ let doc = {
             Sucesso: true
         },
         RetornaDashboard: {
-            "TotalMusicas": 4981,
-            "TotalTocadas": 696
+            "TotalMusicas": 14740,
+            "MusicasTocadas": 17,
+            "TotalTocadas": 50,
+            "TotalRandom": 255,
+            "TotalGeral": 305
         },
         RetornaParametros: {
             "modo": 'Ficha',

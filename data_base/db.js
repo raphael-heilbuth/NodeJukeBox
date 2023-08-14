@@ -1,11 +1,14 @@
 const mongoose = require('mongoose');
 const { Artista, Musica, Parametros } = require('../models');
 
-mongoose.connect('mongodb://localhost/JukeBox', {useNewUrlParser: true,useUnifiedTopology: true}).then(() => {});
-
-const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', () => console.log("Conectado"));
+mongoose.set('strictQuery', false);
+mongoose.connect('mongodb://127.0.0.1:27017/JukeBox', {useNewUrlParser: true, useUnifiedTopology: true})
+    .then(() => {
+        console.log("Conectado")
+    })
+    .catch((error) => {
+        console.log(error);
+    })
 
 function SalvaMusicasBD(musica, newArtista, dadosMusica, success, reject) {
     Musica.findOne({'title': musica, 'artista': newArtista._id}, function (err, retornoMusica) {
@@ -15,7 +18,13 @@ function SalvaMusicasBD(musica, newArtista, dadosMusica, success, reject) {
             newMusica.save()
                 .then(() => {
                     console.log("Musica %s salva", musica);
-                    success(true);
+                    if (!newArtista.genero) {
+                        AdicionaGeneroArtista(newArtista, musica.Meta.genero)
+                            .then(() => success(true))
+                            .catch((err) => {console.log(err); success(true)});
+                    } else {
+                        success(true);
+                    }
                 }).catch((err) => {
                     reject(err);
                     return console.log(err);
@@ -23,6 +32,16 @@ function SalvaMusicasBD(musica, newArtista, dadosMusica, success, reject) {
         }
     });
 }
+
+const AdicionaGeneroArtista = (artista, genero) => new Promise((success, reject) => {
+    artista.updateOne({ _id: artista._id }, {
+        genero: genero
+    }).then(() => {
+        success(true);
+    }).catch((err) => {
+        reject(err);
+    })
+})
 
 const SalvaMusica = (artista, musica, dadosMusica) => new Promise((success, reject) => {
     Artista.findOne({'name': artista}, function (err, retornoArtista) {
@@ -48,12 +67,13 @@ const SalvaMusica = (artista, musica, dadosMusica) => new Promise((success, reje
     });
 });
 
-const CountMusica = (artista, musica) => new Promise(() => {
+const CountMusica = (artista, musica, random = false) => new Promise(() => {
     Artista.findOne({'name': artista}, function (err, retornoArtista) {
+        let update = (random ? {$inc: {random: 1}} : {$inc: {reproduzida: 1}});
         if (err) return console.log(err);
         if (retornoArtista !== null) {
-            Artista.updateOne({'_id': retornoArtista._id}, {$inc: {reproduzida: 1}}).exec().then(r => console.log(r));
-            Musica.updateOne({'title': musica, 'artista': retornoArtista._id}, {$inc: {reproduzida: 1}}).exec().then(r => console.log(r));
+            Artista.updateOne({'_id': retornoArtista._id}, update).exec().then(r => console.log(r));
+            Musica.updateOne({'title': musica, 'artista': retornoArtista._id}, update).exec().then(r => console.log(r));
         }
     });
 });
@@ -69,8 +89,19 @@ const TotalTocadas = () => new Promise((success) => {
        .catch(() => success(0));
 });
 
+const TotalRandom = () => new Promise((success) => {
+    Artista.aggregate([
+        { $group: {
+                _id: null,
+                total: { $sum: "$random"}
+            }}]).exec().then(r => {
+        success(r.length > 0 ? r["0"].total : 0)
+    })
+        .catch(() => success(0));
+});
+
 const PopularidadeArtista = (artista) => new Promise((success) => {
-    Artista.findOne({'name': artista}).then(r => success(r !== null ? r.reproduzida : 0));
+    Artista.findOne({'name': artista}).then(r => success(r !== null ? r["reproduzida"] : 0));
 });
 
 const PopularidadeMusica = (artista, musica) => new Promise((success) => {
@@ -81,7 +112,7 @@ const PopularidadeMusica = (artista, musica) => new Promise((success) => {
             Musica.findOne({
                 'title': musica,
                 'artista': artista._id
-            }).then(r => success(r !== null ? r.reproduzida : 0));
+            }).then(r => success(r !== null ? r["reproduzida"] : 0));
         }
     });
 });
@@ -120,9 +151,9 @@ const RetornaTopMusicas = (qtd) => new Promise((success) => {
 });
 
 const MusicasTocadas = () => new Promise((success) => {
-    Musica.find({reproduzida: {$gt: 0}}).exec(function (err, results) {
-        success(results !== undefined ? results.length : 0);
-      });
+    Musica.countDocuments({reproduzida: {$gt: 0}}, function(err, count){
+        success(count);
+    });
 });
 
 const TotalArtistas = () => new Promise((success) => {
@@ -148,8 +179,8 @@ const SalvaParametros = (modo, valorCredito, topMusicas, randomMusicas, youtubeM
         timeRandom: timeRandom
     });
 
-    if (newParametros.errors !== undefined) {
-        reject(newParametros.errors)
+    if (newParametros["errors"] !== undefined) {
+        reject(newParametros["errors"])
         return false;
     }
 
@@ -187,6 +218,7 @@ function retornaMusica(musica, newArtista, dados) {
 module.exports = {
     TotalArtistas,
     TotalMusicas,
+    TotalRandom,
     TotalTocadas,
     PopularidadeArtista,
     PopularidadeMusica,

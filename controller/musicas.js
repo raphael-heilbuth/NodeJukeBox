@@ -7,7 +7,8 @@ let listaMusicasBanco = {},
     totalMusica = 0,
     musicasTocadas = 0,
     totalTocadas = 0,
-    totalAlbum = 0;
+    totalAlbum = 0,
+    totalRandom = 0;
 
 class MusicasController {
     proxima(req, res) {
@@ -56,26 +57,30 @@ class MusicasController {
 
         for (let i = 0; i < parseInt(req.query["Quantidade"].replace("Random", "")); i++) {
             let tentativa = 0,
-                posArtista = getRandomInteger(listaMusicasBanco.length);
+                posArtista = getRandomInteger(listaMusicasBanco.length),
+                posAntiga;
 
             do {
                 let posMusicas = getRandomInteger(listaMusicasBanco[posArtista].Musicas.length),
-                    artista = listaMusicasBanco[posArtista],
-                    musica = artista.Musicas[posMusicas],
-                        item = {
-                            'Artista': artista.name,
-                            'Musica': musica.Musica,
-                            'Titulo': musica.title,
-                            'Duracao': musica.Meta.duration,
-                            'Tipo': musica.Tipo
-                        };
+                    artista = listaMusicasBanco[posArtista];
+
                     if (artista["artista"]) {
+                        let musica = artista.Musicas[posMusicas],
+                            item = {
+                                'Artista': artista.name,
+                                'Musica': musica.Musica,
+                                'Titulo': musica.title,
+                                'Duracao': musica.Meta.duration,
+                                'Tipo': musica.Tipo
+                            };
                         random.push(item);
+                        posAntiga = posArtista;
                     } else {
+                        posAntiga = posArtista;
                         posArtista = getRandomInteger(listaMusicasBanco.length);
                         tentativa++;
                     }
-            } while (!listaMusicasBanco[posArtista]["artista"] && tentativa < 10);
+            } while (!listaMusicasBanco[posAntiga]["artista"] && tentativa < 10);
         }
 
         res.json(random);
@@ -89,11 +94,12 @@ class MusicasController {
             if (err) {
                 returnData.success = false;
             } else {
-                if (!getBoolean((typeof req.query.random  === "undefined" ? false : req.query.random))) {
-                    db.CountMusica(req.query.artista, req.query["musica"]).then(() => {
-                        //
-                    });
-                }
+                let random = getBoolean((typeof req.query.random === "undefined" ? false : req.query.random));
+
+                db.CountMusica(req.query.artista, req.query["musica"], random).then(() => {
+                    //
+                });
+
                 let base64File = new Buffer.from(file).toString('base64');
 
                 returnData.success = true;
@@ -164,15 +170,17 @@ class MusicasController {
             db.MusicasTocadas(),
             db.TotalTocadas(),
             db.TotalMusicas(),
-            db.TotalArtistas()
+            db.TotalArtistas(),
+            db.TotalRandom()
         ])
-        .then((retornos) => {
-            let parametros = retornos[0];
+        .then(([resParametros, resMusicasTocadas, resTotalTocadas, resTotalMusicas, resTotalArtistas, resTotalRandom]) => {
+            let parametros = resParametros;
 
-            musicasTocadas = retornos[1];
-            totalTocadas = retornos[2];
-            totalMusica = retornos[3];
-            totalAlbum = retornos[4];
+            musicasTocadas = resMusicasTocadas;
+            totalTocadas = resTotalTocadas;
+            totalMusica = resTotalMusicas;
+            totalAlbum = resTotalArtistas;
+            totalRandom = resTotalRandom;
 
             listaMusicasBanco = listaMusicasBanco.map((x) => {
                 x.Musicas.map(musica => {
@@ -215,6 +223,8 @@ class MusicasController {
                 'TotalMusicas': totalMusica,
                 'MusicasTocas': musicasTocadas,
                 'TotalAlbum': totalAlbum,
+                'TotalRandom': totalRandom,
+                'TotalGeral': (totalTocadas + totalRandom),
                 'Parametros': parametros
             }
 
@@ -227,7 +237,9 @@ class MusicasController {
         return {
             'TotalMusicas': totalMusica,
             'MusicasTocadas': musicasTocadas,
-            'TotalTocadas': totalTocadas
+            'TotalTocadas': totalTocadas,
+            'TotalRandom': totalRandom,
+            'TotalGeral': (totalTocadas + totalRandom)
         }
     }
 }
