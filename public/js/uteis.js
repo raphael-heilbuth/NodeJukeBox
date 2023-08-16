@@ -81,7 +81,7 @@ function invocation() {
 function timeRandomInit() {
     timeRandom = window.setInterval(() => {
         if (audio.paused && (audio.ended || isNaN(audio.duration))) {
-            $.get("/randomMusica?Quantidade=1", function (response) {
+            $.get("/randomMusica?Quantidade=1", { "_": $.now() }, function (response) {
                 $.each(response, function (_index, value) {
                     executaMusica(value["Artista"], value["Titulo"], value["Musica"], value["Duracao"], value["Tipo"], {random: true});
                 });
