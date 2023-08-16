@@ -278,7 +278,7 @@ function listaProximas() {
 
     lista.empty();
 
-    $('#badge-tempo-proximas').html(display(listaProximasMusicas.reduce((a, b) => a + +isNaN(b.Duracao) ? 0 : b.Duracao, 0)));
+    $('#badge-tempo-proximas').html(display(listaProximasMusicas.reduce((a, b) => a + (isNaN(b.Duracao) ? 0 : parseFloat(b.Duracao)), 0)));
     $('#badge-proximas').html(listaProximasMusicas.length.toString());
 
     $.each(listaProximasMusicas, function (index, value) {
